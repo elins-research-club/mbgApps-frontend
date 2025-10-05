@@ -1,65 +1,66 @@
 // /frontend/src/components/NutritionLabel.js
 
-// Komponen ini tidak lagi menggunakan Home.module.css, melainkan Tailwind CSS
 const NutritionLabel = ({ data }) => {
   if (!data) return null;
 
-  // Membuat alias agar lebih mudah dibaca
   const gizi = data.informasi_nilai_gizi;
   const akg = data.persen_akg;
 
+  // Helper untuk menampilkan baris nutrisi
+  const renderNutritionRow = (label, value, unit, akgValue) => (
+    <>
+      <div className="flex justify-between text-sm">
+        <span>
+          <strong>{label}</strong> {value}
+          {unit}
+        </span>
+        {akgValue && <span className="font-bold">{akgValue}</span>}
+      </div>
+      <div className="w-full h-px bg-gray-300 my-1"></div>
+    </>
+  );
+
   return (
-    <div className="mt-6 p-4 border-2 border-black bg-white w-full max-w-sm font-sans">
-      <h3 className="font-bold text-2xl tracking-wide">INFORMASI NILAI GIZI</h3>
-      <p className="text-sm">Takaran Saji: {data.takaran_saji_g}g</p>
+    <div className="mt-6 p-4 border-2 border-black bg-white w-full max-w-md font-sans">
+      <h3 className="font-bold text-3xl tracking-wide">Informasi Nilai Gizi</h3>
+      <p className="text-md">Takaran Saji: {data.takaran_saji_g}g</p>
 
       <div className="w-full h-1 bg-black my-1"></div>
 
-      <p className="font-bold">Jumlah per Sajian</p>
-      <div className="flex justify-between items-center font-bold text-lg">
+      <p className="font-bold text-lg">Jumlah per Sajian</p>
+      <div className="flex justify-between items-center font-bold text-xl mb-1">
         <span>Energi Total</span>
-        <span>{gizi.energi_total_kkal} kkal</span>
+        <span>{gizi.energi_kkal} kkal</span>
       </div>
-      <p className="text-right text-sm">
-        Energi dari Lemak {gizi.energi_dari_lemak_kkal} kkal
-      </p>
 
-      <div className="w-full h-px bg-gray-400 my-1"></div>
+      <div className="w-full h-2 bg-black my-1"></div>
       <div className="text-right font-bold">% AKG*</div>
       <div className="w-full h-px bg-gray-800 my-1"></div>
 
-      <div className="flex justify-between">
-        <span>
-          <strong>Lemak Total</strong> {gizi.lemak_total_g}g
-        </span>
-        <span className="font-bold">{akg.lemak_total}</span>
-      </div>
-      <div className="w-full h-px bg-gray-400 my-1"></div>
-
-      <div className="flex justify-between">
-        <span>
-          <strong>Protein</strong> {gizi.protein_g}g
-        </span>
-        <span className="font-bold">{akg.protein}</span>
-      </div>
-      <div className="w-full h-px bg-gray-400 my-1"></div>
-
-      <div className="flex justify-between">
-        <span>
-          <strong>Karbohidrat Total</strong> {gizi.karbohidrat_total_g}g
-        </span>
-        <span className="font-bold">{akg.karbohidrat_total}</span>
-      </div>
-      <div className="w-full h-px bg-gray-400 my-1"></div>
-
-      <div className="flex justify-between">
-        <span>
-          <strong>Natrium</strong> {gizi.natrium_mg}mg
-        </span>
-        <span className="font-bold">{akg.natrium}</span>
-      </div>
+      {renderNutritionRow("Lemak Total", gizi.lemak_g, "g", akg.lemak_total)}
+      {renderNutritionRow("Protein", gizi.protein_g, "g", akg.protein)}
+      {renderNutritionRow(
+        "Karbohidrat Total",
+        gizi.karbohidrat_g,
+        "g",
+        akg.karbohidrat_total
+      )}
+      {renderNutritionRow("Serat Pangan", gizi.serat_g, "g")}
 
       <div className="w-full h-1 bg-black my-1"></div>
+
+      {renderNutritionRow("Natrium", gizi.natrium_mg, "mg", akg.natrium)}
+      <div className="w-full h-px bg-gray-800 my-1"></div>
+      {renderNutritionRow("Kalium", gizi.kalium_mg, "mg")}
+
+      <div className="w-full h-px bg-gray-800 my-1"></div>
+
+      {/* Menampilkan nutrisi dengan % AKG baru */}
+      {renderNutritionRow("Kalsium", gizi.kalsium_mg, "mg", akg.kalsium)}
+      {renderNutritionRow("Besi", gizi.besi_mg, "mg", akg.besi)}
+      {renderNutritionRow("Vitamin C", gizi.vitamin_c_mg, "mg", akg.vitamin_c)}
+
+      <div className="w-full h-2 bg-black my-1"></div>
 
       <p className="text-xs text-left mt-2">
         *Persen AKG berdasarkan kebutuhan energi 2000 kkal. Kebutuhan energi

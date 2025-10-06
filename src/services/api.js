@@ -1,35 +1,56 @@
-const API_BASE_URL = "http://localhost:5000/api"; // Alamat backend kita
+// /frontend/src/services/api.js
+
+const API_URL = "http://localhost:5000/api";
 
 export const getMenus = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/menus`);
+    const response = await fetch(`${API_URL}/menus`);
     if (!response.ok) {
-      throw new Error("Gagal mengambil data menu");
+      throw new Error("Gagal mengambil data menu.");
     }
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error(error);
-    return null; // Mengembalikan null jika ada error
+    console.error("Error di getMenus:", error);
+    return null; // Kembalikan null jika ada error
   }
 };
 
-export const generateNutrition = async (selectedIds) => {
+export const generateNutrition = async (payload) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/generate`, {
+    const response = await fetch(`${API_URL}/generate`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(selectedIds),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
     if (!response.ok) {
-      throw new Error("Gagal men-generate nutrisi");
+      throw new Error("Gagal men-generate nutrisi.");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error di generateNutrition:", error);
+    return null; // Kembalikan null jika ada error
+  }
+};
+
+// PASTIKAN FUNGSI INI ADA DAN DIEKSPOR SEPERTI INI
+export const suggestMenu = async (newMenuName) => {
+  try {
+    const response = await fetch(`${API_URL}/suggest-menu`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ new_menu_name: newMenuName }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        message: errorData.message || "Terjadi error di server.",
+      };
     }
     const data = await response.json();
-    return data;
+    return { success: true, data: data };
   } catch (error) {
-    console.error(error);
-    return null; // Mengembalikan null jika ada error
+    console.error("Error di suggestMenu:", error);
+    return { success: false, message: "Gagal menghubungi server." };
   }
 };

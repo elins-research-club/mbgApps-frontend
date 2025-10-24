@@ -2,7 +2,6 @@
 
 import { MenuIcon, PlateIcon, CarrotIcon, BreadIcon, AppleIcon } from "./Icons";
 
-// Daftar ikon untuk setiap kategori
 const categoryIcons = {
   karbo: <MenuIcon />,
   lauk: <PlateIcon />,

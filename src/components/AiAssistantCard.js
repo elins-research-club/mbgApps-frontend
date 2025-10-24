@@ -4,13 +4,11 @@ import { useState } from "react";
 import { suggestMenu } from "../services/api";
 import { SparklesIcon } from "./Icons";
 
-// Komponen ini menerima satu prop: `onMenuAdded`,
-// yang merupakan fungsi untuk memberitahu halaman utama agar me-refresh daftar menu.
 const AiAssistantCard = ({ onMenuAdded }) => {
   const [newMenuName, setNewMenuName] = useState("");
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [suggestionStatus, setSuggestionStatus] = useState("");
-  const [statusType, setStatusType] = useState("info"); // 'info', 'success', atau 'error'
+  const [statusType, setStatusType] = useState("info");
 
   const handleSuggestMenu = async () => {
     if (!newMenuName.trim()) {
@@ -29,7 +27,7 @@ const AiAssistantCard = ({ onMenuAdded }) => {
       );
       setStatusType("success");
       setNewMenuName("");
-      // Panggil fungsi onMenuAdded untuk memicu refresh di halaman utama
+
       if (onMenuAdded) {
         onMenuAdded();
       }
@@ -42,7 +40,6 @@ const AiAssistantCard = ({ onMenuAdded }) => {
     setIsSuggesting(false);
   };
 
-  // Fungsi untuk menentukan warna status message
   const getStatusClasses = () => {
     switch (statusType) {
       case "success":

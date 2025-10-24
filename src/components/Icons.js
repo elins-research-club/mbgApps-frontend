@@ -48,7 +48,7 @@ export const CarrotIcon = () => (
       strokeWidth={2}
       d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H8v-2h3v2zm0-4H8V9h3v3zm4 4h-3v-2h3v2zm0-4h-3V9h3v3z"
     />
-  </svg> // Placeholder, ganti dengan ikon sayur yang lebih baik jika ada
+  </svg>
 );
 
 export const BreadIcon = () => (
@@ -91,11 +91,10 @@ export const AppleIcon = () => (
   </svg>
 );
 
-// --- IKON BARU YANG PERLU DITAMBAHKAN DAN DIEKSPOR ---
 export const SparklesIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6 text-orange-400"
+    className="h-6 w-6 text-white"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"

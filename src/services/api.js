@@ -11,7 +11,7 @@ export const getMenus = async () => {
     return await response.json();
   } catch (error) {
     console.error("Error di getMenus:", error);
-    return null; // Kembalikan null jika ada error
+    return null;
   }
 };
 
@@ -28,11 +28,10 @@ export const generateNutrition = async (payload) => {
     return await response.json();
   } catch (error) {
     console.error("Error di generateNutrition:", error);
-    return null; // Kembalikan null jika ada error
+    return null;
   }
 };
 
-// PASTIKAN FUNGSI INI ADA DAN DIEKSPOR SEPERTI INI
 export const suggestMenu = async (newMenuName) => {
   try {
     const response = await fetch(`${API_URL}/suggest-menu`, {

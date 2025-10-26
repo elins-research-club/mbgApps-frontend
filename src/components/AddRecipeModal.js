@@ -8,6 +8,20 @@ import {
 } from "../services/api";
 import { PlusIcon, TrashIcon } from "./Icons";
 
+// Ambil URL API dari env atau hardcode
+const API_URL = "http://localhost:5000/api";
+
+// Fungsi Debounce
+function debounce(func, timeout = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+}
+
 const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
   const [menuName, setMenuName] = useState("");
   const [ingredients, setIngredients] = useState([
@@ -15,6 +29,37 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
   ]);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [focusedIngredientId, setFocusedIngredientId] = useState(null);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+
+  // API call for fetching ingredient suggestions
+  const searchApi = async (searchQuery) => {
+    console.log('Searching for ingredient:', searchQuery);
+    if (searchQuery.length < 1) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const response = await fetch(`${API_URL}/ingredients/search?q=${encodeURIComponent(searchQuery)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        console.error('Search API failed:', response.status);
+        setSuggestions([]);
+        return;
+      }
+      const data = await response.json();
+      console.log('Search results:', data);
+      setSuggestions(data.ingredients || []);
+    } catch (error) {
+      console.error('Search API error:', error);
+      setSuggestions([]);
+    }
+  };
 
   const handleAddIngredient = () => {
     setIngredients([
@@ -32,8 +77,10 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
   const handleIngredientDataChange = (id, field, value) => {
     const newIngredients = ingredients.map((item) => {
       if (item.id === id) {
-        // Jika mengubah nama, reset status pengecekan
+        // Jika mengubah nama, reset status pengecekan dan panggil searchApi
         if (field === "name") {
+          searchApi(value);
+          setSelectedSuggestionIndex(-1);
           return { ...item, name: value, status: "idle" };
         }
         // Jika mengubah gramasi, biarkan status apa adanya
@@ -53,9 +100,38 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
     );
   };
 
+  const handleSelectSuggestion = (id, selectedName) => {
+    handleIngredientDataChange(id, "name", selectedName);
+    updateIngredientStatus(id, "found", "Bahan ditemukan di database");
+    setSuggestions([]);
+    setFocusedIngredientId(null);
+    setSelectedSuggestionIndex(-1);
+  };
+
+  const handleKeyDown = (e, id) => {
+    if (suggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => prev < suggestions.length - 1 ? prev + 1 : 0);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : suggestions.length - 1);
+    } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+      e.preventDefault();
+      handleSelectSuggestion(id, suggestions[selectedSuggestionIndex].nama);
+    } else if (e.key === 'Escape') {
+      setSuggestions([]);
+      setSelectedSuggestionIndex(-1);
+    }
+  };
+
   // Cek ke DB saat input 'Bahan' di-blur (fokus hilang)
   const handleIngredientBlur = async (id, name) => {
     if (!name.trim()) return;
+
+    // Jika sudah "found" (dari autocomplete), jangan cek lagi
+    const currentItem = ingredients.find(item => item.id === id);
+    if (currentItem && currentItem.status === "found") return;
 
     updateIngredientStatus(id, "checking");
     const res = await checkIngredient(name); // API call
@@ -209,7 +285,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
               {ingredients.map((item, index) => (
                 <div
                   key={item.id}
-                  className="space-y-1 p-2 rounded-md bg-slate-50 border"
+                  className="space-y-1 p-2 rounded-md bg-slate-50 border relative"
                 >
                   <div className="flex items-center gap-2">
                     {/* Input Nama Bahan */}
@@ -219,9 +295,12 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                       onChange={(e) =>
                         handleIngredientDataChange(item.id, "name", e.target.value)
                       }
-                      onBlur={(e) =>
-                        handleIngredientBlur(item.id, e.target.value)
-                      }
+                      onKeyDown={(e) => handleKeyDown(e, item.id)}
+                      onFocus={() => setFocusedIngredientId(item.id)}
+                      onBlur={() => {
+                        setFocusedIngredientId(null);
+                        handleIngredientBlur(item.id, item.name);
+                      }}
                       placeholder={`Bahan ${index + 1}`}
                       className="flex-grow p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none transition"
                       disabled={item.status === "checking"}
@@ -252,6 +331,23 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                       </button>
                     )}
                   </div>
+                  {/* Suggestions Dropdown */}
+                  {focusedIngredientId === item.id && suggestions.length > 0 && (
+                    <div className="absolute z-20 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
+                      {suggestions.map((suggestion, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onMouseDown={() => handleSelectSuggestion(item.id, suggestion.nama)}
+                          className={`w-full text-left px-3 py-2 ${
+                            selectedSuggestionIndex === idx ? 'bg-blue-100' : 'hover:bg-gray-100'
+                          }`}
+                        >
+                          {suggestion.nama}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {/* Status Pengecekan */}
                   <div className="pl-1 h-4">
                     {renderIngredientStatus(item)}

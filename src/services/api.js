@@ -27,29 +27,59 @@ export const generateNutrition = async (payload) => {
 // (Ini hanya MOCKUP, sesuaikan dengan API Anda)
 export const checkIngredient = async (name) => {
   console.log(`Checking ingredient: ${name}`);
-  // Simulasi API call
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  // Ganti logika ini dengan API call sungguhan
-  if (name.toLowerCase().includes("testing")) {
-    return { found: true };
+  
+  try {
+    const response = await fetch(`${API_URL}/ingredients/search?q=${encodeURIComponent(name)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const found = (result.ingredients || []).length > 0;
+    return { found };
+  } catch (error) {
+    console.error('Error checking ingredient:', error);
+    return { found: false };
   }
-  return { found: false };
 };
 
 // BARU: Generate bahan baru via AI
 // (Ini hanya MOCKUP, sesuaikan dengan API Anda)
 export const generateIngredient = async (name) => {
   console.log(`Generating ingredient: ${name}`);
-  // Simulasi API call AI yang butuh waktu
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  // Ganti logika ini dengan API call sungguhan
-  if (name.toLowerCase().includes("error")) {
-    return { success: false, message: "Simulasi error dari AI." };
+  
+  try {
+    const response = await fetch(`${API_URL}/ingredients/get-ingredients`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error) {
+    console.error('Error generating ingredient:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to generate ingredient.',
+    };
   }
-  return {
-    success: true,
-    data: { message: "Bahan berhasil di-generate oleh AI." },
-  };
 };
 
 // BARU: Simpan resep baru ke DB

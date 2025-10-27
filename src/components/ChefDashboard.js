@@ -15,7 +15,8 @@ import RecommendationCard from "./RecommendationCard";
 import { generateNutrition } from "../services/api"; // API untuk komposisi
 
 // --- Pastikan URL Backend Benar ---
-const API_URL = "http://localhost:5000/api"; // Sesuaikan jika port backend berbeda
+// const API_URL = "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function ChefDashboard() {
   const [isLoading, setIsLoading] = useState(false);

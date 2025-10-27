@@ -11,7 +11,8 @@ import SearchCard from "./SearchCard"; // Komponen search baru
 import NutritionLabel from "./NutritionLabel";
 import DetailResultCard from "./DetailResultCard";
 
-const API_URL = "http://localhost:5000/api";
+// const API_URL = "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const GuestView = ({ onLoginClick }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +41,9 @@ const GuestView = ({ onLoginClick }) => {
     try {
       const node = nutritionLabelRef.current;
       const dataUrl = await htmlToImage.toPng(node, {
-        quality: 1, pixelRatio: 2, backgroundColor: "#ffffff",
+        quality: 1,
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
       });
       const img = new Image();
       img.src = dataUrl;
@@ -49,9 +52,19 @@ const GuestView = ({ onLoginClick }) => {
         const imgHeight = img.height * 0.264583;
         const pdf = new jsPDF({
           orientation: imgHeight > imgWidth ? "portrait" : "landscape",
-          unit: "mm", format: [imgWidth, imgHeight],
+          unit: "mm",
+          format: [imgWidth, imgHeight],
         });
-        pdf.addImage(dataUrl, "PNG", 0, 0, imgWidth, imgHeight, undefined, "FAST");
+        pdf.addImage(
+          dataUrl,
+          "PNG",
+          0,
+          0,
+          imgWidth,
+          imgHeight,
+          undefined,
+          "FAST"
+        );
         pdf.save("Label-Gizi.pdf");
         setIsPrinting(false);
       };
@@ -66,7 +79,8 @@ const GuestView = ({ onLoginClick }) => {
     setIsLoading(true);
     clearResults();
     try {
-      const response = await fetch(`${API_URL}/generate-by-id`, { // Perlu endpoint baru?
+      const response = await fetch(`${API_URL}/generate-by-id`, {
+        // Perlu endpoint baru?
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ menu_id: menuId }),
@@ -107,7 +121,7 @@ const GuestView = ({ onLoginClick }) => {
     }
     setIsLoading(false);
   };
-  
+
   // (handleAiGenerate bisa ditambahkan di sini jika tamu boleh pakai AI)
 
   const hasResults = totalLabel !== null;
@@ -115,7 +129,7 @@ const GuestView = ({ onLoginClick }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <GuestNavbar onLoginClick={onLoginClick} />
-      
+
       <main className="flex-grow bg-slate-50 w-full">
         {!hasResults ? (
           // Tampilan Search (PNG 1)

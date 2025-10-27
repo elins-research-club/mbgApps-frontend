@@ -4,7 +4,8 @@ import { useState, useMemo, useRef } from "react"; // <-- DIUBAH
 import { SearchIcon } from "./Icons";
 
 // Ambil URL API dari env atau hardcode
-const API_URL = "http://localhost:5000/api";
+// const API_URL = "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Fungsi Debounce
 function debounce(func, timeout = 300) {

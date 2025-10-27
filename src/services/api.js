@@ -2,8 +2,6 @@
 
 const API_URL = "http://localhost:5000/api";
 
-// TETAP DIPAKAI: tapi payload-nya berubah
-// Sekarang mengirim { target, karbo, ... }
 export const generateNutrition = async (payload) => {
   try {
     const response = await fetch(`${API_URL}/generate`, {
@@ -21,87 +19,137 @@ export const generateNutrition = async (payload) => {
   }
 };
 
-// --- FUNGSI BARU UNTUK MODAL ---
+export const searchIngredients = async (query) => {
+  if (query.length < 2) return [];
 
-// BARU: Cek apakah bahan ada di DB
-// (Ini hanya MOCKUP, sesuaikan dengan API Anda)
-export const checkIngredient = async (name) => {
-  console.log(`Checking ingredient: ${name}`);
-  
   try {
-    const response = await fetch(`${API_URL}/ingredients/search?q=${encodeURIComponent(name)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(
+      `${API_URL}/ingredients/search?q=${encodeURIComponent(query)}`
+    );
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error("Gagal memuat rekomendasi bahan.");
     }
-
-    const result = await response.json();
-    const found = (result.ingredients || []).length > 0;
-    return { found };
+    const data = await response.json();
+    return data.ingredients.map((item) => ({
+      id: item.id,
+      name: item.nama,
+    }));
   } catch (error) {
-    console.error('Error checking ingredient:', error);
-    return { found: false };
+    console.error("Error di searchIngredients (autocomplete):", error);
+    return [];
   }
 };
 
-// BARU: Generate bahan baru via AI
-// (Ini hanya MOCKUP, sesuaikan dengan API Anda)
+export const checkIngredient = async (name) => {
+  try {
+    const response = await fetch(
+      `${API_URL}/ingredients/search?q=${encodeURIComponent(name)}&exact=true`
+    );
+
+    // --- PERBAIKAN DITAMBAHKAN DI SINI ---
+    // Cek apakah respons dari backend adalah error (seperti 500, 404, dll)
+    if (!response.ok) {
+      console.error("Backend error in checkIngredient:", response.statusText);
+      // Jika error, langsung lempar error agar ditangkap oleh 'catch'
+      throw new Error("Backend error while checking ingredient.");
+    }
+    // --- AKHIR PERBAIKAN ---
+
+    const data = await response.json(); // Baris ini sekarang aman
+
+    if (data.ingredients && data.ingredients.length > 0) {
+      return { found: true, data: data.ingredients[0] };
+    }
+
+    return { found: false };
+  } catch (error) {
+    console.error("Error di checkIngredient:", error);
+    // Selalu kembalikan 'found: false' jika ada error apapun
+    return { found: false, error: error.message };
+  }
+};
+
 export const generateIngredient = async (name) => {
-  console.log(`Generating ingredient: ${name}`);
-  
   try {
     const response = await fetch(`${API_URL}/ingredients/get-ingredients`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name }),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name }),
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const err = await response.json();
+      throw new Error(err.message || "Gagal men-generate bahan");
     }
 
-    const result = await response.json();
-    
-    return {
-      success: true,
-      data: result,
-    };
+    return await response.json();
   } catch (error) {
-    console.error('Error generating ingredient:', error);
-    return {
-      success: false,
-      message: error.message || 'Failed to generate ingredient.',
-    };
+    console.error("Error di generateIngredient:", error);
+    return { success: false, message: error.message };
   }
 };
 
-// BARU: Simpan resep baru ke DB
-// (Ini hanya MOCKUP, sesuaikan dengan API Anda)
 export const saveRecipe = async (recipeData) => {
-  console.log("Saving new recipe:", recipeData);
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  // Ganti logika ini dengan API call sungguhan
-  return { success: true };
-};
-
-// ------------------------------------
-// (Fungsi getMenus dan suggestMenu yang lama bisa Anda hapus jika tidak dipakai lagi)
-export const getMenus = async () => {
+  console.log("Menyimpan resep baru ke backend:", recipeData);
   try {
-    const response = await fetch(`${API_URL}/menus`);
+    const response = await fetch(`${API_URL}/menu`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(recipeData),
+    });
+
     if (!response.ok) {
-      throw new Error("Gagal mengambil data menu.");
+      const err = await response.json();
+      throw new Error(err.message || "Gagal menyimpan resep");
     }
+
     return await response.json();
   } catch (error) {
-    console.error("Error di getMenus:", error);
-    return null;
+    console.error("Error di saveRecipe:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+export const getNotValidatedIngredients = async () => {
+  try {
+    const response = await fetch(`${API_URL}/ingredients/get-not-validated`);
+    if (!response.ok) {
+      throw new Error("Gagal mengambil data untuk validasi");
+    }
+    const data = await response.json();
+    // Backend Anda (getNotValidatedIngredients) mengembalikan { ingredients: [...] }
+    return data.ingredients;
+  } catch (error) {
+    console.error("Error di getNotValidatedIngredients:", error);
+    return []; // Kembalikan array kosong jika error
+  }
+};
+
+export const validateIngredient = async (id, nutritionData) => {
+  try {
+    // Backend Anda (editIngredientsNutritions) mengharapkan payload
+    // dalam format: { ingredientData: {...} }
+    // Backend juga akan OTOMATIS mengatur 'isValidated = true'
+    const payload = {
+      ingredientData: nutritionData,
+    };
+
+    const response = await fetch(`${API_URL}/ingredients/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || "Gagal memvalidasi bahan");
+    }
+
+    // Backend mengembalikan { success: true, ingredient: {...} }
+    return await response.json();
+  } catch (error) {
+    console.error("Error di validateIngredient:", error);
+    return { success: false, message: error.message };
   }
 };

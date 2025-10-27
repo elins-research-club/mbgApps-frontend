@@ -24,6 +24,7 @@ function debounce(func, timeout = 300) {
 
 const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
   const [menuName, setMenuName] = useState("");
+  const [kategori, setKategori] = useState("Lauk");
   const [ingredients, setIngredients] = useState([
     { id: 1, name: "", gramasi: "", status: "idle" }, // <-- DIUBAH
   ]);
@@ -35,28 +36,31 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
 
   // API call for fetching ingredient suggestions
   const searchApi = async (searchQuery) => {
-    console.log('Searching for ingredient:', searchQuery);
+    console.log("Searching for ingredient:", searchQuery);
     if (searchQuery.length < 1) {
       setSuggestions([]);
       return;
     }
     try {
-      const response = await fetch(`${API_URL}/ingredients/search?q=${encodeURIComponent(searchQuery)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `${API_URL}/ingredients/search?q=${encodeURIComponent(searchQuery)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (!response.ok) {
-        console.error('Search API failed:', response.status);
+        console.error("Search API failed:", response.status);
         setSuggestions([]);
         return;
       }
       const data = await response.json();
-      console.log('Search results:', data);
+      console.log("Search results:", data);
       setSuggestions(data.ingredients || []);
     } catch (error) {
-      console.error('Search API error:', error);
+      console.error("Search API error:", error);
       setSuggestions([]);
     }
   };
@@ -94,9 +98,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
 
   const updateIngredientStatus = (id, status, message = "") => {
     setIngredients((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status, message } : item
-      )
+      prev.map((item) => (item.id === id ? { ...item, status, message } : item))
     );
   };
 
@@ -110,16 +112,20 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
 
   const handleKeyDown = (e, id) => {
     if (suggestions.length === 0) return;
-    if (e.key === 'ArrowDown') {
+    if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelectedSuggestionIndex(prev => prev < suggestions.length - 1 ? prev + 1 : 0);
-    } else if (e.key === 'ArrowUp') {
+      setSelectedSuggestionIndex((prev) =>
+        prev < suggestions.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : suggestions.length - 1);
-    } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+      setSelectedSuggestionIndex((prev) =>
+        prev > 0 ? prev - 1 : suggestions.length - 1
+      );
+    } else if (e.key === "Enter" && selectedSuggestionIndex >= 0) {
       e.preventDefault();
       handleSelectSuggestion(id, suggestions[selectedSuggestionIndex].nama);
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setSuggestions([]);
       setSelectedSuggestionIndex(-1);
     }
@@ -130,7 +136,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
     if (!name.trim()) return;
 
     // Jika sudah "found" (dari autocomplete), jangan cek lagi
-    const currentItem = ingredients.find(item => item.id === id);
+    const currentItem = ingredients.find((item) => item.id === id);
     if (currentItem && currentItem.status === "found") return;
 
     updateIngredientStatus(id, "checking");
@@ -151,11 +157,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
     if (res.success) {
       updateIngredientStatus(id, "generated", "Sukses! Bahan akan divalidasi.");
     } else {
-      updateIngredientStatus(
-        id,
-        "error",
-        res.message || "Gagal generate."
-      );
+      updateIngredientStatus(id, "error", res.message || "Gagal generate.");
     }
   };
 
@@ -227,17 +229,13 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
 
     // --- PAYLOAD BARU ---
     const payload = {
-      nama_menu: menuName,
-      bahan: ingredients
-        .filter((item) => item.name.trim() !== "") // Hanya kirim bahan yang terisi
-        .map((item) => ({
-          name: item.name,
-          gramasi: parseFloat(item.gramasi), // Kirim sebagai angka
-        })),
+      menuName: menuName,
+      kategori: kategori, // <-- TAMBAHKAN BARIS INI
+      ingredients: ingredients.filter((item) => item.name.trim() !== ""),
     };
     // --- Akhir Payload Baru ---
 
-    const res = await saveRecipe(payload); // API call
+    const res = await saveRecipe(payload);
 
     if (res.success) {
       alert("Resep baru berhasil ditambahkan!");
@@ -275,6 +273,29 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
               />
             </div>
 
+            {/* --- TAMBAHKAN BLOK DROPDOWN INI --- */}
+            <div className="mt-4">
+              <label
+                htmlFor="kategori"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Kategori Menu
+              </label>
+              <select
+                id="kategori"
+                value={kategori}
+                onChange={(e) => setKategori(e.target.value)}
+                className="mt-1 block w-full rounded-lg border-slate-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+              >
+                <option value="Lauk">Lauk</option>
+                <option value="Sayur">Sayur</option>
+                <option value="Karbo">Karbo</option>
+                <option value="Protein Tambahan">Protein Tambahan</option>
+                <option value="Buah">Buah</option>
+              </select>
+            </div>
+            {/* --- AKHIR BLOK BARU --- */}
+
             <hr />
 
             <label className="text-sm font-semibold text-slate-600">
@@ -293,7 +314,11 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                       type="text"
                       value={item.name}
                       onChange={(e) =>
-                        handleIngredientDataChange(item.id, "name", e.target.value)
+                        handleIngredientDataChange(
+                          item.id,
+                          "name",
+                          e.target.value
+                        )
                       }
                       onKeyDown={(e) => handleKeyDown(e, item.id)}
                       onFocus={() => setFocusedIngredientId(item.id)}
@@ -332,26 +357,29 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                     )}
                   </div>
                   {/* Suggestions Dropdown */}
-                  {focusedIngredientId === item.id && suggestions.length > 0 && (
-                    <div className="absolute z-20 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
-                      {suggestions.map((suggestion, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onMouseDown={() => handleSelectSuggestion(item.id, suggestion.nama)}
-                          className={`w-full text-left px-3 py-2 ${
-                            selectedSuggestionIndex === idx ? 'bg-blue-100' : 'hover:bg-gray-100'
-                          }`}
-                        >
-                          {suggestion.nama}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  {focusedIngredientId === item.id &&
+                    suggestions.length > 0 && (
+                      <div className="absolute z-20 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto mt-1">
+                        {suggestions.map((suggestion, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onMouseDown={() =>
+                              handleSelectSuggestion(item.id, suggestion.nama)
+                            }
+                            className={`w-full text-left px-3 py-2 ${
+                              selectedSuggestionIndex === idx
+                                ? "bg-blue-100"
+                                : "hover:bg-gray-100"
+                            }`}
+                          >
+                            {suggestion.nama}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   {/* Status Pengecekan */}
-                  <div className="pl-1 h-4">
-                    {renderIngredientStatus(item)}
-                  </div>
+                  <div className="pl-1 h-4">{renderIngredientStatus(item)}</div>
                 </div>
               ))}
               {/* --- Akhir Perubahan UI --- */}

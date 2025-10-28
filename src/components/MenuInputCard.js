@@ -30,6 +30,23 @@ const targetOptions = [
   "SMA Kelas 3",
 ];
 
+const TARGET_ID_MAP = {
+  "TK A": 1,
+  "TK B": 1,
+  "SD Kelas 1": 1,
+  "SD Kelas 2": 2,
+  "SD Kelas 3": 3,
+  "SD Kelas 4": 4,
+  "SD Kelas 5": 5,
+  "SD Kelas 6": 6,
+  "SMP Kelas 1": 7,
+  "SMP Kelas 2": 8,
+  "SMP Kelas 3": 9,
+  "SMA Kelas 1": 10,
+  "SMA Kelas 2": 11,
+  "SMA Kelas 3": 12,
+};
+
 const MenuInputCard = ({ onSubmit, isLoading, error }) => {
   const [target, setTarget] = useState(targetOptions[0]); // Default ke "TK A"
   const [inputs, setInputs] = useState({
@@ -48,7 +65,17 @@ const MenuInputCard = ({ onSubmit, isLoading, error }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isLoading) return;
-    onSubmit({ target, ...inputs });
+    const targetId = TARGET_ID_MAP[target];
+
+    if (targetId === undefined) {
+      console.error("Target audiens tidak valid:", target);
+      alert("Pilihan target audiens tidak valid. Silakan pilih ulang.");
+      return;
+    }
+    onSubmit({
+      target: targetId,
+      ...inputs,
+    });
   };
 
   return (
@@ -61,9 +88,7 @@ const MenuInputCard = ({ onSubmit, isLoading, error }) => {
           height={40}
           className="w-10 h-10"
         />
-        <h2 className="text-2xl font-bold text-orange-500">
-          Komposisi Menu
-        </h2>
+        <h2 className="text-2xl font-bold text-orange-500">Komposisi Menu</h2>
       </div>
       <p className="text-slate-500 mt-2 text-sm">
         Pilih target dan ketik nama resep untuk menghitung total gizinya.

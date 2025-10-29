@@ -153,3 +153,41 @@ export const validateIngredient = async (id, nutritionData) => {
     return { success: false, message: error.message };
   }
 };
+
+// Fungsi BARU 1: Mengambil Daftar Menu Tervalidasi
+export const getAllMenus = async () => {
+  try {
+    // UBAH ENDPOINT DARI '/menus/validated' menjadi '/menus'
+    const response = await fetch(`${API_URL}/menus`);
+
+    if (!response.ok) {
+      throw new Error("Gagal mengambil daftar menu.");
+    }
+
+    const data = await response.json();
+    // Asumsi backend mengembalikan array menu di data.menus (atau data saja)
+    return data.menus || data;
+  } catch (error) {
+    console.error("Error di getAllMenus:", error);
+    return [];
+  }
+};
+
+// Fungsi BARU 2: Mengambil Nutrisi Menu berdasarkan ID (menggantikan fetch manual di GuestView)
+export const getMenuNutritionById = async (menuId) => {
+  try {
+    const response = await fetch(`${API_URL}/generate-by-id`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ menu_id: menuId }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Gagal menghitung gizi menu.");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error di getMenuNutritionById:", error);
+    return null;
+  }
+};

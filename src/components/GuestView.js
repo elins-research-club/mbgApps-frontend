@@ -1,6 +1,6 @@
 // /frontend/src/components/GuestView.js
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
 import * as htmlToImage from "html-to-image";
 import NextImage from "next/image";
@@ -10,6 +10,7 @@ import Footer from "./Footer";
 import SearchCard from "./SearchCard"; // Komponen search baru
 import NutritionLabel from "./NutritionLabel";
 import DetailResultCard from "./DetailResultCard";
+import { getAllMenus } from "../services/api";
 
 // const API_URL = "http://localhost:5000/api";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -24,6 +25,8 @@ const GuestView = ({ onLoginClick }) => {
   const [lastSearchedQuery, setLastSearchedQuery] = useState("");
   const nutritionLabelRef = useRef(null);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [menuList, setMenuList] = useState([]);
+  const [isMenuLoading, setIsMenuLoading] = useState(true);
 
   const clearResults = () => {
     setError("");
@@ -73,6 +76,23 @@ const GuestView = ({ onLoginClick }) => {
       setIsPrinting(false);
     }
   };
+
+  useEffect(() => {
+    const fetchMenus = async () => {
+      setIsMenuLoading(true);
+      try {
+        const menus = await getAllMenus();
+        setMenuList(menus);
+      } catch (err) {
+        console.error("Gagal memuat daftar menu:", err);
+        // Anda bisa menambahkan setError di sini jika perlu
+      } finally {
+        setIsMenuLoading(false);
+      }
+    };
+
+    fetchMenus();
+  }, []);
 
   // Fungsi dari SearchCard
   const handleMenuSelect = async (menuId) => {

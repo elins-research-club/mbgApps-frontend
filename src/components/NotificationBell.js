@@ -5,8 +5,16 @@ import { BellIcon } from "./Icons";
 
 // Data Notifikasi Tiruan
 const mockNotifications = [
-  { id: 1, text: "Data bahan baru telah masuk ke database, butuh validasi", time: "1 menit lalu" },
-  { id: 2, text: "Data bahan baru telah masuk ke database, butuh validasi", time: "1 jam lalu" },
+  {
+    id: 1,
+    text: "Data bahan baru telah masuk ke database, butuh validasi",
+    time: "1 menit lalu",
+  },
+  {
+    id: 2,
+    text: "Data bahan baru telah masuk ke database, butuh validasi",
+    time: "1 jam lalu",
+  },
 ];
 
 const NotificationBell = () => {
@@ -37,7 +45,7 @@ const NotificationBell = () => {
       >
         <BellIcon />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 block h-5 w-5 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center ring-2 ring-white">
+          <span className="absolute top-0 right-0 h-5 w-5 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center ring-2 ring-white">
             {unreadCount}
           </span>
         )}

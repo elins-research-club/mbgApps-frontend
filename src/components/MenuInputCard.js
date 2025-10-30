@@ -1,35 +1,12 @@
-// /frontend/src/components/MenuInputCard.js
+// /frontend/src/components/MenuInputCard.js (REVISI TOTAL)
+
 import { useState } from "react";
 import Image from "next/image";
-import AutoCompleteInput from "./AutoCompleteInput"; // <-- BARU
+// Import SearchCard yang sudah kita revisi
+import SearchCard from "./SearchCard";
 
-// Kategori berdasarkan PNG Anda
-const categories = [
-  { key: "karbohidrat", label: "Karbohidrat" },
-  { key: "proteinHewani", label: "Protein Hewani" },
-  { key: "sayur", label: "Sayur" },
-  { key: "proteinTambahan", label: "Protein Tambahan" },
-  { key: "buah", label: "Buah" },
-];
-
-// Opsi untuk dropdown Target
-const targetOptions = [
-  "TK A",
-  "TK B",
-  "SD Kelas 1",
-  "SD Kelas 2",
-  "SD Kelas 3",
-  "SD Kelas 4",
-  "SD Kelas 5",
-  "SD Kelas 6",
-  "SMP Kelas 1",
-  "SMP Kelas 2",
-  "SMP Kelas 3",
-  "SMA Kelas 1",
-  "SMA Kelas 2",
-  "SMA Kelas 3",
-];
-
+// Mapping Target ID (Anda harus memastikan ini sesuai dengan data Anda,
+// ini adalah contoh berdasarkan snippet Anda sebelumnya)
 const TARGET_ID_MAP = {
   "TK A": 1,
   "TK B": 1,
@@ -46,67 +23,73 @@ const TARGET_ID_MAP = {
   "SMA Kelas 2": 11,
   "SMA Kelas 3": 12,
 };
+const targetOptions = Object.keys(TARGET_ID_MAP);
+
+// Kategori (ditambah stateKey sesuai payload backend)
+const categories = [
+  { key: "karbohidrat", label: "Karbohidrat", stateKey: "karbo_id" },
+  { key: "proteinHewani", label: "Protein Hewani", stateKey: "lauk_id" },
+  { key: "sayur", label: "Sayur", stateKey: "sayur_id" },
+  {
+    key: "proteinTambahan",
+    label: "Protein Tambahan",
+    stateKey: "side_dish_id",
+  },
+  { key: "buah", label: "Buah", stateKey: "buah_id" },
+];
 
 const MenuInputCard = ({ onSubmit, isLoading, error }) => {
-  const [target, setTarget] = useState(targetOptions[0]); // Default ke "TK A"
-  const [inputs, setInputs] = useState({
-    karbohidrat: "",
-    proteinHewani: "",
-    sayur: "",
-    proteinTambahan: "",
-    buah: "",
-  });
+  // State untuk menyimpan ID menu yang dipilih (yang akan dikirim ke backend)
+  const [selectedMenuId, setSelectedMenuId] = useState(null);
+  const [selectedMenuName, setSelectedMenuName] = useState("");
 
-  // --- DIUBAH: Handler untuk AutoCompleteInput ---
-  const handleInputChange = (name, value) => {
-    setInputs((prev) => ({ ...prev, [name]: value }));
+  const [target, setTarget] = useState(targetOptions[0]);
+
+  // Handler untuk SearchCard: Menyimpan ID dan Nama Menu Komposisi Chef
+  const handleMenuSelect = (menuId, menuName) => {
+    setSelectedMenuId(menuId);
+    setSelectedMenuName(menuName);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isLoading) return;
-    const targetId = TARGET_ID_MAP[target];
 
-    if (targetId === undefined) {
-      console.error("Target audiens tidak valid:", target);
-      alert("Pilihan target audiens tidak valid. Silakan pilih ulang.");
+    if (isLoading || !selectedMenuId) {
+      alert("Anda harus memilih Menu Komposisi Chef untuk dianalisis.");
       return;
     }
+    const targetId = TARGET_ID_MAP[target];
+
+    // Kirim payload BARU: Hanya ID Menu Komposisi dan Target
     onSubmit({
+      menu_komposisi_id: selectedMenuId,
       target: targetId,
-      ...inputs,
     });
   };
 
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
-      <div className="flex items-center gap-3 mb-3">
-        <Image
-          src="/input-icon.png"
-          alt="Icon Input"
-          width={40}
-          height={40}
-          className="w-10 h-10"
-        />
-        <h2 className="text-2xl font-bold text-orange-500">Komposisi Menu</h2>
-      </div>
-      <p className="text-slate-500 mt-2 text-sm">
-        Pilih target dan ketik nama resep untuk menghitung total gizinya.
-      </p>
+    <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8">
+      <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+        <Image src="/input-icon.png" alt="Icon Menu" width={32} height={32} />
+        Input Komposisi Menu
+      </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-5 mt-8">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Dropdown Target Audiens */}
         <div>
           <label
             htmlFor="target"
-            className="text-md font-semibold text-slate-600"
+            className="block text-sm font-medium text-slate-700"
           >
-            Target
+            Target Audiens (Kelompok Usia)
           </label>
           <select
             id="target"
+            name="target"
             value={target}
             onChange={(e) => setTarget(e.target.value)}
-            className="w-full mt-2 p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none transition"
+            className="w-full mt-2 p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none transition"
+            disabled={isLoading}
           >
             {targetOptions.map((option) => (
               <option key={option} value={option}>
@@ -116,30 +99,38 @@ const MenuInputCard = ({ onSubmit, isLoading, error }) => {
           </select>
         </div>
 
-        {/* --- DIUBAH: Menggunakan AutoCompleteInput --- */}
-        {categories.map((cat) => (
-          <AutoCompleteInput
-            key={cat.key}
-            id={cat.key}
-            name={cat.key}
-            label={cat.label}
-            value={inputs[cat.key]}
-            onValueChange={handleInputChange}
-            placeholder="Ketik nama resep..."
+        {/* BARU: Input Menu Komposisi Chef */}
+        <div>
+          <label className="block text-md font-semibold text-slate-600 mb-1">
+            Pilih Menu Komposisi Chef
+          </label>
+          {/* Menggunakan SearchCard dan mengirim type="composition" */}
+          <SearchCard
+            searchType="composition"
+            filterCategory="Komposisi Chef" // ✅ hanya tampilkan menu dengan kategori ini
+            onMenuSelect={(menuId, menuName) =>
+              handleMenuSelect(menuId, menuName)
+            }
+            placeholder="Cari Menu Komposisi Chef (misal: Menu 1, Paket Sehat)..."
+            showAiFallback={false}
           />
-        ))}
-        {/* --- Akhir Perubahan --- */}
+          {selectedMenuName && (
+            <p className="mt-1 text-xs text-green-600">
+              Menu dipilih: **{selectedMenuName}**
+            </p>
+          )}
+        </div>
 
         <button
           type="submit"
-          disabled={isLoading}
-          className="mt-6 w-full py-4 bg-orange-400 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-gray-700 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed"
+          disabled={isLoading || !selectedMenuId}
+          className="mt-6 w-full py-4 bg-green-500 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-600 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed"
         >
-          {isLoading ? "Menganalisis..." : "Generate Menu"}
+          {isLoading ? "Menganalisis..." : "Generate Nutrisi Menu"}
         </button>
 
         {error && (
-          <p className="mt-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg text-center">
+          <p className="mt-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-lg text-center text-sm">
             {error}
           </p>
         )}

@@ -78,7 +78,7 @@ const RecommendationCard = ({ data }) => {
                           Rekomendasi
                         </th>
                         <th className="text-left px-4 py-3 text-sm font-medium text-slate-600">
-                          Gramasi
+                          Porsi
                         </th>
                       </tr>
                     </thead>
@@ -92,7 +92,7 @@ const RecommendationCard = ({ data }) => {
                             {item.nama}
                           </td>
                           <td className="px-4 py-3 text-sm text-green-600 font-medium">
-                            + {item.gramasi}g
+                            + {item.porsi} porsi
                           </td>
                         </tr>
                       ))}

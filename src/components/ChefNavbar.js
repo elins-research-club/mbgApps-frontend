@@ -1,8 +1,8 @@
 // /frontend/src/components/ChefNavbar.js
-
+import { Utensils, Plus, LogOut } from "lucide-react";
 import UserMenu from "./UserMenu";
 
-const ChefNavbar = ({ onAddRecipeClick }) => {
+const ChefNavbar = ({ onAddRecipeClick, onNewMenuClick }) => {
   return (
     <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,12 +16,23 @@ const ChefNavbar = ({ onAddRecipeClick }) => {
           </div>
 
           {/* Kanan: Tombol Tambah Resep */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
+            {/* 1. Tombol Buat Menu Baru (Recipe Composition - Aksi 2) */}
+            <button
+              onClick={onNewMenuClick} // <-- Tombol baru
+              className="flex items-center gap-2 p-2 px-3 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors shadow-md"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Buat Menu Baru</span>
+            </button>
+
+            {/* 2. Tombol Tambah Resep (Bahan Baru - Aksi 3) */}
             <button
               onClick={onAddRecipeClick}
-              className="px-4 py-2 bg-orange-400 text-white text-sm font-bold rounded-lg shadow-md hover:bg-orange-500 transition-colors"
+              className="flex items-center gap-2 p-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
             >
-              Tambahkan Resep Baru
+              <Utensils className="w-5 h-5" />
+              <span>Tambah Bahan Baru</span>
             </button>
           </div>
         </div>

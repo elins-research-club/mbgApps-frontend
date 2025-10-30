@@ -4,19 +4,56 @@ import { useState, useRef } from "react";
 import jsPDF from "jspdf";
 import * as htmlToImage from "html-to-image";
 import NextImage from "next/image";
-
+import SearchCard from "./SearchCard";
 import ChefNavbar from "./ChefNavbar";
 import Footer from "./Footer";
 import NutritionLabel from "./NutritionLabel";
 import DetailResultCard from "./DetailResultCard";
-import MenuInputCard from "./MenuInputCard"; // Menggunakan 5 input AutoComplete
+import NewMenuModal from "./NewMenuModal";
 import AddRecipeModal from "./AddRecipeModal";
 import RecommendationCard from "./RecommendationCard";
-import { generateNutrition } from "../services/api"; // API untuk komposisi
+import NutritionPerRecipeCard from "./NutritionPerRecipeCard"; // ✅ BARU
+import {
+  generateNutrition,
+  getMenuNutritionById,
+  saveNewMenuComposition,
+} from "../services/api";
 
-// --- Pastikan URL Backend Benar ---
-// const API_URL = "http://localhost:5000/api";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const targetOptions = [
+  "TK A",
+  "TK B",
+  "SD Kelas 1",
+  "SD Kelas 2",
+  "SD Kelas 3",
+  "SD Kelas 4",
+  "SD Kelas 5",
+  "SD Kelas 6",
+  "SMP Kelas 1",
+  "SMP Kelas 2",
+  "SMP Kelas 3",
+  "SMA Kelas 1",
+  "SMA Kelas 2",
+  "SMA Kelas 3",
+];
+
+const TARGET_ID_MAP = {
+  "TK A": 1,
+  "TK B": 1,
+  "SD Kelas 1": 1,
+  "SD Kelas 2": 2,
+  "SD Kelas 3": 3,
+  "SD Kelas 4": 4,
+  "SD Kelas 5": 5,
+  "SD Kelas 6": 6,
+  "SMP Kelas 1": 7,
+  "SMP Kelas 2": 8,
+  "SMP Kelas 3": 9,
+  "SMA Kelas 1": 10,
+  "SMA Kelas 2": 11,
+  "SMA Kelas 3": 12,
+};
 
 export default function ChefDashboard() {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,20 +62,24 @@ export default function ChefDashboard() {
   const [detailBahan, setDetailBahan] = useState([]);
   const [calculationLog, setCalculationLog] = useState([]);
   const [recommendationData, setRecommendationData] = useState(null);
+  const [detailPerResep, setDetailPerResep] = useState(null); // ✅ BARU
   const nutritionLabelRef = useRef(null);
   const [isPrinting, setIsPrinting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTarget, setSelectedTarget] = useState(targetOptions[0]);
+  const [isAddRecipeModalOpen, setIsAddRecipeModalOpen] = useState(false);
+  const [isNewMenuModalOpen, setIsNewMenuModalOpen] = useState(false);
 
-  // Fungsi untuk membersihkan hasil sebelumnya
+  // ✅ UPDATE: Tambahkan detailPerResep ke clearResults
   const clearResults = () => {
     setError("");
     setTotalLabel(null);
     setDetailBahan([]);
     setCalculationLog([]);
     setRecommendationData(null);
+    setDetailPerResep(null); // ✅ BARU
   };
 
-  // Fungsi cetak PDF (tidak berubah dari kode Anda)
   const handlePrintPDF = async () => {
     if (!nutritionLabelRef.current) return;
     setIsPrinting(true);
@@ -52,7 +93,7 @@ export default function ChefDashboard() {
       const img = new Image();
       img.src = dataUrl;
       img.onload = () => {
-        const imgWidth = img.width * 0.264583; // Konversi pixel ke mm
+        const imgWidth = img.width * 0.264583;
         const imgHeight = img.height * 0.264583;
         const pdf = new jsPDF({
           orientation: imgHeight > imgWidth ? "portrait" : "landscape",
@@ -79,18 +120,15 @@ export default function ChefDashboard() {
     }
   };
 
-  // --- FUNGSI UTAMA UNTUK MENGHUBUNGKAN INPUT KE BACKEND ---
   const handleSubmitComposition = async (formData) => {
     setIsLoading(true);
-    clearResults(); // Bersihkan hasil sebelumnya
+    clearResults();
     console.log("[ChefDashboard] Menerima data dari MenuInputCard:", formData);
 
-    // Helper: Mencari ID menu dari backend berdasarkan nama
     const getMenuIdByName = async (name) => {
       if (!name || name.trim() === "") return null;
       try {
         console.log(`[ChefDashboard] Mencari ID untuk: "${name.trim()}"`);
-        // Panggil API search backend
         const response = await fetch(
           `${API_URL}/search?q=${encodeURIComponent(name.trim())}`
         );
@@ -100,10 +138,9 @@ export default function ChefDashboard() {
               response.status
             }) untuk: "${name.trim()}"`
           );
-          return null; // Gagal mencari, kembalikan null
+          return null;
         }
         const suggestions = await response.json();
-        // Cari nama yang sama persis (abaikan besar kecil huruf)
         const exactMatch = suggestions.find(
           (m) => m.nama.toLowerCase() === name.trim().toLowerCase()
         );
@@ -114,14 +151,14 @@ export default function ChefDashboard() {
           setError(
             `Resep "${name.trim()}" tidak ditemukan persis di database. Harap pilih dari saran.`
           );
-          return null; // Tidak ada match persis
+          return null;
         }
         console.log(
           `[ChefDashboard] ID ditemukan untuk "${name.trim()}": ${
             exactMatch.id
           }`
         );
-        return exactMatch.id; // Kembalikan ID jika ditemukan
+        return exactMatch.id;
       } catch (err) {
         console.error(
           `[ChefDashboard] Gagal fetch ID untuk "${name.trim()}":`,
@@ -130,22 +167,20 @@ export default function ChefDashboard() {
         setError(
           `Gagal menghubungi server untuk mencari ID resep. Periksa koneksi backend.`
         );
-        return null; // Gagal fetch, kembalikan null
+        return null;
       }
     };
 
     try {
-      // 1. Konversi Semua Nama Resep ke ID Resep (secara paralel)
       const [karboId, laukId, sayurId, proteinTambahanId, buahId] =
         await Promise.all([
-          getMenuIdByName(formData.karbohidrat), // Ambil nama dari formData
-          getMenuIdByName(formData.proteinHewani), // Ambil nama dari formData
-          getMenuIdByName(formData.sayur), // Ambil nama dari formData
-          getMenuIdByName(formData.proteinTambahan), // Ambil nama dari formData
-          getMenuIdByName(formData.buah), // Ambil nama dari formData
+          getMenuIdByName(formData.karbohidrat),
+          getMenuIdByName(formData.proteinHewani),
+          getMenuIdByName(formData.sayur),
+          getMenuIdByName(formData.proteinTambahan),
+          getMenuIdByName(formData.buah),
         ]);
 
-      // Jika ada error saat fetch ID (setError sudah dipanggil di helper), hentikan proses
       if (
         error &&
         !karboId &&
@@ -155,20 +190,18 @@ export default function ChefDashboard() {
         !buahId
       ) {
         setIsLoading(false);
-        return; // Hentikan jika semua pencarian gagal karena error koneksi/server
+        return;
       }
 
-      // 2. Buat Payload untuk Dikirim ke Backend /generate
       const payload = {
-        target: formData.target, // Sertakan target audiens
-        karbo_id: karboId, // Kirim ID (atau null jika tidak ditemukan/kosong)
-        lauk_id: laukId, // Kirim ID (atau null)
-        sayur_id: sayurId, // Kirim ID (atau null)
-        side_dish_id: proteinTambahanId, // Kirim ID (atau null) - **Pastikan nama field ini sama dengan di backend**
-        buah_id: buahId, // Kirim ID (atau null)
+        target: formData.target,
+        karbo_id: karboId,
+        lauk_id: laukId,
+        sayur_id: sayurId,
+        side_dish_id: proteinTambahanId,
+        buah_id: buahId,
       };
 
-      // 3. Validasi: Pastikan setidaknya satu ID valid ditemukan
       const validIdsCount = [
         karboId,
         laukId,
@@ -177,7 +210,6 @@ export default function ChefDashboard() {
         buahId,
       ].filter((id) => id !== null).length;
       if (validIdsCount === 0) {
-        // Jika tidak ada ID valid sama sekali (semua input kosong atau nama tidak ditemukan)
         throw new Error(
           "Tidak ada resep valid yang dipilih atau ditemukan ID-nya. Pastikan nama resep diketik dengan benar dan dipilih dari saran."
         );
@@ -192,13 +224,9 @@ export default function ChefDashboard() {
         JSON.stringify(payload, null, 2)
       );
 
-      // 4. Panggil API Backend /generate menggunakan fungsi dari api.js
-      // Fungsi generateNutrition di api.js sudah benar, hanya meneruskan payload
       const result = await generateNutrition(payload);
 
-      // 5. Proses Hasil dari Backend
       if (!result) {
-        // Jika generateNutrition mengembalikan null (karena fetch gagal/error)
         throw new Error(
           error ||
             "Gagal menghitung gizi. Respons backend kosong atau terjadi error."
@@ -207,62 +235,143 @@ export default function ChefDashboard() {
 
       console.log("[ChefDashboard] Hasil kalkulasi diterima:", result);
 
-      // 6. Update State Frontend untuk Menampilkan Hasil
-      setTotalLabel(result.totalLabel || null); // Tampilkan label total
-      // Pastikan nama properti ini sesuai dengan respons JSON dari backend Anda
+      setTotalLabel(result.totalLabel || null);
       setDetailBahan(result.detailPerhitungan?.rincian_per_bahan || []);
       setCalculationLog(result.detailPerhitungan?.log || []);
-      setRecommendationData(result.rekomendasi || null); // Tampilkan rekomendasi
+      setRecommendationData(result.rekomendasi || null);
+      setDetailPerResep(result.detailPerResep || null); // ✅ BARU
     } catch (err) {
-      // Tangani error yang terjadi selama proses submit
       console.error(
         "[ChefDashboard] Error dalam handleSubmitComposition:",
         err
       );
-      setError(err.message || "Terjadi kesalahan saat memproses permintaan."); // Tampilkan pesan error
-      // Kosongkan hasil jika terjadi error
+      setError(err.message || "Terjadi kesalahan saat memproses permintaan.");
       setTotalLabel(null);
       setDetailBahan([]);
       setCalculationLog([]);
       setRecommendationData(null);
+      setDetailPerResep(null); // ✅ BARU
     } finally {
-      setIsLoading(false); // Selalu set loading ke false setelah selesai
+      setIsLoading(false);
     }
   };
-  // --- AKHIR DARI FUNGSI UTAMA ---
 
-  const hasResults = totalLabel !== null; // Cek apakah ada hasil kalkulasi
+  // ✅ UPDATE: Tambahkan detailPerResep ke handleMenuSelect
+  const handleMenuSelect = async (menuId) => {
+    setIsLoading(true);
+    clearResults();
+    setError("");
+
+    try {
+      const result = await getMenuNutritionById(menuId, targetId);
+
+      if (!result || !result.totalLabel) {
+        throw new Error("Gagal menghitung gizi atau respons tidak valid.");
+      }
+
+      setTotalLabel(result.totalLabel);
+      setDetailBahan(result.detailPerhitungan?.rincian_per_bahan || []);
+      setCalculationLog(result.detailPerhitungan?.log || []);
+      setRecommendationData(result.rekomendasi || null);
+      setDetailPerResep(result.detailPerResep || null); // ✅ BARU
+    } catch (err) {
+      console.error("[ChefDashboard] Error di handleMenuSelect:", err);
+      setError(err.message || "Terjadi kesalahan saat mencari menu.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveNewMenu = async (formData) => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      console.log("[ChefDashboard] Menyimpan menu baru:", formData);
+
+      const result = await saveNewMenuComposition(formData);
+
+      if (result?.id) {
+        alert(
+          `Menu "${result.nama}" berhasil disimpan dengan ID: ${result.id}`
+        );
+        setIsNewMenuModalOpen(false);
+        clearResults();
+      } else {
+        throw new Error(
+          result?.message || "Gagal menyimpan menu baru. Respons tidak valid."
+        );
+      }
+    } catch (err) {
+      console.error("[ChefDashboard] Error saat menyimpan menu baru:", err);
+      setError(err.message || "Terjadi kesalahan saat menyimpan menu.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const hasResults = totalLabel !== null;
+  const targetId = TARGET_ID_MAP[selectedTarget];
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navbar Chef */}
-      <ChefNavbar onAddRecipeClick={() => setIsModalOpen(true)} />
+      <ChefNavbar
+        onAddRecipeClick={() => setIsAddRecipeModalOpen(true)}
+        onNewMenuClick={() => setIsNewMenuModalOpen(true)}
+      />
 
-      {/* Modal Tambah Resep (jika dibuka) */}
-      {isModalOpen && (
+      {isAddRecipeModalOpen && (
         <AddRecipeModal
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => setIsAddRecipeModalOpen(false)}
           onRecipeAdded={() => {
-            console.log(
-              "Resep baru ditambahkan! (TODO: Mungkin perlu refresh menu?)"
-            );
-            setIsModalOpen(false); // Tutup modal setelah berhasil
+            alert("Resep baru dari bahan berhasil ditambahkan!");
+            setIsAddRecipeModalOpen(false);
           }}
         />
       )}
 
-      {/* Konten Utama */}
+      {isNewMenuModalOpen && (
+        <NewMenuModal
+          onClose={() => setIsNewMenuModalOpen(false)}
+          onSubmit={handleSaveNewMenu}
+          isLoading={isLoading}
+          error={error}
+          targetId={targetId}
+        />
+      )}
+
       <main className="flex-grow bg-slate-50 w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            {/* Kolom Kiri: Input Card */}
+          {/* 🔹 ROW 1: Input (Kiri) & Total Gizi (Kanan) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-8">
+            {/* Kolom Kiri */}
             <div className="lg:sticky lg:top-8">
-              <MenuInputCard
-                onSubmit={handleSubmitComposition} // Hubungkan ke fungsi submit
+              <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 mb-6">
+                <label
+                  htmlFor="target"
+                  className="text-lg font-bold text-orange-500 mb-2 block"
+                >
+                  Target Audiens Analisis
+                </label>
+                <select
+                  id="target"
+                  value={selectedTarget}
+                  onChange={(e) => setSelectedTarget(e.target.value)}
+                  className="w-full mt-2 p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition"
+                >
+                  {targetOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <SearchCard
+                onMenuSelect={handleMenuSelect}
                 isLoading={isLoading}
-                // error prop di MenuInputCard bisa dihapus jika error ditampilkan di sini
               />
-              {/* Tampilkan pesan error di bawah input card */}
+
               {error && (
                 <p className="mt-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg text-center text-sm">
                   ⚠️ {error}
@@ -270,11 +379,9 @@ export default function ChefDashboard() {
               )}
             </div>
 
-            {/* Kolom Kanan: Output Cards */}
-            <div className="space-y-8">
-              {/* 1. Total Label Gizi */}
+            {/* Kolom Kanan */}
+            <div>
               <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full flex flex-col items-center">
-                {/* ... (Header Label Gizi + Tombol Cetak - tidak berubah) ... */}
                 <div className="flex items-center justify-between mb-6 w-full gap-4">
                   <div className="flex items-center gap-2 sm:gap-3">
                     <NextImage
@@ -286,8 +393,7 @@ export default function ChefDashboard() {
                       style={{ objectFit: "contain" }}
                     />
                     <h2 className="text-xl sm:text-2xl font-bold text-orange-500 whitespace-nowrap">
-                      {" "}
-                      Total Nilai Gizi{" "}
+                      Total Nilai Gizi
                     </h2>
                   </div>
                   <button
@@ -298,7 +404,7 @@ export default function ChefDashboard() {
                     {isPrinting ? "Mencetak..." : "Cetak PDF"}
                   </button>
                 </div>
-                {/* Tampilkan Label atau Pesan Default */}
+
                 {hasResults ? (
                   <div ref={nutritionLabelRef} className="w-full max-w-md">
                     <NutritionLabel data={totalLabel} />
@@ -311,46 +417,54 @@ export default function ChefDashboard() {
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
-                      {" "}
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />{" "}
+                      />
                     </svg>
                     <p className="mt-2 text-lg font-medium">
-                      {" "}
-                      Hasil akan ditampilkan di sini.{" "}
+                      Hasil akan ditampilkan di sini.
                     </p>
                     <p className="text-sm">
-                      {" "}
-                      Silakan isi form di sebelah kiri dan klik &ldquo;Generate
-                      Menu&rdquo;.{" "}
+                      Silakan pilih menu di sebelah kiri.
                     </p>
                   </div>
                 )}
               </div>
-
-              {/* 2. Rekomendasi (Hanya tampil jika ada hasil & rekomendasi) */}
-              {hasResults && recommendationData && (
-                <RecommendationCard data={recommendationData} />
-              )}
-
-              {/* 3. Rincian Gizi per Bahan & Log (Hanya tampil jika ada hasil) */}
-              {hasResults &&
-                (detailBahan.length > 0 || calculationLog.length > 0) && (
-                  <DetailResultCard
-                    log={calculationLog}
-                    details={detailBahan}
-                  />
-                )}
             </div>
           </div>
+
+          {/* 🔹 ROW 2: Rekomendasi (Full Width) */}
+          {hasResults && recommendationData && (
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg mb-8 border border-slate-200">
+              <h2 className="text-2xl font-bold text-orange-500 mb-4">
+                Rekomendasi Menu Tambahan
+              </h2>
+              <RecommendationCard data={recommendationData} />
+            </div>
+          )}
+
+          {/* 🔹 ROW 3: Nutrisi per Menu & per Bahan */}
+          {hasResults && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {detailPerResep && detailPerResep.length > 0 && (
+                <NutritionPerRecipeCard data={detailPerResep} />
+              )}
+
+              {(detailBahan.length > 0 || calculationLog.length > 0) && (
+                <DetailResultCard
+                  log={calculationLog}
+                  details={detailBahan}
+                  detailPerResep={detailPerResep}
+                />
+              )}
+            </div>
+          )}
         </div>
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

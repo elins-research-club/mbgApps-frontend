@@ -47,16 +47,12 @@ export const checkIngredient = async (name) => {
       `${API_URL}/ingredients/search?q=${encodeURIComponent(name)}&exact=true`
     );
 
-    // --- PERBAIKAN DITAMBAHKAN DI SINI ---
-    // Cek apakah respons dari backend adalah error (seperti 500, 404, dll)
     if (!response.ok) {
       console.error("Backend error in checkIngredient:", response.statusText);
-      // Jika error, langsung lempar error agar ditangkap oleh 'catch'
       throw new Error("Backend error while checking ingredient.");
     }
-    // --- AKHIR PERBAIKAN ---
 
-    const data = await response.json(); // Baris ini sekarang aman
+    const data = await response.json();
 
     if (data.ingredients && data.ingredients.length > 0) {
       return { found: true, data: data.ingredients[0] };
@@ -65,7 +61,6 @@ export const checkIngredient = async (name) => {
     return { found: false };
   } catch (error) {
     console.error("Error di checkIngredient:", error);
-    // Selalu kembalikan 'found: false' jika ada error apapun
     return { found: false, error: error.message };
   }
 };
@@ -118,19 +113,15 @@ export const getNotValidatedIngredients = async () => {
       throw new Error("Gagal mengambil data untuk validasi");
     }
     const data = await response.json();
-    // Backend Anda (getNotValidatedIngredients) mengembalikan { ingredients: [...] }
     return data.ingredients;
   } catch (error) {
     console.error("Error di getNotValidatedIngredients:", error);
-    return []; // Kembalikan array kosong jika error
+    return [];
   }
 };
 
 export const validateIngredient = async (id, nutritionData) => {
   try {
-    // Backend Anda (editIngredientsNutritions) mengharapkan payload
-    // dalam format: { ingredientData: {...} }
-    // Backend juga akan OTOMATIS mengatur 'isValidated = true'
     const payload = {
       ingredientData: nutritionData,
     };
@@ -146,7 +137,6 @@ export const validateIngredient = async (id, nutritionData) => {
       throw new Error(err.message || "Gagal memvalidasi bahan");
     }
 
-    // Backend mengembalikan { success: true, ingredient: {...} }
     return await response.json();
   } catch (error) {
     console.error("Error di validateIngredient:", error);
@@ -154,10 +144,8 @@ export const validateIngredient = async (id, nutritionData) => {
   }
 };
 
-// Fungsi BARU 1: Mengambil Daftar Menu Tervalidasi
 export const getAllMenus = async () => {
   try {
-    // UBAH ENDPOINT DARI '/menus/validated' menjadi '/menus'
     const response = await fetch(`${API_URL}/menus`);
 
     if (!response.ok) {
@@ -165,7 +153,6 @@ export const getAllMenus = async () => {
     }
 
     const data = await response.json();
-    // Asumsi backend mengembalikan array menu di data.menus (atau data saja)
     return data.menus || data;
   } catch (error) {
     console.error("Error di getAllMenus:", error);
@@ -173,21 +160,95 @@ export const getAllMenus = async () => {
   }
 };
 
-// Fungsi BARU 2: Mengambil Nutrisi Menu berdasarkan ID (menggantikan fetch manual di GuestView)
-export const getMenuNutritionById = async (menuId) => {
+// ✅ PERBAIKAN: Endpoint yang benar untuk getMenuNutritionById
+export const getMenuNutritionById = async (menuId, target) => {
   try {
-    const response = await fetch(`${API_URL}/generate-by-id`, {
+    console.log(
+      "[API] Fetching nutrition for menu ID:",
+      menuId,
+      "target:",
+      target
+    );
+
+    // 🔹 Kirim query target kalau tersedia
+    const url = target
+      ? `${API_URL}/menu/${menuId}?target=${target}`
+      : `${API_URL}/menu/${menuId}`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("text/html")) {
+        console.error("❌ Server returned HTML instead of JSON");
+        throw new Error(
+          "Server error: Endpoint tidak ditemukan atau server crash"
+        );
+      }
+
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Gagal mengambil data gizi menu.");
+    }
+
+    const data = await response.json();
+    console.log("[API] Received nutrition data:", data);
+    return data;
+  } catch (error) {
+    console.error("Error di getMenuNutritionById:", error);
+    throw error;
+  }
+};
+
+const getMenuIdByName = async (name) => {
+  if (!name || name.trim() === "") return null;
+  try {
+    const response = await fetch(
+      `${API_URL}/search?q=${encodeURIComponent(name.trim())}`
+    );
+    if (!response.ok) return null;
+    const suggestions = await response.json();
+    const exactMatch = suggestions.find(
+      (m) => m.nama.toLowerCase() === name.trim().toLowerCase()
+    );
+    return exactMatch ? exactMatch.id : null;
+  } catch (err) {
+    console.error(`Gagal fetch ID untuk "${name.trim()}":`, err);
+    return null;
+  }
+};
+
+// --- FUNGSI BARU: Menyimpan Komposisi Menu Baru ---
+export const saveNewMenuComposition = async (formData) => {
+  const payload = {
+    nama: formData.nama,
+    komposisi: formData.komposisi,
+  };
+
+  const validIdsCount = Object.values(payload.komposisi).filter(
+    (id) => id !== null && id !== 0
+  ).length;
+
+  if (validIdsCount === 0) {
+    throw new Error(
+      "Tidak ada resep yang valid ditemukan untuk komposisi ini. Menu tidak dapat disimpan."
+    );
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/menu/composition`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ menu_id: menuId }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      throw new Error("Gagal menghitung gizi menu.");
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Gagal menyimpan Menu Komposisi.");
     }
+
     return await response.json();
   } catch (error) {
-    console.error("Error di getMenuNutritionById:", error);
-    return null;
+    console.error("Error di saveNewMenuComposition:", error);
+    throw error;
   }
 };

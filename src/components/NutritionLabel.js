@@ -35,11 +35,14 @@ const ReadOnlyRow = ({ label, value, unit, akgValue }) => (
 );
 
 const NutritionLabel = forwardRef(
-  ({ data, isMini = false, isEditable = false, onDataChange = () => {} }, ref) => {
+  (
+    { data, isMini = false, isEditable = false, onDataChange = () => {} },
+    ref
+  ) => {
     if (!data) return null;
 
-    const gizi = data.informasi_nilai_gizi;
-    const akg = data.persen_akg;
+    const gizi = data.informasi_nilai_gizi || {};
+    const akg = data.persen_akg || {};
 
     // --- FUNGSI BARU UNTUK MENANGANI PERUBAHAN INPUT ---
     const handleChange = (field, value) => {
@@ -59,20 +62,27 @@ const NutritionLabel = forwardRef(
       akgValue,
       fieldKey // fieldKey adalah nama properti di objek `gizi`
     ) => {
+      // ✅ pastikan value angka dan dibulatkan 2 angka di belakang koma
+      const roundedValue =
+        typeof value === "number" && !isNaN(value)
+          ? Number(value.toFixed(2))
+          : value || 0;
+
       if (isEditable && fieldKey) {
         return (
           <EditableRow
             label={label}
-            value={value}
+            value={roundedValue}
             unit={unit}
             onChange={(e) => handleChange(fieldKey, e.target.value)}
           />
         );
       }
+
       return (
         <ReadOnlyRow
           label={label}
-          value={value}
+          value={roundedValue}
           unit={unit}
           akgValue={akgValue}
         />
@@ -149,13 +159,7 @@ const NutritionLabel = forwardRef(
           akg.karbohidrat_total,
           "karbohidrat_g"
         )}
-        {renderNutritionRow(
-          "Serat Pangan",
-          gizi.serat_g,
-          "g",
-          null,
-          "serat_g"
-        )}
+        {renderNutritionRow("Serat Pangan", gizi.serat_g, "g", null, "serat_g")}
 
         <div className="w-full h-1 bg-black my-1"></div>
 
@@ -166,14 +170,8 @@ const NutritionLabel = forwardRef(
           akg.natrium,
           "natrium_mg"
         )}
-        {renderNutritionRow(
-          "Kalium",
-          gizi.kalium_mg,
-          "mg",
-          null,
-          "kalium_mg"
-        )}
-        
+        {renderNutritionRow("Kalium", gizi.kalium_mg, "mg", null, "kalium_mg")}
+
         {/* Tambahkan field lain jika perlu diedit */}
         {renderNutritionRow(
           "Kalsium",
@@ -182,13 +180,7 @@ const NutritionLabel = forwardRef(
           akg.kalsium,
           "kalsium_mg"
         )}
-        {renderNutritionRow(
-          "Besi",
-          gizi.besi_mg,
-          "mg",
-          akg.besi,
-          "besi_mg"
-        )}
+        {renderNutritionRow("Besi", gizi.besi_mg, "mg", akg.besi, "besi_mg")}
         {renderNutritionRow(
           "Vitamin C",
           gizi.vitamin_c_mg,

@@ -133,3 +133,96 @@ export const EditIcon = () => (
     />
   </svg>
 );
+
+// /frontend/src/components/Icons.js
+// Kumpulan ikon dasar yang diperlukan oleh SearchCard dan MenuInputCard
+
+export const ListIcon = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <line x1="8" y1="6" x2="21" y2="6"></line>
+    <line x1="8" y1="12" x2="21" y2="12"></line>
+    <line x1="8" y1="18" x2="21" y2="18"></line>
+    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+  </svg>
+);
+
+// Ikon untuk MenuInputCard/CreateMenuCard (Feedback/Aksi)
+export const SaveIcon = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+    <polyline points="7 3 7 8 15 8"></polyline>
+  </svg>
+);
+
+export const CheckCircleIcon = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+  </svg>
+);
+
+export const XCircleIcon = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="15" y1="9" x2="9" y2="15"></line>
+    <line x1="9" y1="9" x2="15" y2="15"></line>
+  </svg>
+);
+
+export const SparklesIcon = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M12.58 20.35a.39.39 0 0 1-.58 0L9.42 16.34a.39.39 0 0 1-.09-.3L7.73 13.9a.39.39 0 0 1 0-.57L9.33 11.66a.39.39 0 0 1 .09-.3l2.58-4.01a.39.39 0 0 1 .58 0l2.58 4.01a.39.39 0 0 1 .09.3l1.6 2.07a.39.39 0 0 1 0 .57l-1.6 2.07a.39.39 0 0 1-.09.3z" />
+    <path d="M22 17l-1.64-1.64" />
+    <path d="M19.7 19.3L18 18" />
+    <path d="M20 7l-1-1" />
+    <path d="M17 10l-1-1" />
+  </svg>
+);

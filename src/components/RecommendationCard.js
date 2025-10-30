@@ -1,9 +1,5 @@
 // /frontend/src/components/RecommendationCard.js
 
-/**
- * Komponen untuk menampilkan rekomendasi gizi.
- * Versi profesional dengan desain simple dan clean.
- */
 const RecommendationCard = ({ data }) => {
   console.log("📦 Data yang diterima oleh RecommendationCard:", data);
 
@@ -92,7 +88,7 @@ const RecommendationCard = ({ data }) => {
                             {item.nama}
                           </td>
                           <td className="px-4 py-3 text-sm text-green-600 font-medium">
-                            + {item.porsi} porsi
+                            + {item.porsi}porsi
                           </td>
                         </tr>
                       ))}

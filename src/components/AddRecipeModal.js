@@ -918,7 +918,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
       onClick={handleOverlayClick}
     >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in duration-200">
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-6">
+        <div className="bg-orange-400 px-8 py-6">
           <h2 className="text-2xl font-bold text-white">
             Tambahkan Resep Baru
           </h2>
@@ -960,9 +960,9 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                   onChange={(e) => setKategori(e.target.value)}
                   className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition bg-white"
                 >
-                  <option value="Lauk">Lauk</option>
+                  <option value="Lauk">Protein Hewani</option>
                   <option value="Sayur">Sayur</option>
-                  <option value="Karbo">Karbo</option>
+                  <option value="Karbo">Karbohidrat</option>
                   <option value="Protein Tambahan">Protein Tambahan</option>
                   <option value="Buah">Buah</option>
                 </select>
@@ -1117,7 +1117,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
             <button
               type="submit"
               disabled={isSaving}
-              className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-xl shadow-lg hover:from-orange-600 hover:to-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-2.5 bg-orange-400 text-white font-bold rounded-xl shadow-lg hover:bg-orange-500 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isSaving ? (
                 <>

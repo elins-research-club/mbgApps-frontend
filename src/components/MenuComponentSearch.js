@@ -121,7 +121,7 @@ const MenuComponentSearch = ({
         onChange={handleQueryChange}
         onFocus={() => query.length >= 2 || suggestions.length > 0}
         placeholder={placeholder}
-        className="w-full p-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none transition disabled:bg-slate-100"
+        className="w-full p-3 pl-10 border border-slate-300 rounded-lg outline-none transition disabled:bg-slate-100"
         disabled={disabled || propIsLoading}
       />
       <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />

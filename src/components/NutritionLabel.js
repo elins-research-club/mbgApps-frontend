@@ -117,14 +117,24 @@ const NutritionLabel = forwardRef(
             <div className="flex items-center gap-1">
               <input
                 type="number"
-                value={gizi.energi_kkal}
+                value={
+                  typeof gizi.energi_kkal === "number" &&
+                  !isNaN(gizi.energi_kkal)
+                    ? Number(gizi.energi_kkal.toFixed(2))
+                    : gizi.energi_kkal || 0
+                }
                 onChange={(e) => handleChange("energi_kkal", e.target.value)}
                 className="w-24 p-1 border border-slate-300 rounded-md text-right focus:ring-2 focus:ring-orange-500 outline-none"
               />
               <span>kkal</span>
             </div>
           ) : (
-            <span>{gizi.energi_kkal} kkal</span>
+            <span>
+              {typeof gizi.energi_kkal === "number" && !isNaN(gizi.energi_kkal)
+                ? Number(gizi.energi_kkal.toFixed(2))
+                : gizi.energi_kkal || 0}{" "}
+              kkal
+            </span>
           )}
         </div>
 

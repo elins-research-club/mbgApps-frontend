@@ -23,7 +23,7 @@ const ChefNavbar = ({ onAddRecipeClick, onNewMenuClick }) => {
               className="flex items-center gap-2 p-2 px-3 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors shadow-md"
             >
               <Plus className="w-4 h-4" />
-              <span>Buat Menu Baru</span>
+              <span>Buat Paket Baru</span>
             </button>
 
             {/* 2. Tombol Tambah Resep (Bahan Baru - Aksi 3) */}
@@ -32,7 +32,7 @@ const ChefNavbar = ({ onAddRecipeClick, onNewMenuClick }) => {
               className="flex items-center gap-2 p-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
             >
               <Utensils className="w-5 h-5" />
-              <span>Tambah Bahan Baru</span>
+              <span>Tambah Resep Baru</span>
             </button>
           </div>
         </div>

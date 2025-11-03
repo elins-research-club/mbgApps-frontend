@@ -244,7 +244,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-white">
-                  Buat Menu Komposisi
+                  Buat Paket Komposisi
                 </h2>
                 <p className="text-orange-50 text-sm mt-0.5">
                   Kelompokkan resep menjadi satu paket menu
@@ -270,7 +270,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                 <Sparkles className="w-4 h-4 text-orange-500" />
-                Nama Menu Kelompokan
+                Nama Paket Kelompokan
                 <span className="text-red-500">*</span>
               </label>
               <input
@@ -292,7 +292,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
               </div>
               <div className="relative flex justify-center">
                 <span className="px-4 text-sm font-medium text-slate-500 bg-white">
-                  Komponen Menu
+                  Komponen Paket
                 </span>
               </div>
             </div>
@@ -367,7 +367,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
               ) : (
                 <>
                   <Save className="w-5 h-5" />
-                  Simpan Menu
+                  Simpan Paket
                 </>
               )}
             </button>

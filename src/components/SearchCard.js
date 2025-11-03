@@ -308,10 +308,10 @@ const SearchCard = ({
           <div className="p-2 bg-orange-50 rounded-xl">
             <SearchIcon className="w-6 h-6 text-orange-500" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-800">Cari Menu</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">Cari Paket</h2>
         </div>
         <p className="text-sm text-gray-500 ml-14">
-          Temukan menu komposisi chef dengan mudah
+          Temukan Paket komposisi chef dengan mudah
         </p>
       </div>
 
@@ -424,7 +424,7 @@ const SearchCard = ({
       <div className="mt-4 flex items-start gap-2 p-3 bg-orange-50 rounded-lg border border-orange-100">
         <Sparkles className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
         <p className="text-xs text-orange-700 leading-relaxed">
-          Ketik minimal 2 karakter untuk mulai mencari menu komposisi chef
+          Ketik minimal 2 karakter untuk mulai mencari paket komposisi chef
         </p>
       </div>
     </div>

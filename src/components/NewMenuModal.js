@@ -1,235 +1,252 @@
-// // /frontend/src/components/NewMenuModal.js
-// // REVISI: Menggunakan kategori baru yang sesuai dengan database
+// /frontend/src/components/NewMenuModal.js
+import { useState, useCallback, useRef, useEffect } from "react";
+import { X, Save, ChefHat, Plus, Trash2 } from "lucide-react";
 
-// import { useState } from "react";
-// import Image from "next/image";
-// import { XCircleIcon, SaveIcon, CheckCircleIcon } from "./Icons";
-// import MenuComponentSearch from "./MenuComponentSearch";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
-// // ✅ PERBAIKAN: Daftar kategori menu disesuaikan dengan database
-// const categories = [
-//   { key: "karbohidrat", label: "Karbohidrat", stateKey: "karbo_id" },
-//   { key: "proteinHewani", label: "Protein Hewani", stateKey: "lauk_id" },
-//   { key: "sayur", label: "Sayur", stateKey: "sayur_id" },
-//   {
-//     key: "proteinTambahan",
-//     label: "Protein Tambahan",
-//     stateKey: "side_dish_id",
-//   },
-//   { key: "buah", label: "Buah", stateKey: "buah_id" },
-// ];
+function debounce(func, timeout = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => func.apply(this, args), timeout);
+  };
+}
 
-// /**
-//  * Modal untuk membuat Menu Komposisi Chef baru
-//  * (Menggunakan resep yang sudah ada)
-//  */
-// const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
-//   const [namaMenu, setNamaMenu] = useState("");
-//   // State sekarang menyimpan ID resep/menu yang dipilih
-//   const [selectedMenus, setSelectedMenus] = useState({
-//     karbo_id: null,
-//     lauk_id: null,
-//     sayur_id: null,
-//     side_dish_id: null,
-//     buah_id: null,
-//   });
-
-//   // Handler untuk menyimpan ID menu dari MenuComponentSearch
-//   const handleMenuSelect = (categoryStateKey, menuId) => {
-//     setSelectedMenus((prev) => ({
-//       ...prev,
-//       [categoryStateKey]: menuId,
-//     }));
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-
-//     // 1. Validasi Nama Menu
-//     if (!namaMenu.trim()) {
-//       alert("Nama Menu Kelompokan wajib diisi.");
-//       return;
-//     }
-
-//     // 2. Validasi ID Menu yang Terpilih (PENTING untuk mengatasi Error Anda)
-//     // Cek apakah ada ID menu yang valid (bukan null atau undefined)
-//     const validMenuIds = Object.values(selectedMenus).filter(
-//       (id) => id !== null && id !== 0
-//     );
-
-//     if (validMenuIds.length === 0) {
-//       alert("Anda harus memilih minimal satu menu komponen.");
-//       return;
-//     }
-
-//     // 3. Panggil onSubmit dari parent (ChefDashboard/lainnya)
-//     // Asumsi parent memiliki logic untuk memanggil /api/menu/composition
-//     onSubmit({
-//       nama: namaMenu.trim(),
-//       komposisi: selectedMenus, // Kirim seluruh objek selectedMenus
-//     });
-//   };
-
-//   return (
-//     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-//       <div className="bg-white rounded-3xl p-6 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-//         <div className="flex justify-between items-center border-b pb-3 mb-4 sticky top-0 bg-white">
-//           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-//             <Image
-//               src="/input-icon.png"
-//               alt="Icon Menu"
-//               width={24}
-//               height={24}
-//             />
-//             Simpan Menu Kelompokan Chef
-//           </h2>
-//           <button
-//             onClick={onClose}
-//             className="text-slate-400 hover:text-slate-800 transition"
-//           >
-//             <XCircleIcon className="w-6 h-6" />
-//           </button>
-//         </div>
-
-//         <form onSubmit={handleSubmit} className="space-y-4">
-//           {/* Input Nama Menu Baru */}
-//           <div>
-//             <label
-//               htmlFor="namaMenu"
-//               className="block text-sm font-medium text-slate-700 mb-1"
-//             >
-//               Nama Menu Kelompokan <span className="text-red-500">*</span>
-//             </label>
-//             <input
-//               id="namaMenu"
-//               type="text"
-//               value={namaMenu}
-//               onChange={(e) => setNamaMenu(e.target.value)}
-//               placeholder="Contoh: Paket Sehat Senin"
-//               className="w-full p-3 border border-slate-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 transition"
-//               required
-//               disabled={isLoading}
-//             />
-//           </div>
-
-//           {/* Input Komposisi (Menggunakan MenuComponentSearch) */}
-//           <h3 className="text-lg font-semibold text-slate-700 pt-2 border-t mt-4">
-//             Pilih Komponen Resep (Menu)
-//           </h3>
-//           {categories.map((cat) => (
-//             <div key={cat.key}>
-//               <label className="block text-sm font-medium text-slate-600 mb-1">
-//                 {cat.label}
-//               </label>
-//               <MenuComponentSearch
-//                 category={cat.key} // ✅ Kirim kategori baru (karbohidrat, proteinHewani, dll)
-//                 onMenuSelect={handleMenuSelect}
-//                 placeholder={`Cari resep ${cat.label}...`}
-//                 disabled={isLoading}
-//               />
-//             </div>
-//           ))}
-
-//           {/* Tombol Save Menu Baru */}
-//           <button
-//             type="submit"
-//             disabled={isLoading}
-//             className="w-full py-3 bg-green-500 text-white font-bold text-lg rounded-lg shadow-md hover:bg-green-600 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-//           >
-//             {isLoading ? (
-//               <>
-//                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-//                 Menyimpan Menu Komposisi...
-//               </>
-//             ) : (
-//               <>
-//                 <SaveIcon className="w-5 h-5" />
-//                 Simpan Menu Komposisi Chef
-//               </>
-//             )}
-//           </button>
-
-//           {error && (
-//             <p className="mt-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-lg text-center text-sm flex items-center justify-center gap-2">
-//               <XCircleIcon className="w-5 h-5" /> {error}
-//             </p>
-//           )}
-//         </form>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default NewMenuModal;
-import { useState } from "react";
-import { X, Save, ChefHat, Sparkles } from "lucide-react";
-import MenuComponentSearch from "./MenuComponentSearch";
-
-// ✅ Kategori sesuai database
-const categories = [
-  {
-    key: "karbohidrat",
-    label: "Karbohidrat",
-    stateKey: "karbo_id",
-    emoji: "🍚",
-  },
-  {
-    key: "proteinHewani",
-    label: "Protein Hewani",
-    stateKey: "lauk_id",
-    emoji: "🍖",
-  },
-  { key: "sayur", label: "Sayur", stateKey: "sayur_id", emoji: "🥬" },
-  {
-    key: "proteinTambahan",
-    label: "Protein Tambahan",
-    stateKey: "side_dish_id",
-    emoji: "🥚",
-  },
-  { key: "buah", label: "Buah", stateKey: "buah_id", emoji: "🍎" },
-];
-
-/**
- * Modal untuk membuat Menu Komposisi Chef (dengan tampilan oranye modern)
- */
 const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
   const [namaMenu, setNamaMenu] = useState("");
-  const [selectedMenus, setSelectedMenus] = useState({
-    karbo_id: null,
-    lauk_id: null,
-    sayur_id: null,
-    side_dish_id: null,
-    buah_id: null,
-  });
+  const [recipes, setRecipes] = useState([
+    { id: 1, name: "", menuId: null, kategori: "", status: "idle" },
+  ]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [focusedRecipeId, setFocusedRecipeId] = useState(null);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
 
-  const handleMenuSelect = (categoryStateKey, menuId) => {
-    setSelectedMenus((prev) => ({
-      ...prev,
-      [categoryStateKey]: menuId,
-    }));
+  const searchAbortController = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (searchAbortController.current) {
+        searchAbortController.current.abort();
+      }
+    };
+  }, []);
+
+  const searchRecipes = async (searchQuery) => {
+    if (!searchQuery || searchQuery.trim().length < 1) {
+      setSuggestions([]);
+      return;
+    }
+
+    if (searchAbortController.current) {
+      searchAbortController.current.abort();
+    }
+
+    searchAbortController.current = new AbortController();
+
+    try {
+      const response = await fetch(
+        `${API_URL}/search?q=${encodeURIComponent(searchQuery.trim())}`,
+        {
+          signal: searchAbortController.current.signal,
+        }
+      );
+
+      if (!response.ok) throw new Error("Search failed");
+
+      const data = await response.json();
+      setSuggestions(Array.isArray(data) ? data : []);
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        console.error("Search error:", error);
+        setSuggestions([]);
+      }
+    }
+  };
+
+  const debouncedSearch = useCallback(debounce(searchRecipes, 300), []);
+
+  const handleAddRecipe = () => {
+    setRecipes([
+      ...recipes,
+      {
+        id: Date.now(),
+        name: "",
+        menuId: null,
+        kategori: "",
+        status: "idle",
+      },
+    ]);
+  };
+
+  const handleRemoveRecipe = (id) => {
+    if (recipes.length <= 1) return;
+    setRecipes(recipes.filter((r) => r.id !== id));
+  };
+
+  const handleRecipeChange = (id, value) => {
+    setRecipes((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, name: value, status: "idle" } : r))
+    );
+    debouncedSearch(value);
+    setSelectedSuggestionIndex(-1);
+  };
+
+  const handleSelectSuggestion = (id, selectedMenu) => {
+    console.log("✅ Selected:", selectedMenu);
+
+    setRecipes((prev) =>
+      prev.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              name: selectedMenu.nama,
+              menuId: selectedMenu.id,
+              kategori: selectedMenu.kategori || "",
+              status: "found",
+            }
+          : r
+      )
+    );
+
+    setSuggestions([]);
+    setFocusedRecipeId(null);
+    setSelectedSuggestionIndex(-1);
+  };
+
+  const handleKeyDown = (e, id) => {
+    if (suggestions.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedSuggestionIndex((prev) =>
+          prev < suggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedSuggestionIndex((prev) =>
+          prev > 0 ? prev - 1 : suggestions.length - 1
+        );
+        break;
+      case "Enter":
+        if (selectedSuggestionIndex >= 0) {
+          e.preventDefault();
+          handleSelectSuggestion(id, suggestions[selectedSuggestionIndex]);
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        setSuggestions([]);
+        setSelectedSuggestionIndex(-1);
+        setFocusedRecipeId(null);
+        break;
+      default:
+        break;
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!namaMenu.trim()) {
-      alert("Nama Menu Kelompokan wajib diisi.");
+      alert("Nama menu kelompokan wajib diisi.");
       return;
     }
 
-    const validMenuIds = Object.values(selectedMenus).filter(
-      (id) => id !== null && id !== 0
+    const validRecipes = recipes.filter(
+      (r) => r.menuId && r.status === "found"
     );
 
-    if (validMenuIds.length === 0) {
-      alert("Anda harus memilih minimal satu menu komponen.");
+    console.log("📋 Valid recipes:", validRecipes);
+
+    if (validRecipes.length === 0) {
+      alert("Minimal harus ada 1 resep yang dipilih.");
       return;
     }
+
+    // ✅ PERBAIKAN: Mapping kategori yang benar
+    const komposisi = {
+      karbo_id: null,
+      lauk_id: null,
+      sayur_id: null,
+      side_dish_id: null,
+      buah_id: null,
+    };
+
+    validRecipes.forEach((r) => {
+      console.log(
+        `🔍 Mapping recipe: ${r.name} (kategori: ${r.kategori}, ID: ${r.menuId})`
+      );
+
+      const kategoriMap = {
+        karbohidrat: "karbo_id",
+        "Karbohidrat": "karbo_id", // ✅ TAMBAH CAPITAL
+        proteinHewani: "lauk_id",
+        "Protein Hewani": "lauk_id", // ✅ TAMBAH CAPITAL
+        sayur: "sayur_id",
+        "Sayur": "sayur_id", // ✅ TAMBAH CAPITAL
+        proteinTambahan: "side_dish_id",
+        "Protein Tambahan": "side_dish_id", // ✅ TAMBAH CAPITAL
+        buah: "buah_id",
+        "Buah": "buah_id", // ✅ TAMBAH CAPITAL
+      };
+
+      const key = kategoriMap[r.kategori];
+
+      if (key) {
+        console.log(`✅ Assigning ${r.menuId} to ${key}`);
+        komposisi[key] = r.menuId;
+      } else {
+        console.warn(`❌ Unknown kategori: "${r.kategori}"`);
+      }
+    });
+
+    console.log("📤 Final komposisi:", komposisi);
 
     onSubmit({
       nama: namaMenu.trim(),
-      komposisi: selectedMenus,
+      komposisi,
     });
+  };
+  const getCategoryBadge = (kategori) => {
+    const badges = {
+      karbohidrat: {
+        emoji: "🍚",
+        color: "bg-amber-100 text-amber-700",
+        label: "Karbohidrat",
+      },
+      proteinHewani: {
+        emoji: "🍖",
+        color: "bg-red-100 text-red-700",
+        label: "Protein Hewani",
+      },
+      sayur: {
+        emoji: "🥬",
+        color: "bg-green-100 text-green-700",
+        label: "Sayur",
+      },
+      proteinTambahan: {
+        emoji: "🥚",
+        color: "bg-yellow-100 text-yellow-700",
+        label: "Protein Tambahan",
+      },
+      buah: { emoji: "🍎", color: "bg-pink-100 text-pink-700", label: "Buah" },
+    };
+
+    const badge = badges[kategori] || {
+      emoji: "📦",
+      color: "bg-gray-100 text-gray-700",
+      label: kategori,
+    };
+
+    return (
+      <span
+        className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge.color}`}
+      >
+        {badge.emoji} {badge.label}
+      </span>
+    );
   };
 
   return (
@@ -266,10 +283,9 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
           className="flex-1 overflow-y-auto px-8 py-6"
         >
           <div className="space-y-6">
-            {/* Input Nama Menu */}
+            {/* Nama Menu */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                <Sparkles className="w-4 h-4 text-orange-500" />
                 Nama Paket Kelompokan
                 <span className="text-red-500">*</span>
               </label>
@@ -278,9 +294,9 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
                 value={namaMenu}
                 onChange={(e) => setNamaMenu(e.target.value)}
                 placeholder="Contoh: Paket Sehat Senin"
-                className="w-full px-4 py-3 bg-none border border-orange-200 rounded-xl
+                className="w-full px-4 py-3 border border-orange-200 rounded-xl
                          focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent
-                         disabled:opacity-50 disabled:cursor-not-allowed transition-all text-slate-900"
+                         disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 disabled={isLoading}
               />
             </div>
@@ -292,43 +308,127 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
               </div>
               <div className="relative flex justify-center">
                 <span className="px-4 text-sm font-medium text-slate-500 bg-white">
-                  Komponen Paket
+                  Resep dalam Paket (
+                  {recipes.filter((r) => r.status === "found").length})
                 </span>
               </div>
             </div>
 
-            {/* Grid Komponen */}
-            <div className="grid gap-4">
-              {categories.map((cat) => (
+            {/* Dynamic Recipe Inputs */}
+            <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+              {recipes.map((recipe, index) => (
                 <div
-                  key={cat.key}
-                  className="group relative bg-none rounded-xl p-5 border border-orange-200 
-                           hover:border-orange-400 hover:shadow-md transition-all"
+                  key={recipe.id}
+                  className="relative p-4 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 
+                           border border-orange-200 hover:shadow-md transition-all"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3">
+                    {/* Number Badge */}
                     <div
-                      className="flex-shrink-0 w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-2xl
-                                  group-hover:scale-110 transition-transform"
+                      className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-lg 
+                                  flex items-center justify-center font-semibold text-sm"
                     >
-                      {cat.emoji}
+                      {index + 1}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">
-                        {cat.label}
-                      </label>
-                      <MenuComponentSearch
-                        category={cat.key}
-                        stateKey={cat.stateKey}
-                        onMenuSelect={handleMenuSelect}
-                        placeholder={`Cari resep ${cat.label.toLowerCase()}...`}
-                        disabled={isLoading}
-                        selectedId={selectedMenus[cat.stateKey]}
+
+                    {/* Input Area */}
+                    <div className="flex-1 space-y-2">
+                      <input
+                        type="text"
+                        value={recipe.name}
+                        onChange={(e) =>
+                          handleRecipeChange(recipe.id, e.target.value)
+                        }
+                        onKeyDown={(e) => handleKeyDown(e, recipe.id)}
+                        onFocus={() => {
+                          setFocusedRecipeId(recipe.id);
+                          if (recipe.name.trim()) {
+                            searchRecipes(recipe.name.trim());
+                          }
+                        }}
+                        onBlur={() => {
+                          setTimeout(() => {
+                            setSuggestions([]);
+                            setFocusedRecipeId(null);
+                          }, 200);
+                        }}
+                        placeholder={`Cari resep ${index + 1}...`}
+                        className="w-full px-3 py-2 border border-orange-300 rounded-lg 
+                                 focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+                                 outline-none transition text-sm"
                       />
+
+                      {/* Suggestions Dropdown */}
+                      {focusedRecipeId === recipe.id &&
+                        suggestions.length > 0 && (
+                          <div
+                            className="absolute z-30 left-14 right-14 bg-white border border-slate-300 
+                                      rounded-lg shadow-xl max-h-48 overflow-y-auto mt-1"
+                          >
+                            {suggestions.map((suggestion, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onMouseDown={() =>
+                                  handleSelectSuggestion(recipe.id, suggestion)
+                                }
+                                className={`w-full text-left px-4 py-2.5 text-sm transition 
+                                       flex items-center justify-between gap-2
+                                       ${
+                                         selectedSuggestionIndex === idx
+                                           ? "bg-orange-50 text-orange-700"
+                                           : "hover:bg-slate-50"
+                                       }`}
+                              >
+                                <span className="font-medium">
+                                  {suggestion.nama}
+                                </span>
+                                {getCategoryBadge(suggestion.kategori)}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                      {/* Status Badge */}
+                      {recipe.status === "found" && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-green-600 font-semibold flex items-center gap-1">
+                            ✅ Resep ditemukan
+                          </span>
+                          {recipe.kategori && getCategoryBadge(recipe.kategori)}
+                        </div>
+                      )}
                     </div>
+
+                    {/* Delete Button */}
+                    {recipes.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveRecipe(recipe.id)}
+                        className="flex-shrink-0 p-2 text-red-400 hover:text-red-600 
+                                 hover:bg-red-50 rounded-lg transition"
+                        title="Hapus resep"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* Add Recipe Button */}
+            <button
+              type="button"
+              onClick={handleAddRecipe}
+              className="w-full flex items-center justify-center gap-2 py-3 
+                       border-2 border-dashed border-orange-300 rounded-xl 
+                       text-orange-600 hover:bg-orange-50 hover:border-orange-400 
+                       transition font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              Tambah Resep Lain
+            </button>
 
             {/* Error Message */}
             {error && (
@@ -347,8 +447,9 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="flex-1 px-6 py-3 bg-white border border-orange-300 text-slate-700 font-semibold rounded-xl
-                       hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 px-6 py-3 bg-white border border-orange-300 text-slate-700 
+                       font-semibold rounded-xl hover:bg-orange-50 disabled:opacity-50 
+                       disabled:cursor-not-allowed transition-colors"
             >
               Batal
             </button>
@@ -357,7 +458,8 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
               disabled={isLoading}
               className="flex-1 px-6 py-3 bg-orange-500 text-white font-semibold rounded-xl
                        hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed
-                       transition-all shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2"
+                       transition-all shadow-lg shadow-orange-500/30 flex items-center 
+                       justify-center gap-2"
             >
               {isLoading ? (
                 <>

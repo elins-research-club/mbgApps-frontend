@@ -9,19 +9,19 @@ import SearchCard from "./SearchCard";
 // ini adalah contoh berdasarkan snippet Anda sebelumnya)
 const TARGET_ID_MAP = {
   "TK A": 1,
-  "TK B": 1,
-  "SD Kelas 1": 1,
-  "SD Kelas 2": 2,
-  "SD Kelas 3": 3,
-  "SD Kelas 4": 4,
-  "SD Kelas 5": 5,
-  "SD Kelas 6": 6,
-  "SMP Kelas 1": 7,
-  "SMP Kelas 2": 8,
-  "SMP Kelas 3": 9,
-  "SMA Kelas 1": 10,
-  "SMA Kelas 2": 11,
-  "SMA Kelas 3": 12,
+  "TK B": 2,
+  "SD Kelas 1": 3,
+  "SD Kelas 2": 4,
+  "SD Kelas 3": 5,
+  "SD Kelas 4": 6,
+  "SD Kelas 5": 7,
+  "SD Kelas 6": 8,
+  "SMP Kelas 1": 9,
+  "SMP Kelas 2": 10,
+  "SMP Kelas 3": 11,
+  "SMA Kelas 1": 12,
+  "SMA Kelas 2": 13,
+  "SMA Kelas 3": 14,
 };
 const targetOptions = Object.keys(TARGET_ID_MAP);
 

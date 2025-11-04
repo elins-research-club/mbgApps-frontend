@@ -219,22 +219,41 @@ const getMenuIdByName = async (name) => {
 
 // --- FUNGSI BARU: Menyimpan Komposisi Menu Baru ---
 export const saveNewMenuComposition = async (formData) => {
-  const payload = {
-    nama: formData.nama,
-    komposisi: formData.komposisi,
-  };
-
-  const validIdsCount = Object.values(payload.komposisi).filter(
-    (id) => id !== null && id !== 0
-  ).length;
-
-  if (validIdsCount === 0) {
-    throw new Error(
-      "Tidak ada resep yang valid ditemukan untuk komposisi ini. Menu tidak dapat disimpan."
-    );
-  }
-
   try {
+    console.log("📤 [API] Menerima formData:", formData);
+
+    // ✅ PERBAIKAN: Validasi dan build payload dengan benar
+    const { nama, komposisi } = formData;
+
+    if (!nama || !nama.trim()) {
+      throw new Error("Nama menu tidak boleh kosong");
+    }
+
+    if (!komposisi || typeof komposisi !== "object") {
+      throw new Error("Data komposisi tidak valid");
+    }
+
+    // Hitung berapa banyak resep yang valid
+    const validIdsCount = Object.values(komposisi).filter(
+      (id) => id !== null && id !== undefined && id !== 0
+    ).length;
+
+    console.log("📊 [API] Valid IDs count:", validIdsCount);
+    console.log("📋 [API] Komposisi:", komposisi);
+
+    if (validIdsCount === 0) {
+      throw new Error(
+        "Tidak ada resep yang valid ditemukan. Minimal 1 resep harus dipilih."
+      );
+    }
+
+    const payload = {
+      nama: nama.trim(),
+      komposisi: komposisi,
+    };
+
+    console.log("📦 [API] Sending payload:", JSON.stringify(payload, null, 2));
+
     const response = await fetch(`${API_URL}/menu/composition`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -243,12 +262,15 @@ export const saveNewMenuComposition = async (formData) => {
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error("❌ [API] Backend error:", errorData);
       throw new Error(errorData.message || "Gagal menyimpan Menu Komposisi.");
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log("✅ [API] Save successful:", result);
+    return result;
   } catch (error) {
-    console.error("Error di saveNewMenuComposition:", error);
+    console.error("💥 [API] Error di saveNewMenuComposition:", error);
     throw error;
   }
 };

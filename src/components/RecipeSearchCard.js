@@ -232,14 +232,14 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
       </div>
 
       {/* Helper text */}
-      {query.length > 0 && query.length < 2 && (
+      {/* {query.length > 0 && query.length < 2 && (
         <p className="text-xs text-slate-500 mt-2">
           💡 Ketik minimal 2 karakter untuk mencari
         </p>
-      )}
+      )} */}
 
       {/* Tips */}
-      {query.length === 0 && (
+      {/* {query.length === 0 && (
         <div className="mt-4 p-3 bg-slate-50 rounded-lg">
           <p className="text-xs text-slate-600 mb-1 font-semibold">
             💡 Tips Pencarian:
@@ -250,7 +250,7 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
             <li>• Hasil akan menampilkan label nutrisi lengkap</li>
           </ul>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

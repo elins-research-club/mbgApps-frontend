@@ -185,12 +185,12 @@ const SearchCard = ({
         </div>
       </div>
 
-      <div className="mt-4 flex items-start gap-2 p-3 bg-orange-50 rounded-lg border border-orange-100">
+      {/* <div className="mt-4 flex items-start gap-2 p-3 bg-orange-50 rounded-lg border border-orange-100">
         <Sparkles className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
         <p className="text-xs text-orange-700 leading-relaxed">
           Ketik minimal 2 karakter untuk mencari paket menu yang sudah dibuat
         </p>
-      </div>
+      </div> */}
     </div>
   );
 };

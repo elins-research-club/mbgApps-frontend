@@ -264,6 +264,9 @@ export default function ChefDashboard() {
     }
   };
 
+  // const groupedData = result.detailPerhitungan?.rincian_per_bahan_grouped || [];
+
+  // Di bagian handleMenuSelect, PINDAHKAN groupedData ke dalam fungsi
   const handleMenuSelect = async (menuId) => {
     setIsLoading(true);
     clearResults();
@@ -281,6 +284,9 @@ export default function ChefDashboard() {
       setCalculationLog(result.detailPerhitungan?.log || []);
       setRecommendationData(result.rekomendasi || null);
       setDetailPerResep(result.detailPerResep || null);
+
+      // ✅ HAPUS LINE 244, TIDAK PERLU groupedData di sini
+      // Backend sudah kirim detailPerResep yang sudah format lengkap
     } catch (err) {
       console.error("[ChefDashboard] Error di handleMenuSelect:", err);
       setError(err.message || "Terjadi kesalahan saat mencari menu.");
@@ -405,13 +411,13 @@ export default function ChefDashboard() {
                   htmlFor="target"
                   className="text-lg font-bold text-orange-500 mb-2 block"
                 >
-                  Target Audiens Analisis
+                  Target Kelompok Sasaran
                 </label>
                 <select
                   id="target"
                   value={selectedTarget}
                   onChange={(e) => setSelectedTarget(e.target.value)}
-                  className="w-full mt-2 p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition"
+                  className="w-full mt-2 p-3 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-orange-400 outline-none transition"
                 >
                   {targetOptions.map((option) => (
                     <option key={option} value={option}>
@@ -433,13 +439,13 @@ export default function ChefDashboard() {
                     }}
                     className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
                       !isRecipeView
-                        ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md"
+                        ? "bg-orange-400 text-white shadow-md"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                   >
                     <div className="flex items-center justify-center gap-2">
                       <span className="text-xl">📋</span>
-                      <span>Paket Menu Lengkap</span>
+                      <span>Cari Paketan Menu</span>
                     </div>
                     {!isRecipeView && (
                       <p className="text-xs mt-1 opacity-90">
@@ -457,7 +463,7 @@ export default function ChefDashboard() {
                     }}
                     className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
                       isRecipeView
-                        ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md"
+                        ? "bg-orange-400 text-white shadow-md"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                   >
@@ -587,7 +593,8 @@ export default function ChefDashboard() {
                 <DetailResultCard
                   log={calculationLog}
                   details={detailBahan}
-                  detailPerResep={isRecipeView ? null : detailPerResep}
+                  detailPerResep={detailPerResep}
+                  // groupedData={groupedData}
                 />
               )}
             </div>

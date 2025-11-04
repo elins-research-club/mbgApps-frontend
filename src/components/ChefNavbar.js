@@ -20,7 +20,7 @@ const ChefNavbar = ({ onAddRecipeClick, onNewMenuClick }) => {
             {/* 1. Tombol Buat Menu Baru (Recipe Composition - Aksi 2) */}
             <button
               onClick={onNewMenuClick} // <-- Tombol baru
-              className="flex items-center gap-2 p-2 px-3 rounded-lg text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors shadow-md"
+              className="flex items-center gap-2 p-2 px-3 rounded-lg text-sm font-semibold bg-orange-400 text-white hover:bg-orange-500 transition-colors shadow-md"
             >
               <Plus className="w-4 h-4" />
               <span>Buat Paket Menu</span>

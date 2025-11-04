@@ -3,7 +3,7 @@ import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import NutritionLabel from "./NutritionLabel";
 
-const DetailResultCard = ({ log, details, detailPerResep }) => {
+const DetailResultCard = ({ log, details, detailPerResep, groupedData }) => {
   const ingredientDetails = details || [];
   const calculationLog = log || [];
 
@@ -37,7 +37,7 @@ const DetailResultCard = ({ log, details, detailPerResep }) => {
             style={{ objectFit: "contain" }}
           />
           <h3 className="text-2xl font-bold text-orange-500">
-            Rincian Gizi per Bahan
+            Nutrisi per Bahan
           </h3>
         </div>
 

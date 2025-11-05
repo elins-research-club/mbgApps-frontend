@@ -2,7 +2,7 @@ import { useState, useMemo, useRef } from "react";
 import { Search as SearchIcon, List as ListIcon, Boxes } from "lucide-react";
 import debounce from "lodash.debounce";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const SearchCard = ({
   onMenuSelect,

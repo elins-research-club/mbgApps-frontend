@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search as SearchIcon } from "lucide-react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
   const [query, setQuery] = useState("");

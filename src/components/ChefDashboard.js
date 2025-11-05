@@ -14,7 +14,9 @@ import NewMenuModal from "./NewMenuModal";
 import AddRecipeModal from "./AddRecipeModal";
 import RecommendationCard from "./RecommendationCard";
 import NutritionPerRecipeCard from "./NutritionPerRecipeCard";
-import RecipeSearchCard from "./RecipeSearchCard"; // ✅ IMPORT BARU
+import RecipeSearchCard from "./RecipeSearchCard";
+import TargetSelector from "./TargetSelector";
+import { LayoutList, UtensilsCrossed } from "lucide-react";
 import {
   generateNutrition,
   getMenuNutritionById,
@@ -402,30 +404,17 @@ export default function ChefDashboard() {
             {/* Kolom Kiri */}
             <div className="lg:sticky lg:top-8">
               {/* Target Audiens Selector */}
-              <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-200 mb-6">
-                <label
-                  htmlFor="target"
-                  className="text-lg font-bold text-orange-500 mb-2 block"
-                >
-                  Target Kelompok Sasaran
-                </label>
-                <select
-                  id="target"
-                  value={selectedTarget}
-                  onChange={(e) => setSelectedTarget(e.target.value)}
-                  className="w-full mt-2 p-3 bg-white border border-slate-300 rounded-lg focus:ring-1 focus:ring-orange-400 outline-none transition"
-                >
-                  {targetOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+              <div className="mb-6">
+                <TargetSelector
+                  selectedTarget={selectedTarget}
+                  onChange={(value) => setSelectedTarget(value)}
+                />
               </div>
 
               {/* ✅ TOGGLE BUTTON BARU: Switch Mode */}
               <div className="bg-white p-4 rounded-2xl shadow-lg border border-slate-200 mb-6">
                 <div className="flex gap-3">
+                  {/* 🔸 Paket Menu Button */}
                   <button
                     type="button"
                     onClick={() => {
@@ -433,23 +422,28 @@ export default function ChefDashboard() {
                       clearResults();
                       setIsRecipeView(false);
                     }}
-                    className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+                    className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-200 border ${
                       !isRecipeView
-                        ? "bg-orange-400 text-white shadow-md"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        ? "bg-orange-400 text-white border-orange-400 shadow-md"
+                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
                     }`}
                   >
                     <div className="flex items-center justify-center gap-2">
-                      <span className="text-xl">📋</span>
+                      <LayoutList
+                        className={`w-5 h-5 ${
+                          !isRecipeView ? "text-white" : "text-orange-400"
+                        }`}
+                      />
                       <span>Cari Paketan Menu</span>
                     </div>
                     {!isRecipeView && (
-                      <p className="text-xs mt-1 opacity-90">
+                      <p className="text-xs mt-1 opacity-90 font-normal">
                         Hitung gizi dari kombinasi resep
                       </p>
                     )}
                   </button>
 
+                  {/* 🔹 Resep Individual Button */}
                   <button
                     type="button"
                     onClick={() => {
@@ -457,18 +451,22 @@ export default function ChefDashboard() {
                       clearResults();
                       setIsRecipeView(true);
                     }}
-                    className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+                    className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-200 border ${
                       isRecipeView
-                        ? "bg-orange-400 text-white shadow-md"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        ? "bg-orange-400 text-white border-orange-400 shadow-md"
+                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
                     }`}
                   >
                     <div className="flex items-center justify-center gap-2">
-                      <span className="text-xl">🍳</span>
+                      <UtensilsCrossed
+                        className={`w-5 h-5 ${
+                          isRecipeView ? "text-white" : "text-orange-400"
+                        }`}
+                      />
                       <span>Resep Individual</span>
                     </div>
                     {isRecipeView && (
-                      <p className="text-xs mt-1 opacity-90">
+                      <p className="text-xs mt-1 opacity-90 font-normal">
                         Lihat gizi satu resep saja
                       </p>
                     )}
@@ -568,10 +566,10 @@ export default function ChefDashboard() {
           {/* 🔹 ROW 2: Rekomendasi (Full Width) */}
           {/* ✅ HANYA TAMPIL jika BUKAN Recipe Mode */}
           {hasResults && recommendationData && !isRecipeView && (
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg mb-8 border border-slate-200">
-              <h2 className="text-2xl font-bold text-orange-500 mb-4">
+            <div className="bg-none p-0 mb-8">
+              {/* <h2 className="text-2xl font-bold text-orange-500 mb-4">
                 Rekomendasi Menu Tambahan
-              </h2>
+              </h2> */}
               <RecommendationCard data={recommendationData} />
             </div>
           )}

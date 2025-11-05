@@ -65,23 +65,70 @@ export const checkIngredient = async (name) => {
   }
 };
 
+// export const generateIngredient = async (name) => {
+//   try {
+//     const response = await fetch(`${API_URL}/ingredients/get-ingredients`, {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ name: name }),
+//     });
+
+//     if (!response.ok) {
+//       const err = await response.json();
+//       throw new Error(err.message || "Gagal men-generate bahan");
+//     }
+
+//     return await response.json();
+//   } catch (error) {
+//     console.error("Error di generateIngredient:", error);
+//     return { success: false, message: error.message };
+//   }
+// };
+
+// Di /frontend/src/services/api.js
+
 export const generateIngredient = async (name) => {
   try {
+    console.log(`📤 [API] Generating ingredient: "${name}"`);
+
     const response = await fetch(`${API_URL}/ingredients/get-ingredients`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: name }),
     });
 
+    console.log(`📥 [API] Response status: ${response.status}`);
+
     if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.message || "Gagal men-generate bahan");
+      const errorText = await response.text();
+      console.error(`❌ [API] HTTP Error ${response.status}:`, errorText);
+
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { error: errorText };
+      }
+
+      return {
+        success: false,
+        error: errorData.error || `HTTP ${response.status}`,
+        message:
+          errorData.error || errorData.message || "Gagal men-generate bahan",
+      };
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`✅ [API] Success response:`, data);
+
+    return data;
   } catch (error) {
-    console.error("Error di generateIngredient:", error);
-    return { success: false, message: error.message };
+    console.error(`💥 [API] Exception in generateIngredient:`, error);
+    return {
+      success: false,
+      error: error.message,
+      message: "Gagal menghubungi server",
+    };
   }
 };
 

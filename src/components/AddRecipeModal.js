@@ -818,7 +818,18 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                                   <button
                                     key={idx}
                                     type="button"
-                                    className="w-full text-left px-4 py-3 hover:bg-slate-50"
+                                    onClick={() =>
+                                      handleSelectSuggestion(
+                                        item.id,
+                                        suggestion.nama,
+                                        suggestion.id
+                                      )
+                                    } // ✅ TAMBAHKAN onClick!
+                                    className={`w-full text-left px-4 py-3 transition-colors ${
+                                      idx === selectedSuggestionIndex
+                                        ? "bg-purple-100 border-l-4 border-purple-500"
+                                        : "hover:bg-slate-50"
+                                    }`}
                                   >
                                     <div className="flex items-center justify-between">
                                       <span className="font-medium">

@@ -167,11 +167,40 @@ export const getNotValidatedIngredients = async () => {
   }
 };
 
-export const validateIngredient = async (id, nutritionData) => {
+// export const validateIngredient = async (id, nutritionData) => {
+//   try {
+//     const payload = {
+//       ingredientData: nutritionData,
+//     };
+
+//     const response = await fetch(`${API_URL}/ingredients/${id}`, {
+//       method: "PUT",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify(payload),
+//     });
+
+//     if (!response.ok) {
+//       const err = await response.json();
+//       throw new Error(err.message || "Gagal memvalidasi bahan");
+//     }
+
+//     return await response.json();
+//   } catch (error) {
+//     console.error("Error di validateIngredient:", error);
+//     return { success: false, message: error.message };
+//   }
+// };
+
+// Di /frontend/src/services/api.js
+
+export const validateIngredient = async (id, nutritionData, validatorName) => {
   try {
     const payload = {
       ingredientData: nutritionData,
+      validatedBy: validatorName, // ✅ KIRIM NAMA AHLI GIZI
     };
+
+    console.log("Validating ingredient:", payload);
 
     const response = await fetch(`${API_URL}/ingredients/${id}`, {
       method: "PUT",

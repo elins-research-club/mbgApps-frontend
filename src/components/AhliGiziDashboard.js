@@ -116,27 +116,63 @@ export default function AhliGiziDashboard() {
   };
 
   // --- DIUBAH: Fungsi ini sekarang memanggil API sungguhan ---
-  const handleValidate = async (id, updatedData) => {
-    console.log("Memvalidasi ID:", id, "dengan data:", updatedData);
+  // const handleValidate = async (id, updatedData) => {
+  //   console.log("Memvalidasi ID:", id, "dengan data:", updatedData);
 
-    // 1. Ambil data nutrisi (flat) dari 'updatedData' (nested)
-    //    Backend kita mengharapkan objek nutrisi yang flat
+  //   // 1. Ambil data nutrisi (flat) dari 'updatedData' (nested)
+  //   //    Backend kita mengharapkan objek nutrisi yang flat
+  //   const flatNutritionData = updatedData.informasi_nilai_gizi;
+
+  //   // 2. Panggil API untuk validasi
+  //   //    Endpoint ini akan menyimpan gizi BARU dan set 'isValidated = true'
+  //   const result = await validateIngredient(id, flatNutritionData);
+
+  //   if (result.success) {
+  //     // 3. Jika sukses, hapus item dari daftar 'perlu validasi' di UI
+  //     setValidationList((prevList) =>
+  //       prevList.filter((item) => item.id !== id)
+  //     );
+  //     handleCloseModal(); // Tutup modal
+  //   } else {
+  //     // Jika gagal, tampilkan error (idealnya di dalam modal)
+  //     console.error("Gagal memvalidasi:", result.message);
+  //     alert(`Error: ${result.message}`); // Tampilkan error sederhana
+  //   }
+  // };
+
+  // Di AhliGiziDashboard.js
+
+  // Update fungsi handleValidate untuk menerima parameter validatorName
+  const handleValidate = async (id, updatedData, validatorName) => {
+    console.log(
+      "Memvalidasi ID:",
+      id,
+      "dengan data:",
+      updatedData,
+      "oleh:",
+      validatorName
+    );
+
     const flatNutritionData = updatedData.informasi_nilai_gizi;
 
-    // 2. Panggil API untuk validasi
-    //    Endpoint ini akan menyimpan gizi BARU dan set 'isValidated = true'
-    const result = await validateIngredient(id, flatNutritionData);
+    // ✅ KIRIM NAMA VALIDATOR KE API
+    const result = await validateIngredient(
+      id,
+      flatNutritionData,
+      validatorName
+    );
 
     if (result.success) {
-      // 3. Jika sukses, hapus item dari daftar 'perlu validasi' di UI
       setValidationList((prevList) =>
         prevList.filter((item) => item.id !== id)
       );
-      handleCloseModal(); // Tutup modal
+      handleCloseModal();
+
+      // ✅ TAMPILKAN SUCCESS MESSAGE
+      alert(`Berhasil! Bahan telah divalidasi oleh ${validatorName}`);
     } else {
-      // Jika gagal, tampilkan error (idealnya di dalam modal)
       console.error("Gagal memvalidasi:", result.message);
-      alert(`Error: ${result.message}`); // Tampilkan error sederhana
+      alert(`Error: ${result.message}`);
     }
   };
 

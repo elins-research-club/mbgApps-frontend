@@ -264,9 +264,6 @@ export default function ChefDashboard() {
     }
   };
 
-  // const groupedData = result.detailPerhitungan?.rincian_per_bahan_grouped || [];
-
-  // Di bagian handleMenuSelect, PINDAHKAN groupedData ke dalam fungsi
   const handleMenuSelect = async (menuId) => {
     setIsLoading(true);
     clearResults();
@@ -279,14 +276,13 @@ export default function ChefDashboard() {
         throw new Error("Gagal menghitung gizi atau respons tidak valid.");
       }
 
+      console.log("📊 detailPerResep received:", result.detailPerResep); // ✅ TAMBAH LOG INI
+
       setTotalLabel(result.totalLabel);
       setDetailBahan(result.detailPerhitungan?.rincian_per_bahan || []);
       setCalculationLog(result.detailPerhitungan?.log || []);
       setRecommendationData(result.rekomendasi || null);
-      setDetailPerResep(result.detailPerResep || null);
-
-      // ✅ HAPUS LINE 244, TIDAK PERLU groupedData di sini
-      // Backend sudah kirim detailPerResep yang sudah format lengkap
+      setDetailPerResep(result.detailPerResep || null); // ✅ PASTIKAN INI ADA
     } catch (err) {
       console.error("[ChefDashboard] Error di handleMenuSelect:", err);
       setError(err.message || "Terjadi kesalahan saat mencari menu.");

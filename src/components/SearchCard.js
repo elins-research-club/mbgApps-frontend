@@ -163,7 +163,7 @@ const SearchCard = ({
           suggestions.length === 0 && (
             <div className="absolute z-10 w-full bg-white border border-slate-300 rounded-lg shadow-xl mt-1 p-4 text-center">
               <p className="text-sm text-slate-500">
-                Tidak ada paket menu dengan nama <b>"{query}"</b>
+                Tidak ada paket menu dengan nama <b>&quot;{query}&quot;</b>
               </p>
             </div>
           )}

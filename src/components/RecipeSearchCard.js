@@ -13,13 +13,12 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchTimeout = useRef(null);
   const wrapperRef = useRef(null);
+  const isSelectingRef = useRef(false); // 🟢 Tambahan penting
 
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
-      if (searchTimeout.current) {
-        clearTimeout(searchTimeout.current);
-      }
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
     };
   }, []);
 
@@ -33,21 +32,23 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Debounced search
+  // 🔍 Debounced search
   useEffect(() => {
+    // ⛔ Skip search kalau baru saja memilih resep
+    if (isSelectingRef.current) {
+      isSelectingRef.current = false;
+      return;
+    }
+
     if (query.length < 2) {
       setSuggestions([]);
       return;
     }
 
-    if (searchTimeout.current) {
-      clearTimeout(searchTimeout.current);
-    }
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
 
     searchTimeout.current = setTimeout(async () => {
       setIsSearching(true);
@@ -55,7 +56,6 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
         const response = await fetch(
           `${API_URL}/search?q=${encodeURIComponent(query)}&type=all`
         );
-
         if (response.ok) {
           const data = await response.json();
           console.log("🔍 Search results:", data);
@@ -73,12 +73,24 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
     }, 300);
   }, [query]);
 
+  // ✅ Handle select (langsung tutup dropdown tanpa trigger search baru)
   const handleSelect = (recipe) => {
     console.log("✅ Selected recipe:", recipe);
-    onRecipeSelect(recipe.id);
-    setQuery(recipe.nama);
+
+    // Tandai bahwa kita sedang memilih manual (agar useEffect tidak fetch ulang)
+    isSelectingRef.current = true;
+
+    // Tutup semua hasil dan hentikan pencarian aktif
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
     setSuggestions([]);
+    setIsSearching(false);
+
+    // Set query ke nama resep
+    setQuery(recipe.nama);
+
+    // Reset highlight dan kirim ID ke parent
     setSelectedIndex(-1);
+    onRecipeSelect(recipe.id);
   };
 
   const handleKeyDown = (e) => {
@@ -222,35 +234,14 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
         )}
 
         {/* No results message */}
-        {!isSearching && query.length >= 2 && suggestions.length === 0 && (
+        {/* {!isSearching && query.length >= 2 && suggestions.length === 0 && (
           <div className="absolute z-10 w-full bg-white border border-slate-300 rounded-lg shadow-xl mt-1 p-4">
             <p className="text-sm text-slate-500 text-center">
               Tidak ada resep yang ditemukan dengan kata kunci "{query}"
             </p>
           </div>
-        )}
+        )} */}
       </div>
-
-      {/* Helper text */}
-      {/* {query.length > 0 && query.length < 2 && (
-        <p className="text-xs text-slate-500 mt-2">
-          💡 Ketik minimal 2 karakter untuk mencari
-        </p>
-      )} */}
-
-      {/* Tips */}
-      {/* {query.length === 0 && (
-        <div className="mt-4 p-3 bg-slate-50 rounded-lg">
-          <p className="text-xs text-slate-600 mb-1 font-semibold">
-            💡 Tips Pencarian:
-          </p>
-          <ul className="text-xs text-slate-600 space-y-1 ml-4">
-            <li>• Ketik nama resep yang ingin dicari</li>
-            <li>• Gunakan keyboard (↑↓ untuk navigasi, Enter untuk pilih)</li>
-            <li>• Hasil akan menampilkan label nutrisi lengkap</li>
-          </ul>
-        </div>
-      )} */}
     </div>
   );
 };

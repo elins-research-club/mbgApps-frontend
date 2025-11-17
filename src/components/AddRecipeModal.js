@@ -679,13 +679,13 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
               </div>
 
               <div>
-                <label
+                {/* <label
                   htmlFor="kategori"
                   className="block text-sm font-semibold text-slate-700 mb-2"
                 >
                   Kategori Resep <span className="text-red-500">*</span>
-                </label>
-                <select
+                </label> */}
+                {/* <select
                   id="kategori"
                   value={kategori}
                   onChange={(e) => setKategori(e.target.value)}
@@ -696,7 +696,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                   <option value="sayur">Sayur</option>
                   <option value="proteinTambahan">Protein Tambahan</option>
                   <option value="buah">Buah/Susu/Salad</option>
-                </select>
+                </select> */}
               </div>
             </div>
 
@@ -818,12 +818,13 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                                   <button
                                     key={idx}
                                     type="button"
-                                    onClick={() =>
+                                    onMouseDown={(e) =>{
+                                      e.preventDefault();
                                       handleSelectSuggestion(
                                         item.id,
                                         suggestion.nama,
                                         suggestion.id
-                                      )
+                                      )}
                                     } // ✅ TAMBAHKAN onClick!
                                     className={`w-full text-left px-4 py-3 transition-colors ${
                                       idx === selectedSuggestionIndex

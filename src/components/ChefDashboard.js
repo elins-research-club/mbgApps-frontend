@@ -15,7 +15,7 @@ import AddRecipeModal from "./AddRecipeModal";
 import RecommendationCard from "./RecommendationCard";
 import NutritionPerRecipeCard from "./NutritionPerRecipeCard";
 import RecipeSearchCard from "./RecipeSearchCard";
-import TargetSelector from "./TargetSelector";
+// import TargetSelector from "./TargetSelector";
 import { LayoutList, UtensilsCrossed } from "lucide-react";
 import {
   generateNutrition,
@@ -405,10 +405,10 @@ export default function ChefDashboard() {
             <div className="lg:sticky lg:top-8">
               {/* Target Audiens Selector */}
               <div className="mb-6">
-                <TargetSelector
+                {/* <TargetSelector
                   selectedTarget={selectedTarget}
                   onChange={(value) => setSelectedTarget(value)}
-                />
+                /> */}
               </div>
 
               {/* ✅ TOGGLE BUTTON BARU: Switch Mode */}

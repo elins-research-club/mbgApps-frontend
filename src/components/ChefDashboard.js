@@ -329,6 +329,7 @@ export default function ChefDashboard() {
         `Total bahan: ${result.detailPerhitungan?.jumlah_bahan || 0}`,
       ]);
       setSelectedRecipeId(recipeId);
+      setRecommendationData(result.rekomendasi);
 
       console.log("✅ Recipe data loaded successfully");
     } catch (err) {
@@ -565,7 +566,7 @@ export default function ChefDashboard() {
 
           {/* 🔹 ROW 2: Rekomendasi (Full Width) */}
           {/* ✅ HANYA TAMPIL jika BUKAN Recipe Mode */}
-          {hasResults && recommendationData && !isRecipeView && (
+          {hasResults && recommendationData && isRecipeView && (
             <div className="bg-none p-0 mb-8">
               {/* <h2 className="text-2xl font-bold text-orange-500 mb-4">
                 Rekomendasi Menu Tambahan

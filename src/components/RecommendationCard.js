@@ -4,7 +4,11 @@ import NextImage from 'next/image'
 import * as htmlToImage from 'html-to-image'
 import jsPDF from 'jspdf'
 const RecommendationCard = ({ data, totalLabel }) => {
-  const { combinedKekurangan = [], combinedSaran = [] } = data || {}
+	const {
+		combinedKekurangan = [],
+		combinedSaran = [],
+		warnings = [],
+	} = data || {}
   const [isPrinting, setIsPrinting] = useState(false)
   const nutritionLabelRef = useRef(null)
   const hasResults = totalLabel !== null
@@ -56,24 +60,44 @@ const handlePrintPDF = async () => {
 }
   
 
-// Group kekurangan by kelas
-  const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
-    if (!acc[item.kelas]) acc[item.kelas] = []
-    acc[item.kelas].push(item)
-    return acc
-  }, {})
+	// --- 1. Group kekurangan by kelas ---
+	const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
+		if (!acc[item.kelas]) acc[item.kelas] = [];
+		acc[item.kelas].push(item);
+		return acc;
+	}, {});
 
-  // Group saran by kelas
-  const groupedSaran = combinedSaran.reduce((acc, item) => {
-    if (!acc[item.kelas]) acc[item.kelas] = []
-    acc[item.kelas].push(item)
-    return acc
-  }, {})
+	// --- 2. Group saran by kelas ---
+	const groupedSaran = combinedSaran.reduce((acc, item) => {
+		if (!acc[item.kelas]) acc[item.kelas] = []
+		acc[item.kelas].push(item)
+		return acc
+	}, {})
 
-  // Combine all kelas keys
-  const allKelas = Array.from(
-    new Set([...Object.keys(groupedKekurangan), ...Object.keys(groupedSaran)])
-  ).sort((a, b) => a - b) // sort numerically
+	// --- 3. Group warnings by kelas AND by reason ---
+	const groupedWarnings = warnings.reduce((acc, item) => {
+		if (!acc[item.kelas]) acc[item.kelas] = {};
+
+		const reason = item.warning || item.reason || "Peringatan";
+		if (!acc[item.kelas][reason]) acc[item.kelas][reason] = [];
+
+		if (item.details && item.details.length) {
+			acc[item.kelas][reason].push(...item.details);
+		} else {
+			acc[item.kelas][reason].push({ reason });
+		}
+
+		return acc;
+	}, {});
+
+	// Combine all kelas keys
+	const allKelas = Array.from(
+		new Set([
+			...Object.keys(groupedKekurangan),
+			...Object.keys(groupedSaran),
+			...Object.keys(groupedWarnings),
+		]),
+	).sort((a, b) => a - b);
 
   const hasData = allKelas.length > 0
 
@@ -107,37 +131,37 @@ const handlePrintPDF = async () => {
       return next
     })
 
-  return (
-    <div className='bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200'>
-      {/* Header */}
-      <div className='border-b-2 border-orange-200 bg-gradient-to-r from-orange-50 to-white px-6 py-5'>
-        <div className='flex items-start gap-3'>
-          <div className='w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1'>
-            <svg
-              className='w-6 h-6 text-white'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={2}
-                d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'
-              />
-            </svg>
-          </div>
-          <div>
-            <h3 className='text-xl font-bold text-[#202020]'>
-              Analisis & Rekomendasi Nutrisi
-            </h3>
-            <p className='text-sm text-slate-600 mt-1'>
-              Evaluasi kecukupan gizi dan saran optimalisasi menu untuk berbagai
-              tingkat pendidikan
-            </p>
-          </div>
-        </div>
-      </div>
+	return (
+		<div className='bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200'>
+			{/* Header */}
+			<div className='border-b-2 border-orange-200 bg-gradient-to-r from-orange-50 to-white px-6 py-5'>
+				<div className='flex items-start gap-3'>
+					<div className='w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1'>
+						<svg
+							className='w-6 h-6 text-white'
+							fill='none'
+							viewBox='0 0 24 24'
+							stroke='currentColor'
+						>
+							<path
+								strokeLinecap='round'
+								strokeLinejoin='round'
+								strokeWidth={2}
+								d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'
+							/>
+						</svg>
+					</div>
+					<div>
+						<h3 className='text-xl font-bold text-[#202020]'>
+							Analisis & Rekomendasi Nutrisi
+						</h3>
+						<p className='text-sm text-slate-600 mt-1'>
+							Evaluasi kecukupan gizi dan saran optimalisasi menu untuk berbagai
+							tingkat pendidikan
+						</p>
+					</div>
+				</div>
+			</div>
 
       {/* Content */}
       <div className='p-6'>

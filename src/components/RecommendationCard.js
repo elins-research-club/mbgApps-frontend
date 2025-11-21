@@ -5,10 +5,10 @@ import * as htmlToImage from 'html-to-image'
 import jsPDF from 'jspdf'
 const RecommendationCard = ({ data, totalLabel }) => {
 	const {
-		combinedKekurangan = [],
-		combinedSaran = [],
-		warnings = [],
-	} = data || {}
+	combinedKekurangan = [],
+	combinedSaran = [],
+	warnings = [],
+} = data || {}
   const [isPrinting, setIsPrinting] = useState(false)
   const nutritionLabelRef = useRef(null)
   const hasResults = totalLabel !== null
@@ -60,12 +60,24 @@ const handlePrintPDF = async () => {
 }
   
 
-	// --- 1. Group kekurangan by kelas ---
-	const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
-		if (!acc[item.kelas]) acc[item.kelas] = [];
-		acc[item.kelas].push(item);
-		return acc;
-	}, {});
+// --- 1. Group kekurangan by kelas and split by comma ---
+const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
+	if (!acc[item.kelas]) acc[item.kelas] = [];
+
+	// Split by comma and trim each part
+	const nutrients = item.kurang.split(",").map(n => n.trim());
+
+	// Push each nutrient separately, keep kelas info
+	nutrients.forEach(nutrient => {
+		acc[item.kelas].push({
+			kelas: item.kelas,
+			nutrient,
+		});
+	});
+
+	return acc;
+}, {});
+
 
 	// --- 2. Group saran by kelas ---
 	const groupedSaran = combinedSaran.reduce((acc, item) => {
@@ -248,6 +260,7 @@ const handlePrintPDF = async () => {
                               </ul>
                             </div>
                           )}
+
 
                         {/* Saran */}
                         {groupedSaran[kelas] && groupedSaran[kelas].length > 0 && (

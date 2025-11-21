@@ -242,23 +242,22 @@ const RecommendationCard = ({ data, totalLabel }) => {
                   {open && (
                     <div className='grid grid-flow-col'>
                       <div className='px-4 py-4 bg-white'>
+                        
                         {/* Kekurangan */}
-                        {groupedKekurangan[kelas] &&
-                          groupedKekurangan[kelas].length > 0 && (
-                            <div className='mb-4'>
-                              <h5 className='font-bold text-red-600 mb-1'>
-                                Kekurangan Nutrisi
-                              </h5>
-                              <ul className='list-disc list-inside text-sm text-slate-700'>
-                                {groupedKekurangan[kelas].map((item, idx) => (
-                                  <li key={idx}>
-                                    {item.menu}: {item.kurang}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
+                        {groupedKekurangan[kelas] && groupedKekurangan[kelas].length > 0 && (
+                          <div className='mb-4'>
+                            <h5 className='font-bold text-red-600 mb-1'>
+                              Kekurangan Nutrisi
+                            </h5>
+                            <ul className='list-disc list-inside text-sm text-slate-700'>
+                              {groupedKekurangan[kelas].map((item, idx) => (
+                                <li key={idx}>
+                                  {item.nutrient}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
 
 
                         {/* Saran */}
@@ -270,7 +269,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
                             <ul className='list-disc list-inside text-sm text-slate-700'>
                               {groupedSaran[kelas].map((item, idx) => (
                                 <li key={idx}>
-                                  {item.nama} - {item.serving} porsi
+                                  {item.nama} - {item.serving} gram
                                 </li>
                               ))}
                             </ul>
@@ -302,7 +301,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
                                                 {d.food}
                                               </span>
                                             )}
-                                            {d.serving && ` — ${d.serving} porsi`}
+                                            {d.serving && ` — ${d.serving} gram`}
                                             {` — ${d.reason}`}
                                           </li>
                                         ))}

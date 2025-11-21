@@ -4,112 +4,112 @@ import NextImage from 'next/image'
 import * as htmlToImage from 'html-to-image'
 import jsPDF from 'jspdf'
 const RecommendationCard = ({ data, totalLabel }) => {
-	const {
-	combinedKekurangan = [],
-	combinedSaran = [],
-	warnings = [],
-} = data || {}
+  const {
+    combinedKekurangan = [],
+    combinedSaran = [],
+    warnings = [],
+  } = data || {}
   const [isPrinting, setIsPrinting] = useState(false)
   const nutritionLabelRef = useRef(null)
   const hasResults = totalLabel !== null
-const handlePrintPDF = async () => {
-  if (!nutritionLabelRef.current) return
-  setIsPrinting(true)
-  try {
-    const node = nutritionLabelRef.current
-    
-    await new Promise(resolve => setTimeout(resolve, 200))
-    
-    const dataUrl = await htmlToImage.toPng(node, {
-      quality: 1,
-      pixelRatio: 2,
-      backgroundColor: '#ffffff'
-    })
-    
-    const img = new Image()
-    img.src = dataUrl
-    img.onload = () => {
-      const imgWidth = img.width * 0.264583
-      const imgHeight = img.height * 0.264583
-      const pdf = new jsPDF({
-        orientation: imgHeight > imgWidth ? 'portrait' : 'landscape',
-        unit: 'mm',
-        format: [imgWidth, imgHeight]
+  const handlePrintPDF = async () => {
+    if (!nutritionLabelRef.current) return
+    setIsPrinting(true)
+    try {
+      const node = nutritionLabelRef.current
+
+      await new Promise(resolve => setTimeout(resolve, 200))
+
+      const dataUrl = await htmlToImage.toPng(node, {
+        quality: 1,
+        pixelRatio: 2,
+        backgroundColor: '#ffffff'
       })
-      pdf.addImage(
-        dataUrl,
-        'PNG',
-        0,
-        0,
-        imgWidth,
-        imgHeight,
-        undefined,
-        'FAST'
-      )
-      pdf.save('Label-Gizi.pdf')
+
+      const img = new Image()
+      img.src = dataUrl
+      img.onload = () => {
+        const imgWidth = img.width * 0.264583
+        const imgHeight = img.height * 0.264583
+        const pdf = new jsPDF({
+          orientation: imgHeight > imgWidth ? 'portrait' : 'landscape',
+          unit: 'mm',
+          format: [imgWidth, imgHeight]
+        })
+        pdf.addImage(
+          dataUrl,
+          'PNG',
+          0,
+          0,
+          imgWidth,
+          imgHeight,
+          undefined,
+          'FAST'
+        )
+        pdf.save('Label-Gizi.pdf')
+        setIsPrinting(false)
+      }
+      img.onerror = () => {
+        console.error('Failed to load image for PDF')
+        setIsPrinting(false)
+      }
+    } catch (err) {
+      console.error('Gagal membuat PDF:', err)
       setIsPrinting(false)
     }
-    img.onerror = () => {
-      console.error('Failed to load image for PDF')
-      setIsPrinting(false)
-    }
-  } catch (err) {
-    console.error('Gagal membuat PDF:', err)
-    setIsPrinting(false)
   }
-}
-  
-
-// --- 1. Group kekurangan by kelas and split by comma ---
-const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
-	if (!acc[item.kelas]) acc[item.kelas] = [];
-
-	// Split by comma and trim each part
-	const nutrients = item.kurang.split(",").map(n => n.trim());
-
-	// Push each nutrient separately, keep kelas info
-	nutrients.forEach(nutrient => {
-		acc[item.kelas].push({
-			kelas: item.kelas,
-			nutrient,
-		});
-	});
-
-	return acc;
-}, {});
 
 
-	// --- 2. Group saran by kelas ---
-	const groupedSaran = combinedSaran.reduce((acc, item) => {
-		if (!acc[item.kelas]) acc[item.kelas] = []
-		acc[item.kelas].push(item)
-		return acc
-	}, {})
+  // --- 1. Group kekurangan by kelas and split by comma ---
+  const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
+    if (!acc[item.kelas]) acc[item.kelas] = [];
 
-	// --- 3. Group warnings by kelas AND by reason ---
-	const groupedWarnings = warnings.reduce((acc, item) => {
-		if (!acc[item.kelas]) acc[item.kelas] = {};
+    // Split by comma and trim each part
+    const nutrients = item.kurang.split(",").map(n => n.trim());
 
-		const reason = item.warning || item.reason || "Peringatan";
-		if (!acc[item.kelas][reason]) acc[item.kelas][reason] = [];
+    // Push each nutrient separately, keep kelas info
+    nutrients.forEach(nutrient => {
+      acc[item.kelas].push({
+        kelas: item.kelas,
+        nutrient,
+      });
+    });
 
-		if (item.details && item.details.length) {
-			acc[item.kelas][reason].push(...item.details);
-		} else {
-			acc[item.kelas][reason].push({ reason });
-		}
+    return acc;
+  }, {});
 
-		return acc;
-	}, {});
 
-	// Combine all kelas keys
-	const allKelas = Array.from(
-		new Set([
-			...Object.keys(groupedKekurangan),
-			...Object.keys(groupedSaran),
-			...Object.keys(groupedWarnings),
-		]),
-	).sort((a, b) => a - b);
+  // --- 2. Group saran by kelas ---
+  const groupedSaran = combinedSaran.reduce((acc, item) => {
+    if (!acc[item.kelas]) acc[item.kelas] = []
+    acc[item.kelas].push(item)
+    return acc
+  }, {})
+
+  // --- 3. Group warnings by kelas AND by reason ---
+  const groupedWarnings = warnings.reduce((acc, item) => {
+    if (!acc[item.kelas]) acc[item.kelas] = {};
+
+    const reason = item.warning || item.reason || "Peringatan";
+    if (!acc[item.kelas][reason]) acc[item.kelas][reason] = [];
+
+    if (item.details && item.details.length) {
+      acc[item.kelas][reason].push(...item.details);
+    } else {
+      acc[item.kelas][reason].push({ reason });
+    }
+
+    return acc;
+  }, {});
+
+  // Combine all kelas keys
+  const allKelas = Array.from(
+    new Set([
+      ...Object.keys(groupedKekurangan),
+      ...Object.keys(groupedSaran),
+      ...Object.keys(groupedWarnings),
+    ]),
+  ).sort((a, b) => a - b);
 
   const hasData = allKelas.length > 0
 
@@ -143,37 +143,37 @@ const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
       return next
     })
 
-	return (
-		<div className='bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200'>
-			{/* Header */}
-			<div className='border-b-2 border-orange-200 bg-gradient-to-r from-orange-50 to-white px-6 py-5'>
-				<div className='flex items-start gap-3'>
-					<div className='w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1'>
-						<svg
-							className='w-6 h-6 text-white'
-							fill='none'
-							viewBox='0 0 24 24'
-							stroke='currentColor'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								strokeWidth={2}
-								d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'
-							/>
-						</svg>
-					</div>
-					<div>
-						<h3 className='text-xl font-bold text-[#202020]'>
-							Analisis & Rekomendasi Nutrisi
-						</h3>
-						<p className='text-sm text-slate-600 mt-1'>
-							Evaluasi kecukupan gizi dan saran optimalisasi menu untuk berbagai
-							tingkat pendidikan
-						</p>
-					</div>
-				</div>
-			</div>
+  return (
+    <div className='bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200'>
+      {/* Header */}
+      <div className='border-b-2 border-orange-200 bg-gradient-to-r from-orange-50 to-white px-6 py-5'>
+        <div className='flex items-start gap-3'>
+          <div className='w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1'>
+            <svg
+              className='w-6 h-6 text-white'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 className='text-xl font-bold text-[#202020]'>
+              Analisis & Rekomendasi Nutrisi
+            </h3>
+            <p className='text-sm text-slate-600 mt-1'>
+              Evaluasi kecukupan gizi dan saran optimalisasi menu untuk berbagai
+              tingkat pendidikan
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Content */}
       <div className='p-6'>
@@ -215,19 +215,17 @@ const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
 
                     <div className='flex items-center gap-3'>
                       <span
-                        className={`text-lg font-bold ${
-                          open ? 'text-orange-600' : 'text-slate-400'
-                        }`}
+                        className={`text-lg font-bold ${open ? 'text-orange-600' : 'text-slate-400'
+                          }`}
                       >
                         {open ? 'Tutup' : 'Lihat'}
                       </span>
 
                       <svg
-                        className={`w-5 h-5 transform transition-transform duration-200 ${
-                          open
+                        className={`w-5 h-5 transform transition-transform duration-200 ${open
                             ? 'rotate-180 text-orange-600'
                             : 'rotate-0 text-slate-400'
-                        }`}
+                          }`}
                         viewBox='0 0 24 24'
                         fill='currentColor'
                         aria-hidden='true'
@@ -262,6 +260,7 @@ const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
                           )}
 
 
+
                         {/* Saran */}
                         {groupedSaran[kelas] && groupedSaran[kelas].length > 0 && (
                           <div>
@@ -278,6 +277,43 @@ const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
                           </div>
                         )}
                       </div>
+                      
+                      {groupedWarnings[kelas] &&
+                        Object.keys(groupedWarnings[kelas]).length > 0 && (
+                          <div className="mt-3">
+                            <h5 className="font-semibold text-orange-600 mb-1">
+                              Peringatan Sistem
+                            </h5>
+
+                            <ul className="list-disc list-inside text-sm space-y-2 text-orange-700">
+                              {Object.entries(groupedWarnings[kelas]).map(
+                                ([reason, details], idx) => (
+                                  <li key={idx}>
+                                    {/* Reason bullet */}
+                                    <span className="font-medium">{reason}</span>
+
+                                    {/* Details list */}
+                                    {details.length > 0 && (
+                                      <ul className="list-disc list-inside ml-6 mt-1 text-slate-700 text-sm space-y-1">
+                                        {details.map((d, i) => (
+                                          <li key={i}>
+                                            {d.food && (
+                                              <span className="font-semibold">
+                                                {d.food}
+                                              </span>
+                                            )}
+                                            {d.serving && ` — ${d.serving} porsi`}
+                                            {` — ${d.reason}`}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </li>
+                                ),
+                              )}
+                            </ul>
+                          </div>
+                        )}
 
                       {/* Kolom Kanan - Label Gizi */}
                       <div>
@@ -298,7 +334,7 @@ const groupedKekurangan = combinedKekurangan.reduce((acc, item) => {
                             </div>
                             <button
                               onClick={(e) => {
-                                e.stopPropagation() 
+                                e.stopPropagation()
                                 handlePrintPDF()
                               }}
                               disabled={isPrinting || !hasResults}

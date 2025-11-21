@@ -500,6 +500,12 @@ export default function ChefDashboard() {
                     setIsAddRecipeModalOpen(false);
                     handleNewRecipeAdded(newId);
                   }}
+                  onNutritionCalculated={(data) => {
+                    console.log("onNutritionCalculated ", data)
+                    setTotalLabel(data.totalLabel);
+                    setRecommendationData(data.recommendationData);
+                    setIsRecipeView(false);
+                  }}
                 />
               )}
 
@@ -517,6 +523,12 @@ export default function ChefDashboard() {
               {/* <h2 className="text-2xl font-bold text-orange-500 mb-4">
                 Rekomendasi Menu Tambahan
               </h2> */}
+              <RecommendationCard data={recommendationData} totalLabel={totalLabel} />
+            </div>
+          )}
+
+          {hasResults && recommendationData && !isRecipeView && (
+            <div className="bg-none p-0 mb-8">
               <RecommendationCard data={recommendationData} totalLabel={totalLabel} />
             </div>
           )}

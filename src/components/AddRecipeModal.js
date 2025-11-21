@@ -124,6 +124,17 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
       },
     ]);
   };
+  const initialIngredients = [
+    {
+      id: 1,
+      name: "",
+      gramasi: "",
+      status: "idle",
+      message: "",
+      nutrisi: null,
+      bahanId: null,
+    },
+  ];
 
   const handleRemoveIngredient = (id) => {
     if (ingredients.length <= 1) {
@@ -458,7 +469,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
     return (
       <div className="mt-3">
         <div
-          className={`${config.bgColor} ${config.borderColor} border-2 rounded-xl p-4 transition-all duration-300`}
+          className={`${config.bgColor} ${config.borderColor} border-2 rounded-xl p-4 transition-all duration-300 w-full`}
         >
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 mt-0.5">
@@ -593,6 +604,16 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
     return true;
   };
 
+  const resetForm = () => {
+    setMenuName("");
+    setKategori("karbohidrat");
+    setIngredients(initialIngredients);
+    setSuggestions([]);
+    setError("");
+    setSelectedSuggestionIndex(-1);
+    setFocusedIngredientId(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSaving) return;
@@ -624,8 +645,15 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
       console.log("Save response:", res);
 
       if (res?.success) {
-        if (onRecipeAdded) onRecipeAdded();
-        onClose();
+        const newRecipeId =
+          res.menu?.id || null;
+        console.log("Recipe ID ", newRecipeId);
+        if (onRecipeAdded) onRecipeAdded(newRecipeId);
+        if (onClose) {
+          onClose();
+        } else {
+          resetForm();
+        }
       } else {
         setError(res?.message || "Gagal menyimpan resep");
       }
@@ -637,6 +665,15 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
     }
   };
 
+  const handleCancel = () => {
+    if (isSaving) return;
+    if (onClose) {
+      onClose();
+    } else {
+      resetForm();
+    }
+  };
+
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget && !isSaving) {
       onClose();
@@ -644,11 +681,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-      onClick={handleOverlayClick}
-    >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in duration-200">
+    <div className="bg-white rounded-2xl shadow-2xl w-full flex flex-col animate-in fade-in duration-200">
         <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-6">
           <h2 className="text-2xl font-bold text-white">
             Tambahkan Resep Baru
@@ -658,7 +691,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+        <form onSubmit={handleSubmit} className="flex-1">
           <div className="px-8 py-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -712,7 +745,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                 </span>
               </div>
 
-              <div className="space-y-4 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+              <div className="space-y-4 pr-2 custom-scrollbar">
                 {ingredients.map((item, index) => (
                   <div
                     key={item.id}
@@ -778,6 +811,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                               item.status === "generating"
                             }
                           />
+                          
 
                           {(item.status === "checking" ||
                             item.status === "generating") && (
@@ -861,7 +895,10 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                             </div>
                           )}
 
-                        <div className="flex items-center gap-3">
+                        {/* {renderIngredientStatus(item)} */}
+                      </div>
+
+                      <div className="flex items-center gap-3">
                           <div className="relative flex-shrink-0">
                             <input
                               type="number"
@@ -882,7 +919,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                               g
                             </span>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-slate-600">
+                          {/* <div className="flex items-center gap-2 text-sm text-slate-600">
                             <svg
                               className="w-4 h-4"
                               fill="none"
@@ -895,12 +932,9 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                                 strokeWidth={2}
                                 d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
                               />
-                            </svg>
-                            <span className="font-medium">Gramasi</span>
-                          </div>
-                        </div>
-
-                        {renderIngredientStatus(item)}
+                            </svg> */}
+                            {/* <span className="font-medium">Gramasi</span> */}
+                          {/* </div> */}
                       </div>
 
                       {ingredients.length > 1 && (
@@ -914,6 +948,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                         </button>
                       )}
                     </div>
+                    {renderIngredientStatus(item)}
                   </div>
                 ))}
               </div>
@@ -921,7 +956,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
               <button
                 type="button"
                 onClick={handleAddIngredient}
-                className="w-full mt-4 flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition font-medium"
+                className="w-full mt-4 flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition font-medium cursor-pointer"
               >
                 <PlusIcon />
                 Tambahkan Bahan
@@ -935,7 +970,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
             )}
           </div>
 
-          <div className="px-8 py-6 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+          {/* <div className="px-8 py-6 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
@@ -943,11 +978,11 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
               className="px-6 py-2.5 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Batal
-            </button>
+            </button> */}
             <button
               type="submit"
               disabled={isSaving}
-              className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:from-orange-600 hover:to-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold shadow-lg hover:shadow-xl hover:from-orange-600 cursor-pointer hover:to-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 w-full"
             >
               {isSaving ? (
                 <>
@@ -973,12 +1008,10 @@ const AddRecipeModal = ({ onClose, onRecipeAdded }) => {
                   Menyimpan...
                 </>
               ) : (
-                "Simpan Resep"
+                <span className="w-full text-center">Tampilkan Gizi</span>
               )}
             </button>
-          </div>
         </form>
-      </div>
 
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {

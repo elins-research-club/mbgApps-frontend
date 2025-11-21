@@ -27,13 +27,13 @@ const ChefNavbar = ({ onAddRecipeClick, onNewMenuClick }) => {
             </button> */}
 
             {/* 2. Tombol Tambah Resep (Bahan Baru - Aksi 3) */}
-            <button
+            {/* <button
               onClick={onAddRecipeClick}
               className="flex cursor-pointer items-center gap-2 p-2 px-3 rounded-lg text-sm font-semibold bg-orange-400 text-white hover:bg-orange-500 transition-colors shadow-md"
             >
               <Utensils className="w-5 h-5" />
               <span>Tambah Resep Baru</span>
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

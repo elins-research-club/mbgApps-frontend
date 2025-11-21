@@ -513,7 +513,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
       <div className='p-6'>
         {hasData ? (
           <div className='space-y-8'>
-            {allKelas.map(kelas => {
+            {allKelas.map((kelas, index) => {
               const open = openKelas.has(kelas)
               const kekuranganCount = (groupedKekurangan[kelas] || []).reduce(
                 (acc, it) => {
@@ -794,7 +794,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
                           </div>
 
                           <div ref={nutritionLabelRef}>
-                            <NutritionLabel data={totalLabel} />
+                            <NutritionLabel data={totalLabel} classGrade={index+1} fromRecCard={true} />
                           </div>
                         </div>
                       </div>

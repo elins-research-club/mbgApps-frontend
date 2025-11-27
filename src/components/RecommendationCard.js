@@ -437,14 +437,30 @@ const RecommendationCard = ({ data, totalLabel }) => {
   }, {})
 
   // Combine all kelas keys
-  const allKelas = Array.from(
-    new Set([
-      ...Object.keys(groupedKekurangan),
-      ...Object.keys(groupedSaran),
-      ...Object.keys(groupedWarnings)
-    ])
-  ).sort((a, b) => a - b)
-
+  // const allKelas = Array.from(
+  //   new Set([
+  //     ...Object.keys(groupedKekurangan),
+  //     ...Object.keys(groupedSaran),
+  //     ...Object.keys(groupedWarnings),
+  //   ]),
+  // ).sort((a, b) => a - b);
+  const classMap = {
+      1: 'TK A',
+      2: 'TK B',
+      3: 'SD Kelas 1',
+      4: 'SD Kelas 2',
+      5: 'SD Kelas 3',
+      6: 'SD Kelas 4',
+      7: 'SD Kelas 5',
+      8: 'SD Kelas 6',
+      9: 'SMP Kelas 1',
+      10: 'SMP Kelas 2',
+      11: 'SMP Kelas 3',
+      12: 'SMA Kelas 1',
+      13: 'SMA Kelas 2',
+      14: 'SMA Kelas 3'
+    }
+  const allKelas = Object.keys(classMap).map(Number);
   const hasData = allKelas.length > 0
 
   // Helper untuk format nama kelas

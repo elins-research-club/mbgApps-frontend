@@ -1,13 +1,35 @@
 // /frontend/src/contexts/AuthContext.js
-
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // null = Guest, { role: '...' } = Logged In
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // --- FUNGSI LOGIN DIPERBARUI ---
+  // Load user from sessionStorage on mount
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Failed to parse user from session:", error);
+        sessionStorage.removeItem("user");
+      }
+    }
+    setLoading(false);
+  }, []);
+
+  // Save user to sessionStorage whenever it changes
+  useEffect(() => {
+    if (user) {
+      sessionStorage.setItem("user", JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem("user");
+    }
+  }, [user]);
+
   const login = (username, password) => {
     let loggedInUser = null;
     let success = false;
@@ -18,7 +40,6 @@ export const AuthProvider = ({ children }) => {
       loggedInUser = { role: "Chef", name: "Chef" };
       success = true;
     } else if (username === "AhliGizi" && password === "ahligizi") {
-      // Disesuaikan agar unik
       loggedInUser = { role: "Ahli Gizi", name: "Ahli Gizi" };
       success = true;
     }
@@ -31,11 +52,15 @@ export const AuthProvider = ({ children }) => {
       return { success: false, message };
     }
   };
-  // --- AKHIR PERUBAHAN ---
 
   const logout = () => {
     setUser(null);
   };
+
+  // Show loading state while checking session
+  if (loading) {
+    return null; // or a loading spinner if you prefer
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>

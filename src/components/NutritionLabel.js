@@ -36,13 +36,20 @@ const ReadOnlyRow = ({ label, value, unit, akgValue }) => (
 
 const NutritionLabel = forwardRef(
   (
-    { data, isMini = false, isEditable = false, onDataChange = () => {} },
+    { data, classGrade, fromRecCard=false, isMini = false, isEditable = false, onDataChange = () => {} },
     ref
   ) => {
     if (!data) return null;
 
     const gizi = data.informasi_nilai_gizi || {};
-    const akg = data.persen_akg || {};
+    let akg = data.persen_akg || {};
+    if (fromRecCard){
+      const akgAll = data.persen_akg_all || {};
+      akg = akgAll[classGrade] || {};
+    }
+    
+    console.log("akg",akg);
+    console.log("classGrade", classGrade)
 
     // --- FUNGSI BARU UNTUK MENANGANI PERUBAHAN INPUT ---
     const handleChange = (field, value) => {
@@ -152,24 +159,24 @@ const NutritionLabel = forwardRef(
           "Lemak Total",
           gizi.lemak_g,
           "g",
-          akg.lemak_total,
+          akg.lemak_g,
           "lemak_g"
         )}
         {renderNutritionRow(
           "Protein",
           gizi.protein_g,
           "g",
-          akg.protein,
+          akg.protein_g,
           "protein_g"
         )}
         {renderNutritionRow(
           "Karbohidrat Total",
           gizi.karbohidrat_g,
           "g",
-          akg.karbohidrat_total,
+          akg.karbohidrat_g,
           "karbohidrat_g"
         )}
-        {renderNutritionRow("Serat Pangan", gizi.serat_g, "g", null, "serat_g")}
+        {renderNutritionRow("Serat Pangan", gizi.serat_g, "g", akg.serat_g, "serat_g")}
 
         <div className="w-full h-1 bg-black my-1"></div>
 
@@ -177,25 +184,25 @@ const NutritionLabel = forwardRef(
           "Natrium",
           gizi.natrium_mg,
           "mg",
-          akg.natrium,
+          akg.natrium_mg,
           "natrium_mg"
         )}
-        {renderNutritionRow("Kalium", gizi.kalium_mg, "mg", null, "kalium_mg")}
+        {renderNutritionRow("Kalium", gizi.kalium_mg, "mg", akg.kalium_mg, "kalium_mg")}
 
         {/* Tambahkan field lain jika perlu diedit */}
         {renderNutritionRow(
           "Kalsium",
           gizi.kalsium_mg,
           "mg",
-          akg.kalsium,
+          akg.kalsium_mg,
           "kalsium_mg"
         )}
-        {renderNutritionRow("Besi", gizi.besi_mg, "mg", akg.besi, "besi_mg")}
+        {renderNutritionRow("Besi", gizi.besi_mg, "mg", akg.besi_mg, "besi_mg")}
         {renderNutritionRow(
           "Vitamin C",
           gizi.vitamin_c_mg,
           "mg",
-          akg.vitamin_c,
+          akg.vitamin_c_mg,
           "vitamin_c_mg"
         )}
 

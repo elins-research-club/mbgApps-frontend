@@ -98,7 +98,6 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData }) => {
                                   data={{
                                     takaran_saji_g: item.gramasi,
                                     informasi_nilai_gizi: item.gizi,
-                                    persen_akg: {},
                                   }}
                                   isMini={true}
                                 />
@@ -143,7 +142,6 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData }) => {
                           data={{
                             takaran_saji_g: item.gramasi,
                             informasi_nilai_gizi: item.gizi,
-                            persen_akg: {},
                           }}
                           isMini={true}
                         />

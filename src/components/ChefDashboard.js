@@ -15,7 +15,7 @@ import AddRecipeModal from "./AddRecipeModal";
 import RecommendationCard from "./RecommendationCard";
 import NutritionPerRecipeCard from "./NutritionPerRecipeCard";
 import RecipeSearchCard from "./RecipeSearchCard";
-import TargetSelector from "./TargetSelector";
+// import TargetSelector from "./TargetSelector";
 import { LayoutList, UtensilsCrossed } from "lucide-react";
 import {
   generateNutrition,
@@ -329,6 +329,7 @@ export default function ChefDashboard() {
         `Total bahan: ${result.detailPerhitungan?.jumlah_bahan || 0}`,
       ]);
       setSelectedRecipeId(recipeId);
+      setRecommendationData(result.rekomendasi);
 
       console.log("✅ Recipe data loaded successfully");
     } catch (err) {
@@ -336,6 +337,15 @@ export default function ChefDashboard() {
       setError(err.message || "Terjadi kesalahan saat mencari resep.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleNewRecipeAdded = (newRecipeId) => {
+    setIsAddRecipeModalOpen(false);
+    if (newRecipeId) {
+      handleRecipeSelect(newRecipeId);
+    } else {
+      console.warn("New recipe saved but no id returned");
     }
   };
 
@@ -380,14 +390,18 @@ export default function ChefDashboard() {
       {isAddRecipeModalOpen && (
         <AddRecipeModal
           onClose={() => setIsAddRecipeModalOpen(false)}
-          onRecipeAdded={() => {
-            alert("Resep baru dari bahan berhasil ditambahkan!");
+          onRecipeAdded={(newId) => {
             setIsAddRecipeModalOpen(false);
+            if (newId) {
+              handleRecipeSelect(newId);
+            } else {
+              handleNewRecipeAdded(newId);
+            }
           }}
         />
       )}
 
-      {isNewMenuModalOpen && (
+      {/* {isNewMenuModalOpen && (
         <NewMenuModal
           onClose={() => setIsNewMenuModalOpen(false)}
           onSubmit={handleSaveNewMenu}
@@ -395,24 +409,24 @@ export default function ChefDashboard() {
           error={error}
           targetId={targetId}
         />
-      )}
+      )} */}
 
       <main className="flex-grow bg-slate-50 w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* 🔹 ROW 1: Input (Kiri) & Total Gizi (Kanan) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-8">
+          <div className="mb-8">
             {/* Kolom Kiri */}
             <div className="lg:sticky lg:top-8">
               {/* Target Audiens Selector */}
               <div className="mb-6">
-                <TargetSelector
+                {/* <TargetSelector
                   selectedTarget={selectedTarget}
                   onChange={(value) => setSelectedTarget(value)}
-                />
+                /> */}
               </div>
 
               {/* ✅ TOGGLE BUTTON BARU: Switch Mode */}
-              <div className="bg-white p-4 rounded-2xl shadow-lg border border-slate-200 mb-6">
+              <div className="bg-white w-full p-4 rounded-2xl shadow-lg border border-slate-200 mb-6">
                 <div className="flex gap-3">
                   {/* 🔸 Paket Menu Button */}
                   <button
@@ -434,11 +448,11 @@ export default function ChefDashboard() {
                           !isRecipeView ? "text-white" : "text-orange-400"
                         }`}
                       />
-                      <span>Cari Paketan Menu</span>
+                      <span>Hitung Nilai Gizi</span>
                     </div>
                     {!isRecipeView && (
                       <p className="text-xs mt-1 opacity-90 font-normal">
-                        Hitung gizi dari kombinasi resep
+                        Hitung nilai gizi dari resep yang dibuat
                       </p>
                     )}
                   </button>
@@ -463,11 +477,11 @@ export default function ChefDashboard() {
                           isRecipeView ? "text-white" : "text-orange-400"
                         }`}
                       />
-                      <span>Resep Individual</span>
+                      <span>Cari Resep</span>
                     </div>
                     {isRecipeView && (
                       <p className="text-xs mt-1 opacity-90 font-normal">
-                        Lihat gizi satu resep saja
+                        Lihat gizi satu resep
                       </p>
                     )}
                   </button>
@@ -481,9 +495,17 @@ export default function ChefDashboard() {
                   isLoading={isLoading}
                 />
               ) : (
-                <SearchCard
-                  onMenuSelect={handleMenuSelect}
-                  isLoading={isLoading}
+                <AddRecipeModal
+                  onRecipeAdded={(newId) => {
+                    setIsAddRecipeModalOpen(false);
+                    handleNewRecipeAdded(newId);
+                  }}
+                  onNutritionCalculated={(data) => {
+                    console.log("onNutritionCalculated ", data)
+                    setTotalLabel(data.totalLabel);
+                    setRecommendationData(data.recommendationData);
+                    setIsRecipeView(false);
+                  }}
                 />
               )}
 
@@ -493,84 +515,21 @@ export default function ChefDashboard() {
                 </p>
               )}
             </div>
-
-            {/* Kolom Kanan - Label Gizi */}
-            <div>
-              <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full flex flex-col items-center">
-                <div className="flex items-center justify-between mb-6 w-full gap-4">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <NextImage
-                      src="/pdf-icon.png"
-                      alt="PDF Icon"
-                      width={20}
-                      height={20}
-                      className="w-5 h-5 flex-shrink-0"
-                      style={{ objectFit: "contain" }}
-                    />
-                    <h2 className="text-xl sm:text-2xl font-bold text-orange-500 whitespace-nowrap">
-                      Total Nilai Gizi
-                    </h2>
-                  </div>
-                  <button
-                    onClick={handlePrintPDF}
-                    disabled={isPrinting || !hasResults}
-                    className="py-2 px-3 sm:px-4 bg-[#202020]/10 text-[#202020]/80 text-xs sm:text-sm font-semibold rounded-lg hover:bg-[#202020]/20 border border-[#202020]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                  >
-                    {isPrinting ? "Mencetak..." : "Cetak PDF"}
-                  </button>
-                </div>
-
-                {hasResults ? (
-                  <div className="w-full max-w-md">
-                    {/* ✅ INFO BADGE untuk Recipe Mode */}
-                    {isRecipeView && (
-                      <div className="mb-3 p-2 bg-purple-50 border border-purple-200 rounded-lg">
-                        <p className="text-xs text-purple-700 font-medium text-center">
-                          🍳 Mode Resep Individual
-                        </p>
-                      </div>
-                    )}
-
-                    <div ref={nutritionLabelRef}>
-                      <NutritionLabel data={totalLabel} />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-72 text-center text-slate-400">
-                    <svg
-                      className="w-16 h-16 text-slate-300"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                    <p className="mt-2 text-lg font-medium">
-                      Hasil akan ditampilkan di sini.
-                    </p>
-                    <p className="text-sm">
-                      Silakan pilih {isRecipeView ? "resep" : "menu"} di sebelah
-                      kiri.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
           {/* 🔹 ROW 2: Rekomendasi (Full Width) */}
-          {/* ✅ HANYA TAMPIL jika BUKAN Recipe Mode */}
-          {hasResults && recommendationData && !isRecipeView && (
+          {hasResults && recommendationData && isRecipeView && (
             <div className="bg-none p-0 mb-8">
               {/* <h2 className="text-2xl font-bold text-orange-500 mb-4">
                 Rekomendasi Menu Tambahan
               </h2> */}
-              <RecommendationCard data={recommendationData} />
+              <RecommendationCard data={recommendationData} totalLabel={totalLabel} />
+            </div>
+          )}
+
+          {hasResults && recommendationData && !isRecipeView && (
+            <div className="bg-none p-0 mb-8">
+              <RecommendationCard data={recommendationData} totalLabel={totalLabel} />
             </div>
           )}
 

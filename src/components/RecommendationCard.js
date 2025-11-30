@@ -735,7 +735,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
                               <BarChart
                                 data={chartData}
                                 margin={{
-                                  top: 5,
+                                  top: 30,
                                   right: 30,
                                   left: 20,
                                   bottom: 80
@@ -755,6 +755,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
                                     position: 'insideLeft' 
                                   }}
                                   domain={showPercentage ? [0, 100] : [0, 'auto']}
+                                  allowDataOverflow
                                 />
                                 <Tooltip
                                   content={({ active, payload }) => {
@@ -787,6 +788,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
                                     dataKey='percentage'
                                     name='Pencapaian (%)'
                                     label={{ position: 'top', formatter: (value) => `${value.toFixed(0)}%` }}
+                                    offset={5}
                                   >
                                     {chartData.map((entry, index) => (
                                       <Cell key={`cell-${index}`} fill={entry.percentage >= 100 ? '#10B981' : '#EF4444'} />

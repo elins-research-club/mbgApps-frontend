@@ -12,341 +12,343 @@ import {
 	Tooltip,
 	Legend,
 	ResponsiveContainer,
+	Cell,
 } from "recharts";
 const RecommendationCard = ({ data, totalLabel }) => {
-	const {
-		combinedKekurangan = [],
-		combinedSaran = [],
-		warnings = [],
-	} = data || {};
-	const [isPrinting, setIsPrinting] = useState(false);
-	const nutritionLabelRef = useRef(null);
-	const hasResults = totalLabel !== null;
-	// ------------------------------
-	const goals = {
-		1: {
-			// TK A
-			energi_kkal: 1350,
-			protein_g: 20,
-			lemak_g: 45,
-			karbohidrat_g: 215,
-			serat_g: 19,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1000,
-			// fosfor_mg: 500,
-			besi_mg: 10,
-			natrium_mg: 1000,
-			kalium_mg: 3200,
-			// tembaga_mg: 570,
-			// seng_mg: 5,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.1,
-			// riboflavin_mg: 1.1,
-			// niasin_mg: 10,
-			vitamin_c_mg: 45,
-		},
-		2: {
-			// TK B
-			energi_kkal: 1400,
-			protein_g: 25,
-			lemak_g: 50,
-			karbohidrat_g: 250,
-			serat_g: 20,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1000,
-			// fosfor_mg: 500,
-			besi_mg: 10,
-			natrium_mg: 1000,
-			kalium_mg: 3200,
-			// tembaga_mg: 570,
-			// seng_mg: 5,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.1,
-			// riboflavin_mg: 1.1,
-			// niasin_mg: 10,
-			vitamin_c_mg: 45,
-		},
-		3: {
-			//SD 1
-			energi_kkal: 1650,
-			protein_g: 40,
-			lemak_g: 55,
-			karbohidrat_g: 250,
-			serat_g: 23,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1000,
-			// fosfor_mg: 500,
-			besi_mg: 10,
-			natrium_mg: 1000,
-			kalium_mg: 3200,
-			// tembaga_mg: 570,
-			// seng_mg: 5,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.1,
-			// riboflavin_mg: 1.1,
-			// niasin_mg: 10,
-			vitamin_c_mg: 45,
-		},
-		4: {
-			// SD 2
-			energi_kkal: 1650,
-			protein_g: 40,
-			lemak_g: 55,
-			karbohidrat_g: 250,
-			serat_g: 23,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1000,
-			// fosfor_mg: 500,
-			besi_mg: 10,
-			natrium_mg: 1000,
-			kalium_mg: 3200,
-			// tembaga_mg: 570,
-			// seng_mg: 5,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.1,
-			// riboflavin_mg: 1.1,
-			// niasin_mg: 10,
-			vitamin_c_mg: 45,
-		},
-		5: {
-			//SD 3
-			energi_kkal: 1650,
-			protein_g: 40,
-			lemak_g: 55,
-			karbohidrat_g: 250,
-			serat_g: 23,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1000,
-			// fosfor_mg: 500,
-			// besi_mg: 10,
-			natrium_mg: 1000,
-			kalium_mg: 3200,
-			tembaga_mg: 570,
-			// seng_mg: 5,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.1,
-			// riboflavin_mg: 1.1,
-			// niasin_mg: 10,
-			vitamin_c_mg: 45,
-		},
-		6: {
-			//SD 4
-			energi_kkal: 2000,
-			protein_g: 50,
-			lemak_g: 65,
-			karbohidrat_g: 300,
-			serat_g: 28,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1000,
-			// fosfor_mg: 1250,
-			besi_mg: 8,
-			natrium_mg: 1300,
-			kalium_mg: 3900,
-			// tembaga_mg: 700,
-			// seng_mg: 8,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.1,
-			// riboflavin_mg: 1.3,
-			// niasin_mg: 12,
-			vitamin_c_mg: 50,
-		},
-		7: {
-			//SD 5
-			energi_kkal: 2000,
-			protein_g: 50,
-			lemak_g: 65,
-			karbohidrat_g: 300,
-			serat_g: 28,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1000,
-			// fosfor_mg: 1250,
-			// besi_mg: 8,
-			natrium_mg: 1300,
-			kalium_mg: 3900,
-			tembaga_mg: 700,
-			// seng_mg: 8,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.1,
-			// riboflavin_mg: 1.3,
-			// niasin_mg: 12,
-			vitamin_c_mg: 50,
-		},
-		8: {
-			//SD 6
-			energi_kkal: 2000,
-			protein_g: 50,
-			lemak_g: 65,
-			karbohidrat_g: 300,
-			serat_g: 28,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1000,
-			// fosfor_mg: 1250,
-			// besi_mg: 8,
-			natrium_mg: 1300,
-			kalium_mg: 3900,
-			tembaga_mg: 700,
-			// seng_mg: 8,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.1,
-			// riboflavin_mg: 1.3,
-			// niasin_mg: 12,
-			vitamin_c_mg: 50,
-		},
-		9: {
-			// SMP 1
-			energi_kkal: 2400,
-			protein_g: 70,
-			lemak_g: 80,
-			karbohidrat_g: 350,
-			serat_g: 34,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1200,
-			// fosfor_mg: 1250,
-			besi_mg: 11,
-			natrium_mg: 1500,
-			kalium_mg: 4800,
-			// tembaga_mg: 795,
-			// seng_mg: 11,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.2,
-			// riboflavin_mg: 1.3,
-			// niasin_mg: 16,
-			vitamin_c_mg: 75,
-		},
-		10: {
-			//SMP 2
-			energi_kkal: 2400,
-			protein_g: 70,
-			lemak_g: 80,
-			karbohidrat_g: 350,
-			serat_g: 34,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1200,
-			// fosfor_mg: 1250,
-			besi_mg: 11,
-			natrium_mg: 1500,
-			kalium_mg: 4800,
-			// tembaga_mg: 795,
-			// seng_mg: 11,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.2,
-			// riboflavin_mg: 1.3,
-			// niasin_mg: 16,
-			vitamin_c_mg: 75,
-		},
-		11: {
-			//SMP 3
-			energi_kkal: 2650,
-			protein_g: 75,
-			lemak_g: 85,
-			karbohidrat_g: 400,
-			serat_g: 37,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1200,
-			// fosfor_mg: 1250,
-			besi_mg: 9,
-			natrium_mg: 1700,
-			kalium_mg: 5300,
-			// tembaga_mg: 890,
-			// seng_mg: 11,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.2,
-			// riboflavin_mg: 1.3,
-			// niasin_mg: 16,
-			vitamin_c_mg: 90,
-		},
-		12: {
-			//SMA 1
-			energi_kkal: 2650,
-			protein_g: 75,
-			lemak_g: 85,
-			karbohidrat_g: 400,
-			serat_g: 37,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1200,
-			// fosfor_mg: 1250,
-			besi_mg: 9,
-			natrium_mg: 1700,
-			kalium_mg: 5300,
-			// tembaga_mg: 890,
-			// seng_mg: 11,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.2,
-			// riboflavin_mg: 1.3,
-			// niasin_mg: 16,
-			vitamin_c_mg: 90,
-		},
-		13: {
-			//SMA 2
-			energi_kkal: 2650,
-			protein_g: 75,
-			lemak_g: 85,
-			karbohidrat_g: 400,
-			serat_g: 37,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1200,
-			// fosfor_mg: 1250,
-			besi_mg: 9,
-			natrium_mg: 1700,
-			kalium_mg: 5300,
-			// tembaga_mg: 890,
-			// seng_mg: 11,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.2,
-			// riboflavin_mg: 1.3,
-			// niasin_mg: 16,
-			vitamin_c_mg: 90,
-		},
-		14: {
-			//SMA 3
-			energi_kkal: 2650,
-			protein_g: 65,
-			lemak_g: 75,
-			karbohidrat_g: 430,
-			serat_g: 37,
-			// abu_g: 5, // optional, tidak tercantum di AKG resmi
-			kalsium_mg: 1000,
-			// fosfor_mg: 700,
-			besi_mg: 9,
-			natrium_mg: 1500,
-			kalium_mg: 4700,
-			// tembaga_mg: 900,
-			// seng_mg: 11,
-			// retinol_mcg: 500,
-			// b_kar_mcg: 3600,
-			// karoten_total_mcg: 4000,
-			// thiamin_mg: 1.2,
-			// riboflavin_mg: 1.3,
-			// niasin_mg: 16,
-			vitamin_c_mg: 90,
-		},
-	};
+  const {
+    combinedKekurangan = [],
+    combinedSaran = [],
+    warnings = []
+  } = data || {}
+  const [isPrinting, setIsPrinting] = useState(false)
+  const [showPercentage, setShowPercentage] = useState(true) 
+  const nutritionLabelRef = useRef(null)
+  const hasResults = totalLabel !== null
+  // ------------------------------
+  const goals = {
+    1: {
+      // TK A
+      energi_kkal: 1350,
+      protein_g: 20,
+      lemak_g: 45,
+      karbohidrat_g: 215,
+      serat_g: 19,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1000,
+      // fosfor_mg: 500,
+      besi_mg: 10,
+      natrium_mg: 1000,
+      kalium_mg: 3200,
+      // tembaga_mg: 570,
+      // seng_mg: 5,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.1,
+      // riboflavin_mg: 1.1,
+      // niasin_mg: 10,
+      vitamin_c_mg: 45
+    },
+    2: {
+      // TK B
+      energi_kkal: 1400,
+      protein_g: 25,
+      lemak_g: 50,
+      karbohidrat_g: 250,
+      serat_g: 20,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1000,
+      // fosfor_mg: 500,
+      besi_mg: 10,
+      natrium_mg: 1000,
+      kalium_mg: 3200,
+      // tembaga_mg: 570,
+      // seng_mg: 5,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.1,
+      // riboflavin_mg: 1.1,
+      // niasin_mg: 10,
+      vitamin_c_mg: 45
+    },
+    3: {
+      //SD 1
+      energi_kkal: 1650,
+      protein_g: 40,
+      lemak_g: 55,
+      karbohidrat_g: 250,
+      serat_g: 23,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1000,
+      // fosfor_mg: 500,
+      besi_mg: 10,
+      natrium_mg: 1000,
+      kalium_mg: 3200,
+      // tembaga_mg: 570,
+      // seng_mg: 5,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.1,
+      // riboflavin_mg: 1.1,
+      // niasin_mg: 10,
+      vitamin_c_mg: 45
+    },
+    4: {
+      // SD 2
+      energi_kkal: 1650,
+      protein_g: 40,
+      lemak_g: 55,
+      karbohidrat_g: 250,
+      serat_g: 23,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1000,
+      // fosfor_mg: 500,
+      besi_mg: 10,
+      natrium_mg: 1000,
+      kalium_mg: 3200,
+      // tembaga_mg: 570,
+      // seng_mg: 5,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.1,
+      // riboflavin_mg: 1.1,
+      // niasin_mg: 10,
+      vitamin_c_mg: 45
+    },
+    5: {
+      //SD 3
+      energi_kkal: 1650,
+      protein_g: 40,
+      lemak_g: 55,
+      karbohidrat_g: 250,
+      serat_g: 23,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1000,
+      // fosfor_mg: 500,
+      // besi_mg: 10,
+      natrium_mg: 1000,
+      kalium_mg: 3200,
+      tembaga_mg: 570,
+      // seng_mg: 5,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.1,
+      // riboflavin_mg: 1.1,
+      // niasin_mg: 10,
+      vitamin_c_mg: 45
+    },
+    6: {
+      //SD 4
+      energi_kkal: 2000,
+      protein_g: 50,
+      lemak_g: 65,
+      karbohidrat_g: 300,
+      serat_g: 28,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1000,
+      // fosfor_mg: 1250,
+      besi_mg: 8,
+      natrium_mg: 1300,
+      kalium_mg: 3900,
+      // tembaga_mg: 700,
+      // seng_mg: 8,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.1,
+      // riboflavin_mg: 1.3,
+      // niasin_mg: 12,
+      vitamin_c_mg: 50
+    },
+    7: {
+      //SD 5
+      energi_kkal: 2000,
+      protein_g: 50,
+      lemak_g: 65,
+      karbohidrat_g: 300,
+      serat_g: 28,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1000,
+      // fosfor_mg: 1250,
+      // besi_mg: 8,
+      natrium_mg: 1300,
+      kalium_mg: 3900,
+      tembaga_mg: 700,
+      // seng_mg: 8,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.1,
+      // riboflavin_mg: 1.3,
+      // niasin_mg: 12,
+      vitamin_c_mg: 50
+    },
+    8: {
+      //SD 6
+      energi_kkal: 2000,
+      protein_g: 50,
+      lemak_g: 65,
+      karbohidrat_g: 300,
+      serat_g: 28,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1000,
+      // fosfor_mg: 1250,
+      // besi_mg: 8,
+      natrium_mg: 1300,
+      kalium_mg: 3900,
+      tembaga_mg: 700,
+      // seng_mg: 8,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.1,
+      // riboflavin_mg: 1.3,
+      // niasin_mg: 12,
+      vitamin_c_mg: 50
+    },
+    9: {
+      // SMP 1
+      energi_kkal: 2400,
+      protein_g: 70,
+      lemak_g: 80,
+      karbohidrat_g: 350,
+      serat_g: 34,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1200,
+      // fosfor_mg: 1250,
+      besi_mg: 11,
+      natrium_mg: 1500,
+      kalium_mg: 4800,
+      // tembaga_mg: 795,
+      // seng_mg: 11,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.2,
+      // riboflavin_mg: 1.3,
+      // niasin_mg: 16,
+      vitamin_c_mg: 75
+    },
+    10: {
+      //SMP 2
+      energi_kkal: 2400,
+      protein_g: 70,
+      lemak_g: 80,
+      karbohidrat_g: 350,
+      serat_g: 34,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1200,
+      // fosfor_mg: 1250,
+      besi_mg: 11,
+      natrium_mg: 1500,
+      kalium_mg: 4800,
+      // tembaga_mg: 795,
+      // seng_mg: 11,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.2,
+      // riboflavin_mg: 1.3,
+      // niasin_mg: 16,
+      vitamin_c_mg: 75
+    },
+    11: {
+      //SMP 3
+      energi_kkal: 2650,
+      protein_g: 75,
+      lemak_g: 85,
+      karbohidrat_g: 400,
+      serat_g: 37,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1200,
+      // fosfor_mg: 1250,
+      besi_mg: 9,
+      natrium_mg: 1700,
+      kalium_mg: 5300,
+      // tembaga_mg: 890,
+      // seng_mg: 11,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.2,
+      // riboflavin_mg: 1.3,
+      // niasin_mg: 16,
+      vitamin_c_mg: 90
+    },
+    12: {
+      //SMA 1
+      energi_kkal: 2650,
+      protein_g: 75,
+      lemak_g: 85,
+      karbohidrat_g: 400,
+      serat_g: 37,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1200,
+      // fosfor_mg: 1250,
+      besi_mg: 9,
+      natrium_mg: 1700,
+      kalium_mg: 5300,
+      // tembaga_mg: 890,
+      // seng_mg: 11,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.2,
+      // riboflavin_mg: 1.3,
+      // niasin_mg: 16,
+      vitamin_c_mg: 90
+    },
+    13: {
+      //SMA 2
+      energi_kkal: 2650,
+      protein_g: 75,
+      lemak_g: 85,
+      karbohidrat_g: 400,
+      serat_g: 37,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1200,
+      // fosfor_mg: 1250,
+      besi_mg: 9,
+      natrium_mg: 1700,
+      kalium_mg: 5300,
+      // tembaga_mg: 890,
+      // seng_mg: 11,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.2,
+      // riboflavin_mg: 1.3,
+      // niasin_mg: 16,
+      vitamin_c_mg: 90
+    },
+    14: {
+      //SMA 3
+      energi_kkal: 2650,
+      protein_g: 65,
+      lemak_g: 75,
+      karbohidrat_g: 430,
+      serat_g: 37,
+      // abu_g: 5, // optional, tidak tercantum di AKG resmi
+      kalsium_mg: 1000,
+      // fosfor_mg: 700,
+      besi_mg: 9,
+      natrium_mg: 1500,
+      kalium_mg: 4700,
+      // tembaga_mg: 900,
+      // seng_mg: 11,
+      // retinol_mcg: 500,
+      // b_kar_mcg: 3600,
+      // karoten_total_mcg: 4000,
+      // thiamin_mg: 1.2,
+      // riboflavin_mg: 1.3,
+      // niasin_mg: 16,
+      vitamin_c_mg: 90
+    }
+  }
 
 	const handlePrintPDF = async () => {
 		if (!nutritionLabelRef.current) return;
@@ -525,108 +527,126 @@ const RecommendationCard = ({ data, totalLabel }) => {
 				</div>
 			</div>
 
-			{/* Content */}
-			<div className="p-6">
-				{hasData ? (
-					<div className="space-y-8">
-						{allKelas.map((kelas, index) => {
-							const open = openKelas.has(kelas);
-							const kekuranganCount = (groupedKekurangan[kelas] || []).reduce(
-								(acc, it) => {
-									const parts = (it.kurang || "")
-										.split(",")
-										.map((s) => s.trim())
-										.filter(Boolean);
-									return acc + parts.length;
-								},
-								0,
-							);
-							const mins = goals[kelas] || {};
-							const chartData = totalLabel
-								? [
-										{
-											nutrient: "Energi",
-											value: totalLabel.informasi_nilai_gizi.energi_kkal || 0,
-											min: (mins.energi_kkal || 0) / 3,
-											unit: "kkal",
-										},
-										{
-											nutrient: "Protein",
-											value: totalLabel.informasi_nilai_gizi.protein_g || 0,
-											min: (mins.protein_g || 0) / 3,
-											unit: "g",
-										},
-										{
-											nutrient: "Lemak",
-											value: totalLabel.informasi_nilai_gizi.lemak_g || 0,
-											min: (mins.lemak_g || 0) / 3,
-											unit: "g",
-										},
-										{
-											nutrient: "Karbohidrat",
-											value: totalLabel.informasi_nilai_gizi.karbohidrat_g || 0,
-											min: (mins.karbohidrat_g || 0) / 3,
-											unit: "g",
-										},
-										{
-											nutrient: "Serat",
-											value: totalLabel.informasi_nilai_gizi.serat_g || 0,
-											min: (mins.serat_g || 0) / 3,
-											unit: "g",
-										},
-										// {
-										// 	nutrient: "Kalsium",
-										// 	value: totalLabel.informasi_nilai_gizi.kalsium_mg || 0,
-										// 	min: (mins.kalsium_mg || 0) / 3,
-										// 	unit: "mg",
-										// },
-										// {
-										// 	nutrient: "Besi",
-										// 	value: totalLabel.informasi_nilai_gizi.besi_mg || 0,
-										// 	min: (mins.besi_mg || 0) / 3,
-										// 	unit: "mg",
-										// },
-										// {
-										// 	nutrient: "Natrium",
-										// 	value: totalLabel.informasi_nilai_gizi.natrium_mg || 0,
-										// 	min: (mins.natrium_mg || 0) / 3,
-										// 	unit: "mg",
-										// },
-										// {
-										// 	nutrient: "Kalium",
-										// 	value: totalLabel.informasi_nilai_gizi.kalium_mg || 0,
-										// 	min: (mins.kalium_mg || 0) / 3,
-										// 	unit: "mg",
-										// },
-										// {
-										// 	nutrient: "Vitamin C",
-										// 	value: totalLabel.informasi_nilai_gizi.vitamin_c_mg || 0,
-										// 	min: (mins.vitamin_c_mg || 0) / 3,
-										// 	unit: "mg",
-										// },
-									].filter((item) => item.min > 0)
-								: [];
-							return (
-								<div
-									key={kelas}
-									className="border-2 border-slate-200 rounded-xl p-4 cursor-pointer"
-									onClick={() => toggleKelas(kelas)}
-								>
-									<div className="flex justify-between">
-										<div>
-											<h4 className="text-lg font-semibold text-[#202020]">
-												{getClassName(Number(kelas))}
-											</h4>
-											<p className="text-xs text-slate-500 mt-0.5">
-												{kekuranganCount > 0
-													? `${kekuranganCount} kekurangan`
-													: "Tidak ada kekurangan"}{" "}
-												•{" "}
-												{(groupedSaran[kelas]?.length || 0) > 0
-													? `${groupedSaran[kelas].length} rekomendasi`
-													: "Tidak ada rekomendasi"}
-											</p>
-										</div>
+      {/* Content */}
+      <div className='p-6'>
+        {hasData ? (
+          <div className='space-y-8'>
+            {allKelas.map((kelas, index) => {
+              const open = openKelas.has(kelas)
+              const kekuranganCount = (groupedKekurangan[kelas] || []).reduce(
+                (acc, it) => {
+                  const parts = (it.kurang || '')
+                    .split(',')
+                    .map(s => s.trim())
+                    .filter(Boolean)
+                  return acc + parts.length
+                },
+                0
+              )
+              const mins = goals[kelas] || {}
+              const chartData = totalLabel
+                ? [
+                    {
+                      nutrient: 'Energi',
+                      actual: totalLabel.informasi_nilai_gizi.energi_kkal || 0,
+                      target: (mins.energi_kkal || 0) / 3,
+                      percentage: Math.min(((totalLabel.informasi_nilai_gizi.energi_kkal || 0) / ((mins.energi_kkal || 0) / 3)) * 100, 100),
+                      unit: 'kkal'
+                    },
+                    {
+                      nutrient: 'Protein',
+                      actual: totalLabel.informasi_nilai_gizi.protein_g || 0,
+                      target: (mins.protein_g || 0) / 3,
+                      percentage: Math.min(((totalLabel.informasi_nilai_gizi.protein_g || 0) / ((mins.protein_g || 0) / 3)) * 100, 100),
+                      unit: 'g'
+                    },
+                    {
+                      nutrient: 'Lemak',
+                      actual: totalLabel.informasi_nilai_gizi.lemak_g || 0,
+                      target: (mins.lemak_g || 0) / 3,
+                      percentage: Math.min(((totalLabel.informasi_nilai_gizi.lemak_g || 0) / ((mins.lemak_g || 0) / 3)) * 100, 100),
+                      unit: 'g'
+                    },
+                    {
+                      nutrient: 'Karbohidrat',
+                      actual: totalLabel.informasi_nilai_gizi.karbohidrat_g || 0,
+                      target: (mins.karbohidrat_g || 0) / 3,
+                      percentage: Math.min(((totalLabel.informasi_nilai_gizi.karbohidrat_g || 0) / ((mins.karbohidrat_g || 0) / 3)) * 100, 100),
+                      unit: 'g'
+                    },
+                    {
+                      nutrient: 'Serat',
+                      actual: totalLabel.informasi_nilai_gizi.serat_g || 0,
+                      target: (mins.serat_g || 0) / 3,
+                      percentage: Math.min(((totalLabel.informasi_nilai_gizi.serat_g || 0) / ((mins.serat_g || 0) / 3)) * 100, 100),
+                      unit: 'g'
+                    },
+                    // {
+                    //   nutrient: 'Kalsium',
+                    //   actual: totalLabel.informasi_nilai_gizi.kalsium_mg || 0,
+                    //   target: (mins.kalsium_mg || 0) / 3,
+                    //   percentage: Math.min(((totalLabel.informasi_nilai_gizi.kalsium_mg || 0) / ((mins.kalsium_mg || 0) / 3)) * 100, 100),
+                    //   unit: 'mg'
+                    // },
+                    // {
+                    //   nutrient: 'Besi',
+                    //   actual: totalLabel.informasi_nilai_gizi.besi_mg || 0,
+                    //   target: (mins.besi_mg || 0) / 3,
+                    //   percentage: ((totalLabel.informasi_nilai_gizi.besi_mg || 0) / ((mins.besi_mg || 0) / 3)) * 100,
+                    //   unit: 'mg'
+                    // },
+                    // {
+                    //   nutrient: 'Natrium',
+                    //   actual: totalLabel.informasi_nilai_gizi.natrium_mg || 0,
+                    //   target: (mins.natrium_mg || 0) / 3,
+                    //   percentage: ((totalLabel.informasi_nilai_gizi.natrium_mg || 0) / ((mins.natrium_mg || 0) / 3)) * 100,
+                    //   unit: 'mg'
+                    // },
+                    // {
+                    //   nutrient: 'Kalium',
+                    //   actual: totalLabel.informasi_nilai_gizi.kalium_mg || 0,
+                    //   target: (mins.kalium_mg || 0) / 3,
+                    //   percentage: ((totalLabel.informasi_nilai_gizi.kalium_mg || 0) / ((mins.kalium_mg || 0) / 3)) * 100,
+                    //   unit: 'mg'
+                    // },
+                    // {
+                    //   nutrient: 'Vitamin C',
+                    //   actual: totalLabel.informasi_nilai_gizi.vitamin_c_mg || 0,
+                    //   target: (mins.vitamin_c_mg || 0) / 3,
+                    //   percentage: ((totalLabel.informasi_nilai_gizi.vitamin_c_mg || 0) / ((mins.vitamin_c_mg || 0) / 3)) * 100,
+                    //   unit: 'mg'
+                    // },
+                    // ...(mins.tembaga_mg ? [{
+                    //   nutrient: 'Tembaga',
+                    //   actual: totalLabel.informasi_nilai_gizi.tembaga_mg || 0,
+                    //   target: (mins.tembaga_mg || 0) / 3,
+                    //   percentage: ((totalLabel.informasi_nilai_gizi.tembaga_mg || 0) / ((mins.tembaga_mg || 0) / 3)) * 100,
+                    //   unit: 'mg'
+                    // }] 
+                    // : [])
+                  ].filter(item => item.target > 0)
+                : []
+              return (
+                <div
+                  key={kelas}
+                  className='border-2 border-slate-200 rounded-xl p-4 cursor-pointer'
+                  onClick={() => toggleKelas(kelas)}
+                >
+                  <div className='flex justify-between'>
+                    <div>
+                      <h4 className='text-lg font-semibold text-[#202020]'>
+                        {getClassName(Number(kelas))}
+                      </h4>
+                      <p className='text-xs text-slate-500 mt-0.5'>
+                        {kekuranganCount > 0
+                          ? `${kekuranganCount} kekurangan`
+                          : 'Tidak ada kekurangan'}{' '}
+                        •{' '}
+                        {(groupedSaran[kelas]?.length || 0) > 0
+                          ? `${groupedSaran[kelas].length} rekomendasi`
+                          : 'Tidak ada rekomendasi'}
+                      </p>
+                    </div>
 
 										<div className="flex items-center gap-3">
 											<span
@@ -691,55 +711,125 @@ const RecommendationCard = ({ data, totalLabel }) => {
 														</div>
 													)}
 
-												{chartData.length > 0 && (
-													<div className="mb-4">
-														<h5 className="font-semibold text-blue-600 mb-3">
-															Tingkat Nutrisi vs Target (1/3 Kebutuhan Harian)
-														</h5>
-														<ResponsiveContainer width="100%" height={300}>
-															<BarChart
-																data={chartData}
-																margin={{
-																	top: 5,
-																	right: 30,
-																	left: 20,
-																	bottom: 5,
-																}}
-															>
-																<CartesianGrid strokeDasharray="3 3" />
-																<XAxis
-																	dataKey="nutrient"
-																	angle={-45}
-																	textAnchor="end"
-																	height={80}
-																/>
-																<YAxis />
-																<Tooltip
-																	formatter={(value, name, props) => [
-																		`${value.toFixed(2)} ${props.payload.unit}`,
-																		name
-																	]}
-																/>
-																<Legend />
-																<Bar
-																	dataKey="value"
-																	fill="#10B981"
-																	name="Aktual"
-																/>
-																<Bar
-																	dataKey="min"
-																	fill="#F59E0B"
-																	name="Target (1/3)"
-																/>
-															</BarChart>
-														</ResponsiveContainer>
-														<p className="text-xs text-slate-500 mt-2">
-															Target menunjukkan 1/3 dari kebutuhan harian
-															(untuk 1 kali makan)
-														</p>
-													</div>
-												)}
-											</div>
+                        {chartData.length > 0 && (
+                          <div className='mb-4'>
+                            <div className='flex items-center justify-between mb-3'>
+                              <h5 className='font-semibold text-blue-600'>
+                                {showPercentage ? 'Persentase Pencapaian Target' : 'Nilai Nutrisi vs Target'} (1/3 Kebutuhan Harian)
+                              </h5>
+                              {/* ✅ Toggle Switch */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setShowPercentage(!showPercentage)
+                                }}
+                                className='flex items-center gap-2 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-semibold rounded-lg transition-colors'
+                              >
+                                <svg className='w-4 h-4' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' />
+                                </svg>
+                                {showPercentage ? 'Lihat Nilai' : 'Lihat %'}
+                              </button>
+                            </div>
+                            <ResponsiveContainer width='100%' height={350}>
+                              <BarChart
+                                data={chartData}
+                                margin={{
+                                  top: 5,
+                                  right: 30,
+                                  left: 20,
+                                  bottom: 80
+                                }}
+                              >
+                                <CartesianGrid strokeDasharray='3 3' />
+                                <XAxis
+                                  dataKey='nutrient'
+                                  angle={-45}
+                                  textAnchor='end'
+                                  height={80}
+                                />
+                                <YAxis 
+                                  label={{ 
+                                    value: showPercentage ? 'Persentase (%)' : 'Nilai', 
+                                    angle: -90, 
+                                    position: 'insideLeft' 
+                                  }}
+                                  domain={showPercentage ? [0, 100] : [0, 'auto']}
+                                />
+                                <Tooltip
+                                  content={({ active, payload }) => {
+                                    if (active && payload && payload.length) {
+                                      const data = payload[0].payload
+                                      return (
+                                        <div className="bg-white p-3 border-2 border-slate-300 rounded-lg shadow-lg">
+                                          <p className="font-bold text-slate-800">{data.nutrient}</p>
+                                          <p className="text-sm text-[#10B981]">
+                                            Aktual: <span className="font-semibold">{data.actual.toFixed(2)} {data.unit}</span>
+                                          </p>
+                                          <p className="text-sm text-[#F59E0B]">
+                                            Target: <span className="font-semibold">{data.target.toFixed(2)} {data.unit}</span>
+                                          </p>
+                                          {showPercentage ? (
+                                            
+                                          <p className={`text-sm font-bold mt-1 ${data.percentage >= 100 ? 'text-green-600' : 'text-red-600'}`}>
+                                            Pencapaian: {data.percentage.toFixed(1)}%
+                                          </p>
+                                          ) : <></>}
+                                        </div>
+                                      )
+                                    }
+                                    return null
+                                  }}
+                                />
+                                <Legend />
+                                {showPercentage ? (
+                                  <Bar
+                                    dataKey='percentage'
+                                    name='Pencapaian (%)'
+                                    label={{ position: 'top', formatter: (value) => `${value.toFixed(0)}%` }}
+                                  >
+                                    {chartData.map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fill={entry.percentage >= 100 ? '#10B981' : '#EF4444'} />
+                                    ))}
+                                  </Bar>
+                                ) : (
+                                  <>
+                                    <Bar
+                                      dataKey='actual'
+                                      fill='#10B981'
+                                      name='Aktual'
+                                    />
+                                    <Bar
+                                      dataKey='target'
+                                      fill='#F59E0B'
+                                      name='Target (1/3)'
+                                    />
+                                  </>
+                                )}
+                              </BarChart>
+                            </ResponsiveContainer>
+                            
+                            {/* ✅ Legend dengan penjelasan */}
+                            {showPercentage && (
+                              <div className='mt-3 flex items-center gap-4 text-xs'>
+                                <div className='flex items-center gap-2'>
+                                  <div className='w-4 h-4 bg-green-500 rounded'></div>
+                                  <span className='text-slate-600'>≥ 100% (Memenuhi target)</span>
+                                </div>
+                                <div className='flex items-center gap-2'>
+                                  <div className='w-4 h-4 bg-red-500 rounded'></div>
+                                  <span className='text-slate-600'>&lt; 100% (Kurang dari target)</span>
+                                </div>
+                              </div>
+                            )}
+                            
+                            <p className='text-xs text-slate-500 mt-2'>
+                              Target menunjukkan 1/3 dari kebutuhan harian (untuk 1 kali makan).
+                              {!showPercentage && ' Hover pada bar untuk melihat persentase pencapaian.'}
+                            </p>
+                          </div>
+                        )}
+                      </div>
 
 											{/* Kolom Kanan - Label Gizi */}
 											<div>
@@ -773,6 +863,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
 													<div ref={nutritionLabelRef}>
 														<NutritionLabel
 															data={totalLabel}
+                              goals={goals}
 															classGrade={index + 1}
 															fromRecCard={true}
 														/>

@@ -36,7 +36,7 @@ const ReadOnlyRow = ({ label, value, unit, akgValue }) => (
 
 const NutritionLabel = forwardRef(
   (
-    { data, classGrade, fromRecCard=false, isMini = false, isEditable = false, onDataChange = () => {} },
+    { data, goals, classGrade, fromRecCard=false, isMini = false, isEditable = false, onDataChange = () => {} },
     ref
   ) => {
     if (!data) return null;
@@ -47,9 +47,14 @@ const NutritionLabel = forwardRef(
       const akgAll = data.persen_akg_all || {};
       akg = akgAll[classGrade] || {};
     }
+    const defaultGoals = {
+      6: { energi_kkal: 2000 }
+    };
+    const currentGoals = goals || defaultGoals;
     
     console.log("akg",akg);
     console.log("classGrade", classGrade)
+    console.log("Goals ", currentGoals)
 
     // --- FUNGSI BARU UNTUK MENANGANI PERUBAHAN INPUT ---
     const handleChange = (field, value) => {
@@ -208,7 +213,7 @@ const NutritionLabel = forwardRef(
 
         <div className="w-full h-2 bg-black my-1"></div>
         <p className="text-xs text-left mt-2">
-          *Persen AKG berdasarkan kebutuhan energi 2000 kkal. Kebutuhan energi
+          *Persen AKG berdasarkan kebutuhan {currentGoals[classGrade || 6]?.energi_kkal || 2000} energi kkal. Kebutuhan energi
           Anda mungkin lebih tinggi atau lebih rendah.
         </p>
       </div>

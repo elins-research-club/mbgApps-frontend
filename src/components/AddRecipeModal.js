@@ -379,21 +379,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
         ),
         showSpinner: true
       },
-      found: {
-        text: 'Ditemukan di database',
-        className: 'text-green-600 font-semibold',
-        bgColor: 'bg-green-50',
-        borderColor: 'border-green-200',
-        icon: (
-          <svg className='w-6 h-6' fill='currentColor' viewBox='0 0 20 20'>
-            <path
-              fillRule='evenodd'
-              d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
-              clipRule='evenodd'
-            />
-          </svg>
-        )
-      },
+      found: null,
       not_found: {
         text: 'Tidak ditemukan di database',
         className: 'text-amber-700 font-medium',
@@ -471,7 +457,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
     }
 
     const config = statusConfig[item.status]
-    if (!config || item.status === 'idle') return null
+    if (!config || item.status === 'idle' || item.status === 'found') return null
 
     return (
       <div className='mt-3'>
@@ -693,11 +679,11 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
         if (onRecipeAdded) onRecipeAdded(newRecipeId)
         if (onClose) onClose();
       } else {
-        setError(res?.message || 'Gagal menyimpan resep')
+        setError(res?.message || 'Gagal menyimpan menu')
       }
     } catch (error) {
       console.error('Error saving recipe:', error)
-      setError('Terjadi kesalahan saat menyimpan resep')
+      setError('Terjadi kesalahan saat menyimpan menu')
     } finally {
       setIsSaving(false)
     }
@@ -779,9 +765,9 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
   return (
     <div className='bg-white rounded-2xl shadow-2xl w-full flex flex-col animate-in fade-in duration-200'>
       <div className='bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-6'>
-        <h2 className='text-2xl font-bold text-white'>Tambahkan Resep Baru</h2>
+        <h2 className='text-2xl font-bold text-white'>Buat Menu Masakan</h2>
         <p className='text-orange-50 text-sm mt-1'>
-          Lengkapi informasi resep dan bahan-bahan yang diperlukan
+          Lengkapi informasi menu dan bahan-bahan yang diperlukan
         </p>
       </div>
       {!showRecommendation ? (
@@ -793,7 +779,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
                   htmlFor='menu-name'
                   className='block text-sm font-semibold text-slate-700 mb-2'
                 >
-                  Nama Resep <span className='text-red-500'>*</span>
+                  Nama Menu <span className='text-red-500'>*</span>
                 </label>
                 <input
                   id='menu-name'
@@ -978,7 +964,6 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
                                               clipRule='evenodd'
                                             />
                                           </svg>
-                                          {suggestion.validatedBy || 'TKPI'}
                                         </span>
                                       )}
                                     </div>
@@ -1012,6 +997,17 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
                             g
                           </span>
                         </div>
+                        {item.status === 'found' && (
+                          <div className='flex-shrink-0'>
+                            <svg className='w-6 h-6 text-green-600' fill='currentColor' viewBox='0 0 20 20'>
+                              <path
+                                fillRule='evenodd'
+                                d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
+                                clipRule='evenodd'
+                              />
+                            </svg>
+                          </div>
+                        )}
                         {/* <div className="flex items-center gap-2 text-sm text-slate-600">
                             <svg
                               className="w-4 h-4"
@@ -1157,7 +1153,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
                   Menyimpan...
                 </>
               ) : (
-                'Simpan Resep'
+                'Simpan Menu'
               )}
             </button>
           </div>

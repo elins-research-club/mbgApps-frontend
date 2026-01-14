@@ -161,7 +161,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
     console.log("📋 Valid recipes:", validRecipes);
 
     if (validRecipes.length === 0) {
-      alert("Minimal harus ada 1 resep yang dipilih.");
+      alert("Minimal harus ada 1 menu yang dipilih.");
       return;
     }
 
@@ -308,7 +308,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
               </div>
               <div className="relative flex justify-center">
                 <span className="px-4 text-sm font-medium text-slate-500 bg-white">
-                  Resep dalam Paket (
+                  Menu dalam Paket (
                   {recipes.filter((r) => r.status === "found").length})
                 </span>
               </div>
@@ -352,7 +352,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
                             setFocusedRecipeId(null);
                           }, 200);
                         }}
-                        placeholder={`Cari resep ${index + 1}...`}
+                        placeholder={`Cari menu ${index + 1}...`}
                         className="w-full px-3 py-2 border border-orange-300 rounded-lg 
                                  focus:ring-2 focus:ring-orange-500 focus:border-transparent 
                                  outline-none transition text-sm"
@@ -393,7 +393,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
                       {recipe.status === "found" && (
                         <div className="flex items-center gap-2 text-xs">
                           <span className="text-green-600 font-semibold flex items-center gap-1">
-                            ✅ Resep ditemukan
+                            ✅ Menu ditemukan
                           </span>
                           {recipe.kategori && getCategoryBadge(recipe.kategori)}
                         </div>
@@ -407,7 +407,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
                         onClick={() => handleRemoveRecipe(recipe.id)}
                         className="flex-shrink-0 p-2 text-red-400 hover:text-red-600 
                                  hover:bg-red-50 rounded-lg transition"
-                        title="Hapus resep"
+                        title="Hapus menu"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -427,7 +427,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
                        transition font-medium"
             >
               <Plus className="w-5 h-5" />
-              Tambah Resep Lain
+              Tambah Menu Lain
             </button>
 
             {/* Error Message */}

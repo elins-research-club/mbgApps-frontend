@@ -156,7 +156,7 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ketik nama resep (min. 2 karakter)..."
+          placeholder="Ketik nama menu (min. 2 karakter)..."
           className="w-full p-3 pl-10 pr-10 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition disabled:bg-slate-100 disabled:cursor-not-allowed"
           disabled={isLoading}
         />

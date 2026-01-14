@@ -159,7 +159,7 @@ export default function ChefDashboard() {
             `[ChefDashboard] ID tidak ditemukan (tidak ada match persis) untuk: "${name.trim()}"`
           );
           setError(
-            `Resep "${name.trim()}" tidak ditemukan persis di database. Harap pilih dari saran.`
+            `Menu "${name.trim()}" tidak ditemukan persis di database. Harap pilih dari saran.`
           );
           return null;
         }
@@ -175,7 +175,7 @@ export default function ChefDashboard() {
           err
         );
         setError(
-          `Gagal menghubungi server untuk mencari ID resep. Periksa koneksi backend.`
+          `Gagal menghubungi server untuk mencari ID menu. Periksa koneksi backend.`
         );
         return null;
       }
@@ -221,7 +221,7 @@ export default function ChefDashboard() {
       ].filter((id) => id !== null).length;
       if (validIdsCount === 0) {
         throw new Error(
-          "Tidak ada resep valid yang dipilih atau ditemukan ID-nya. Pastikan nama resep diketik dengan benar dan dipilih dari saran."
+          "Tidak ada menu valid yang dipilih atau ditemukan ID-nya. Pastikan nama menu diketik dengan benar dan dipilih dari saran."
         );
       }
       console.log(
@@ -310,7 +310,7 @@ export default function ChefDashboard() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("❌ API Error:", response.status, errorText);
-        throw new Error(`Gagal mengambil data resep (${response.status})`);
+        throw new Error(`Gagal mengambil data menu (${response.status})`);
       }
 
       const result = await response.json();
@@ -324,7 +324,7 @@ export default function ChefDashboard() {
       setTotalLabel(result.totalLabel);
       setDetailBahan(result.detailPerhitungan?.rincian_per_bahan || []);
       setCalculationLog([
-        `Resep: ${result.menu?.nama || "Unknown"}`,
+        `Menu: ${result.menu?.nama || "Unknown"}`,
         `Kategori: ${result.menu?.kategori || "Unknown"}`,
         `Total bahan: ${result.detailPerhitungan?.jumlah_bahan || 0}`,
       ]);
@@ -334,7 +334,7 @@ export default function ChefDashboard() {
       console.log("✅ Recipe data loaded successfully");
     } catch (err) {
       console.error("[ChefDashboard] Error di handleRecipeSelect:", err);
-      setError(err.message || "Terjadi kesalahan saat mencari resep.");
+      setError(err.message || "Terjadi kesalahan saat mencari menu.");
     } finally {
       setIsLoading(false);
     }
@@ -452,7 +452,7 @@ export default function ChefDashboard() {
                     </div>
                     {!isRecipeView && (
                       <p className="text-xs mt-1 opacity-90 font-normal">
-                        Hitung nilai gizi dari resep yang dibuat
+                        Hitung nilai gizi dari menu yang dibuat
                       </p>
                     )}
                   </button>
@@ -461,7 +461,7 @@ export default function ChefDashboard() {
                   <button
                     type="button"
                     onClick={() => {
-                      console.log("🔘 Clicking Resep Individual button");
+                      console.log("🔘 Clicking Menu Individual button");
                       clearResults();
                       setIsRecipeView(true);
                     }}
@@ -477,11 +477,11 @@ export default function ChefDashboard() {
                           isRecipeView ? "text-white" : "text-orange-400"
                         }`}
                       />
-                      <span>Cari Resep</span>
+                      <span>Cari Menu</span>
                     </div>
                     {isRecipeView && (
                       <p className="text-xs mt-1 opacity-90 font-normal">
-                        Lihat gizi satu resep
+                        Lihat gizi satu menu
                       </p>
                     )}
                   </button>

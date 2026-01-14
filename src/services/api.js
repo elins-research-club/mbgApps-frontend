@@ -270,7 +270,7 @@ export const saveNewMenuComposition = async (formData) => {
 
 		if (validIdsCount === 0) {
 			throw new Error(
-				"Tidak ada resep yang valid ditemukan. Minimal 1 resep harus dipilih.",
+				"Tidak ada menu yang valid ditemukan. Minimal 1 menu harus dipilih.",
 			);
 		}
 

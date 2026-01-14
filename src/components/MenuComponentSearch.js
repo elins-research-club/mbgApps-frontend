@@ -14,7 +14,7 @@ const API_URL = "http://localhost:5000/api";
 const MenuComponentSearch = ({
   category, // ✅ Sekarang: 'karbohidrat', 'proteinHewani', 'sayur', 'proteinTambahan', 'buah'
   onMenuSelect, // Dipanggil saat menu dipilih: (stateKey, menuId, menuName)
-  placeholder = "Cari atau pilih resep...",
+  placeholder = "Cari atau pilih menu...",
   isLoading: propIsLoading,
   disabled,
 }) => {

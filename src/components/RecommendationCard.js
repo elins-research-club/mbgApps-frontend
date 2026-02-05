@@ -415,6 +415,9 @@ const RecommendationCard = ({ data, totalLabel }) => {
 		return acc;
 	}, {});
 
+  console.log('Grouped Kekurangan ', groupedKekurangan)
+  console.log("combined Kekurangan ", combinedKekurangan)
+
 	// --- 2. Group saran by kelas ---
 	const groupedSaran = combinedSaran.reduce((acc, item) => {
 		if (!acc[item.kelas]) acc[item.kelas] = [];
@@ -533,16 +536,8 @@ const RecommendationCard = ({ data, totalLabel }) => {
           <div className='space-y-8'>
             {allKelas.map((kelas, index) => {
               const open = openKelas.has(kelas)
-              const kekuranganCount = (groupedKekurangan[kelas] || []).reduce(
-                (acc, it) => {
-                  const parts = (it.kurang || '')
-                    .split(',')
-                    .map(s => s.trim())
-                    .filter(Boolean)
-                  return acc + parts.length
-                },
-                0
-              )
+              const kekuranganCount = (groupedKekurangan[kelas] || []).length
+              console.log("Kekurangan Count: ", kekuranganCount)
               const mins = goals[kelas] || {}
               const chartData = totalLabel
                 ? [

@@ -545,35 +545,35 @@ const RecommendationCard = ({ data, totalLabel }) => {
                       nutrient: 'Energi',
                       actual: totalLabel.informasi_nilai_gizi.energi_kkal || 0,
                       target: (mins.energi_kkal || 0) / 3,
-                      percentage: Math.min(((totalLabel.informasi_nilai_gizi.energi_kkal || 0) / ((mins.energi_kkal || 0) / 3)) * 100, 100),
+                      percentage: ((totalLabel.informasi_nilai_gizi.energi_kkal || 0) / ((mins.energi_kkal || 0) / 3)) * 100,
                       unit: 'kkal'
                     },
                     {
                       nutrient: 'Protein',
                       actual: totalLabel.informasi_nilai_gizi.protein_g || 0,
                       target: (mins.protein_g || 0) / 3,
-                      percentage: Math.min(((totalLabel.informasi_nilai_gizi.protein_g || 0) / ((mins.protein_g || 0) / 3)) * 100, 100),
+                      percentage:((totalLabel.informasi_nilai_gizi.protein_g || 0) / ((mins.protein_g || 0) / 3)) * 100,
                       unit: 'g'
                     },
                     {
                       nutrient: 'Lemak',
                       actual: totalLabel.informasi_nilai_gizi.lemak_g || 0,
                       target: (mins.lemak_g || 0) / 3,
-                      percentage: Math.min(((totalLabel.informasi_nilai_gizi.lemak_g || 0) / ((mins.lemak_g || 0) / 3)) * 100, 100),
+                      percentage: ((totalLabel.informasi_nilai_gizi.lemak_g || 0) / ((mins.lemak_g || 0) / 3)) * 100,
                       unit: 'g'
                     },
                     {
                       nutrient: 'Karbohidrat',
                       actual: totalLabel.informasi_nilai_gizi.karbohidrat_g || 0,
                       target: (mins.karbohidrat_g || 0) / 3,
-                      percentage: Math.min(((totalLabel.informasi_nilai_gizi.karbohidrat_g || 0) / ((mins.karbohidrat_g || 0) / 3)) * 100, 100),
+                      percentage: ((totalLabel.informasi_nilai_gizi.karbohidrat_g || 0) / ((mins.karbohidrat_g || 0) / 3)) * 100,
                       unit: 'g'
                     },
                     {
                       nutrient: 'Serat',
                       actual: totalLabel.informasi_nilai_gizi.serat_g || 0,
                       target: (mins.serat_g || 0) / 3,
-                      percentage: Math.min(((totalLabel.informasi_nilai_gizi.serat_g || 0) / ((mins.serat_g || 0) / 3)) * 100, 100),
+                      percentage:((totalLabel.informasi_nilai_gizi.serat_g || 0) / ((mins.serat_g || 0) / 3)) * 100,
                       unit: 'g'
                     },
                     // {
@@ -749,7 +749,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
                                     angle: -90, 
                                     position: 'insideLeft' 
                                   }}
-                                  domain={showPercentage ? [0, 100] : [0, 'auto']}
+                                  domain={showPercentage ? [0, 'auto'] : [0, 'auto']}
                                   allowDataOverflow
                                 />
                                 <Tooltip

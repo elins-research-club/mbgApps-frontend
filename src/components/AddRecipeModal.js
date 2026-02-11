@@ -6,7 +6,8 @@ import {
   checkIngredient,
   generateIngredient,
   generateNutrition,
-  saveRecipe
+  saveRecipe,
+  updateRecipe
 } from '../services/api'
 import { PlusIcon, TrashIcon } from './Icons'
 
@@ -22,7 +23,7 @@ function debounce (func, timeout = 300) {
   }
 }
 
-const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
+const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initialData }) => {
   const [menuName, setMenuName] = useState('')
   const [kategori, setKategori] = useState('karbohidrat')
   const [ingredients, setIngredients] = useState([
@@ -36,6 +37,29 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
       bahanId: null
     }
   ])
+  const [editingRecipeId, setEditingRecipeId] = useState(null)
+
+  // Pre-fill form when initialData is provided (edit mode)
+  useEffect(() => {
+    if (initialData) {
+      setMenuName(initialData.menuName || initialData.nama || '')
+      setKategori(initialData.kategori || 'karbohidrat')
+      if (initialData.id) setEditingRecipeId(initialData.id)
+      if (initialData.ingredients && initialData.ingredients.length > 0) {
+        setIngredients(
+          initialData.ingredients.map((ing, idx) => ({
+            id: ing.id || Date.now() + idx,
+            name: ing.nama || ing.name || '',
+            gramasi: ing.gramasi || '',
+            status: ing.bahanId || ing.bahan_id ? 'found' : 'idle',
+            message: (ing.bahanId || ing.bahan_id) ? 'Bahan ditemukan di database' : '',
+            nutrisi: ing.nutrisi || null,
+            bahanId: ing.bahanId || ing.bahan_id || null
+          }))
+        )
+      }
+    }
+  }, [initialData])
 
   const [showRecommendation, setShowRecommendation] = useState(false)
   const [recommendationData, setRecommendationData] = useState(null)
@@ -43,6 +67,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
   const [isCalculating, setIsCalculating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [focusedIngredientId, setFocusedIngredientId] = useState(null)
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
@@ -577,7 +602,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
     }
 
     const emptyGramasi = validIngredients.find(
-      item => !item.gramasi.trim() || parseFloat(item.gramasi) <= 0
+      item => !String(item.gramasi).trim() || parseFloat(item.gramasi) <= 0
     )
     if (emptyGramasi) {
       setError('Gramasi untuk semua bahan harus diisi dengan nilai yang valid')
@@ -635,6 +660,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
       setTotalLabel(data.totalLabel || null)
       setRecommendationData(data.rekomendasi || null)
       setShowRecommendation(true)
+      
       if (onNutritionCalculated) {
         onNutritionCalculated(data)
       }
@@ -646,38 +672,55 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
     }
   }
 
-  // ✅ NEW: Handle saving the recipe after recommendation
   const handleSave = async () => {
     if (isSaving) return
 
     setError('')
+    setSuccessMessage('')
     setIsSaving(true)
 
     try {
       const validIngredients = ingredients.filter(item => item.name.trim())
 
       const payload = {
-        menuName: menuName.trim(),
+        nama: menuName.trim(),
         kategori: kategori,
         ingredients: validIngredients.map(item => ({
           id: item.id,
           name: item.name.trim(),
           gramasi: parseFloat(item.gramasi),
           status: item.status,
-          bahanId: item.bahanId,
+          bahan_id: item.bahanId,
           nutrisi: item.nutrisi
         }))
       }
 
       console.log('Sending payload:', JSON.stringify(payload, null, 2))
-      const res = await saveRecipe(payload)
+      
+      let res;
+      if (editingRecipeId) {
+        console.log('Updating recipe ID:', editingRecipeId)
+        res = await updateRecipe(editingRecipeId, payload)
+      } else {
+        res = await saveRecipe(payload)
+      }
+      
       console.log('Save response:', res)
 
       if (res?.success) {
-        const newRecipeId = res.menu?.id || null
-        console.log('Recipe ID ', newRecipeId)
-        if (onRecipeAdded) onRecipeAdded(newRecipeId)
-        if (onClose) onClose();
+        const recipeId = editingRecipeId || res.menu?.id || null
+        console.log('Recipe ID:', recipeId)
+        
+        const message = editingRecipeId 
+          ? `✅ Menu "${menuName}" berhasil diupdate!`
+          : `✅ Menu "${menuName}" berhasil disimpan!`
+        setSuccessMessage(message)
+        
+        // Navigate after a short delay to show the success message
+        setTimeout(() => {
+          setSuccessMessage('')
+          if (onRecipeAdded) onRecipeAdded(recipeId)
+        }, 1500)
       } else {
         setError(res?.message || 'Gagal menyimpan menu')
       }
@@ -695,6 +738,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
     setRecommendationData(null)
     setTotalLabel(null)
     setError('')
+    setSuccessMessage('')
   }
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
@@ -765,7 +809,9 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
   return (
     <div className='bg-white rounded-2xl shadow-2xl w-full flex flex-col animate-in fade-in duration-200'>
       <div className='bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-6'>
-        <h2 className='text-2xl font-bold text-white'>Buat Menu Masakan</h2>
+        <h2 className='text-2xl font-bold text-white'>
+          {editingRecipeId ? 'Edit Menu Masakan' : 'Buat Menu Masakan'}
+        </h2>
         <p className='text-orange-50 text-sm mt-1'>
           Lengkapi informasi menu dan bahan-bahan yang diperlukan
         </p>
@@ -1108,6 +1154,17 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
             totalLabel={totalLabel}
           />
 
+          {successMessage && (
+            <div className='mt-4 p-4 bg-green-50 border-2 border-green-200 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300'>
+              <p className='text-sm text-green-700 font-semibold flex items-center gap-2'>
+                <svg className='w-5 h-5 flex-shrink-0' fill='currentColor' viewBox='0 0 20 20'>
+                  <path fillRule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clipRule='evenodd' />
+                </svg>
+                {successMessage}
+              </p>
+            </div>
+          )}
+
           {error && (
             <div className='mt-4 p-4 bg-red-50 border-2 border-red-200 rounded-xl'>
               <p className='text-sm text-red-700 font-medium'>{error}</p>
@@ -1118,7 +1175,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
             <button
               type='button'
               onClick={handleBackToInput}
-              disabled={isSaving}
+              disabled={isSaving || !!successMessage}
               className='px-6 py-2.5 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed'
             >
               Kembali
@@ -1126,7 +1183,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
             <button
               type='button'
               onClick={handleSave}
-              disabled={isSaving}
+              disabled={isSaving || !!successMessage}
               className='px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold shadow-lg hover:shadow-xl hover:from-green-600 hover:to-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
             >
               {isSaving ? (
@@ -1150,10 +1207,10 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated }) => {
                       d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
                     />
                   </svg>
-                  Menyimpan...
+                  {editingRecipeId ? 'Mengupdate...' : 'Menyimpan...'}
                 </>
               ) : (
-                'Simpan Menu'
+                editingRecipeId ? 'Update Menu' : 'Simpan Menu'
               )}
             </button>
           </div>

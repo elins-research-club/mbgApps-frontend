@@ -109,6 +109,43 @@ export const generateIngredient = async (name) => {
 	}
 };
 
+export const getRecipeById = async (recipeId) => {
+	try {
+		console.log("[API] Fetching recipe details for ID:", recipeId);
+		const response = await fetch(`${API_URL}/recipes/${recipeId}`);
+		if (!response.ok) {
+			throw new Error("Gagal mengambil detail resep");
+		}
+		const data = await response.json();
+		console.log("[API] Recipe details received:", data);
+		return data;
+	} catch (error) {
+		console.error("Error di getRecipeById:", error);
+		return null;
+	}
+};
+
+export const updateRecipe = async (recipeId, recipeData) => {
+	console.log("Updating recipe ID:", recipeId, recipeData);
+	try {
+		const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(recipeData),
+		});
+
+		if (!response.ok) {
+			const err = await response.json();
+			throw new Error(err.message || "Gagal mengupdate resep");
+		}
+
+		return await response.json();
+	} catch (error) {
+		console.error("Error di updateRecipe:", error);
+		return { success: false, message: error.message };
+	}
+};
+
 export const saveRecipe = async (recipeData) => {
 	console.log("Menyimpan resep baru ke backend:", recipeData);
 	try {

@@ -125,15 +125,6 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
     }
   };
 
-  // Kategori icons
-  const kategoriIcons = {
-    karbohidrat: "🍚",
-    proteinHewani: "🍗",
-    sayur: "🥬",
-    proteinTambahan: "🥜",
-    buah: "🍌",
-  };
-
   return (
     <div
       ref={wrapperRef}
@@ -202,9 +193,6 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <span className="text-xl flex-shrink-0">
-                      {kategoriIcons[recipe.kategori] || "🍽️"}
-                    </span>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-slate-800 truncate">
                         {recipe.nama}

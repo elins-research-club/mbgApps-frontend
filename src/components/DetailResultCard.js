@@ -1,9 +1,9 @@
 // /frontend/src/components/DetailResultCard.js
 import Image from "next/image";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Pencil } from "lucide-react";
 import NutritionLabel from "./NutritionLabel";
 
-const DetailResultCard = ({ log, details, detailPerResep, groupedData }) => {
+const DetailResultCard = ({ log, details, detailPerResep, groupedData, selectedRecipeId, onRecipeEdit }) => {
   const ingredientDetails = details || [];
   const calculationLog = log || [];
 
@@ -27,18 +27,31 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData }) => {
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
       {/* Bagian: Rincian Gizi Bahan */}
       <div className="p-6 lg:p-8 bg-slate-50/50">
-        <div className="flex items-center gap-3 mb-5">
-          <Image
-            src="/search-icon.png"
-            alt="Icon Rincian Gizi"
-            width={20}
-            height={20}
-            className="w-10 h-10"
-            style={{ objectFit: "contain" }}
-          />
-          <h3 className="text-2xl font-bold text-orange-500">
-            Nutrisi per Bahan
-          </h3>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/search-icon.png"
+              alt="Icon Rincian Gizi"
+              width={20}
+              height={20}
+              className="w-10 h-10"
+              style={{ objectFit: "contain" }}
+            />
+            <h3 className="text-2xl font-bold text-orange-500">
+              Nutrisi per Bahan
+            </h3>
+          </div>
+          {selectedRecipeId && onRecipeEdit && (
+            <button
+              type="button"
+              onClick={() => onRecipeEdit({ id: selectedRecipeId })}
+              className="flex items-center gap-2 px-4 py-2 border-2 border-orange-400 text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200 font-semibold hover:shadow-md"
+              title="Edit menu ini"
+            >
+              <Pencil className="w-4 h-4" />
+              <span>Edit Menu</span>
+            </button>
+          )}
         </div>
 
         {ingredientDetails.length > 0 ? (

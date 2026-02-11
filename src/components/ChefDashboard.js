@@ -21,6 +21,7 @@ import {
   generateNutrition,
   getMenuNutritionById,
   saveNewMenuComposition,
+  getRecipeById,
 } from "../services/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -71,12 +72,12 @@ export default function ChefDashboard() {
   const [isPrinting, setIsPrinting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState(targetOptions[0]);
-  const [isAddRecipeModalOpen, setIsAddRecipeModalOpen] = useState(false);
   const [isNewMenuModalOpen, setIsNewMenuModalOpen] = useState(false);
 
   // ✅ STATE BARU untuk Individual Recipe Search
   const [isRecipeView, setIsRecipeView] = useState(false);
   const [selectedRecipeId, setSelectedRecipeId] = useState(null);
+  const [editRecipeData, setEditRecipeData] = useState(null);
 
   // ✅ UPDATE: clearResults sekarang reset recipe mode juga
   const clearResults = () => {
@@ -340,8 +341,40 @@ export default function ChefDashboard() {
     }
   };
 
+  const handleRecipeEdit = async (recipe) => {
+    console.log("✏️ Editing recipe:", recipe);
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const details = await getRecipeById(recipe.id);
+      console.log("📦 Recipe details for edit:", details);
+
+      const recipeData = {
+        id: recipe.id,
+        menuName: details?.menu?.nama || details?.nama || recipe.nama || "",
+        kategori: details?.menu?.kategori || details?.kategori || recipe.kategori || "karbohidrat",
+        ingredients: (details?.ingredients || details?.bahan || []).map((ing, idx) => ({
+          id: ing.id || Date.now() + idx,
+          name: ing.nama || ing.name || "",
+          gramasi: ing.gramasi || ing.gram || "",
+          bahanId: ing.bahan_id || ing.bahanId || ing.id || null,
+          nutrisi: ing.nutrisi || null,
+        })),
+      };
+
+      setEditRecipeData(recipeData);
+      setIsRecipeView(false); // Switch to AddRecipeModal view with data
+      clearResults();
+    } catch (err) {
+      console.error("Error fetching recipe for edit:", err);
+      setError("Gagal mengambil detail resep untuk diedit.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleNewRecipeAdded = (newRecipeId) => {
-    setIsAddRecipeModalOpen(false);
     if (newRecipeId) {
       handleRecipeSelect(newRecipeId);
     } else {
@@ -383,23 +416,13 @@ export default function ChefDashboard() {
   return (
     <div className="flex flex-col min-h-screen">
       <ChefNavbar
-        onAddRecipeClick={() => setIsAddRecipeModalOpen(true)}
+        onAddRecipeClick={() => {
+          clearResults();
+          setEditRecipeData(null);
+          setIsRecipeView(false);
+        }}
         onNewMenuClick={() => setIsNewMenuModalOpen(true)}
       />
-
-      {isAddRecipeModalOpen && (
-        <AddRecipeModal
-          onClose={() => setIsAddRecipeModalOpen(false)}
-          onRecipeAdded={(newId) => {
-            setIsAddRecipeModalOpen(false);
-            if (newId) {
-              handleRecipeSelect(newId);
-            } else {
-              handleNewRecipeAdded(newId);
-            }
-          }}
-        />
-      )}
 
       {/* {isNewMenuModalOpen && (
         <NewMenuModal
@@ -434,7 +457,9 @@ export default function ChefDashboard() {
                     onClick={() => {
                       console.log("🔘 Clicking Paket Menu button");
                       clearResults();
+                      setEditRecipeData(null);
                       setIsRecipeView(false);
+                    
                     }}
                     className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-200 border ${
                       !isRecipeView
@@ -463,6 +488,7 @@ export default function ChefDashboard() {
                     onClick={() => {
                       console.log("🔘 Clicking Menu Individual button");
                       clearResults();
+                      setEditRecipeData(null);
                       setIsRecipeView(true);
                     }}
                     className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-200 border ${
@@ -496,15 +522,26 @@ export default function ChefDashboard() {
                 />
               ) : (
                 <AddRecipeModal
-                  onRecipeAdded={(newId) => {
-                    setIsAddRecipeModalOpen(false);
-                    handleNewRecipeAdded(newId);
+                  key={editRecipeData ? editRecipeData.id : 'new'}
+                  initialData={editRecipeData}
+                  onRecipeAdded={(recipeId) => {
+                    const wasEditing = editRecipeData !== null;
+                    setEditRecipeData(null);
+                    
+                    if (recipeId) {
+                      setIsRecipeView(true);
+                      handleRecipeSelect(recipeId);
+                    } else {
+                      handleNewRecipeAdded(recipeId);
+                    }
                   }}
                   onNutritionCalculated={(data) => {
                     console.log("onNutritionCalculated ", data)
-                    setTotalLabel(data.totalLabel);
-                    setRecommendationData(data.recommendationData);
-                    setIsRecipeView(false);
+                    setTotalLabel(data.totalLabel || null);
+                    setDetailBahan(data.detailPerhitungan?.rincian_per_bahan || []);
+                    setCalculationLog(data.detailPerhitungan?.log || []);
+                    setRecommendationData(data.rekomendasi || null);
+                    setDetailPerResep(data.detailPerResep || null);
                   }}
                 />
               )}
@@ -517,17 +554,7 @@ export default function ChefDashboard() {
             </div>
           </div>
 
-          {/* 🔹 ROW 2: Rekomendasi (Full Width) */}
           {hasResults && recommendationData && isRecipeView && (
-            <div className="bg-none p-0 mb-8">
-              {/* <h2 className="text-2xl font-bold text-orange-500 mb-4">
-                Rekomendasi Menu Tambahan
-              </h2> */}
-              <RecommendationCard data={recommendationData} totalLabel={totalLabel} />
-            </div>
-          )}
-
-          {hasResults && recommendationData && !isRecipeView && (
             <div className="bg-none p-0 mb-8">
               <RecommendationCard data={recommendationData} totalLabel={totalLabel} />
             </div>
@@ -547,7 +574,8 @@ export default function ChefDashboard() {
                   log={calculationLog}
                   details={detailBahan}
                   detailPerResep={detailPerResep}
-                  // groupedData={groupedData}
+                  selectedRecipeId={isRecipeView ? selectedRecipeId : null}
+                  onRecipeEdit={isRecipeView ? handleRecipeEdit : null}
                 />
               )}
             </div>

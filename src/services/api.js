@@ -124,7 +124,23 @@ export const getRecipeById = async (recipeId) => {
 		return null;
 	}
 };
+export const getAllRecipes = async () => {
+	try {
+		console.log("[API] Fetching all recipes");
+		const response = await fetch(`${API_URL}/recipes`);
+		
+		if (!response.ok) {
+			throw new Error("Gagal mengambil daftar resep.");
+		}
 
+		const data = await response.json();
+		console.log("[API] All recipes received:", data);
+		return data.recipes || data;
+	} catch (error) {
+		console.error("Error di getAllRecipes:", error);
+		return [];
+	}
+};
 export const updateRecipe = async (recipeId, recipeData) => {
 	console.log("Updating recipe ID:", recipeId, recipeData);
 	try {

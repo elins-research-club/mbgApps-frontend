@@ -15,66 +15,77 @@ import {
 export default function NutritionChart({ nutrients, targetClass }) {
   const [showPercentage, setShowPercentage] = useState(true);
   
-  console.log('NutritionChart received nutrients:', nutrients);
-  console.log('NutritionChart received targetClass:', targetClass);
   
   // Target nutritional values from AKG (same as RecommendationCard)
   const goals = {
-    1: { energi_kkal: 1350, protein_g: 20, lemak_g: 45, karbohidrat_g: 215, serat_g: 19 },
-    2: { energi_kkal: 1400, protein_g: 25, lemak_g: 50, karbohidrat_g: 250, serat_g: 20 },
-    3: { energi_kkal: 1650, protein_g: 40, lemak_g: 55, karbohidrat_g: 250, serat_g: 23 },
-    4: { energi_kkal: 1650, protein_g: 40, lemak_g: 55, karbohidrat_g: 250, serat_g: 23 },
-    5: { energi_kkal: 1650, protein_g: 40, lemak_g: 55, karbohidrat_g: 250, serat_g: 23 },
-    6: { energi_kkal: 2000, protein_g: 50, lemak_g: 65, karbohidrat_g: 300, serat_g: 28 },
-    7: { energi_kkal: 2000, protein_g: 50, lemak_g: 65, karbohidrat_g: 300, serat_g: 28 },
-    8: { energi_kkal: 2000, protein_g: 50, lemak_g: 65, karbohidrat_g: 300, serat_g: 28 },
-    9: { energi_kkal: 2150, protein_g: 60, lemak_g: 70, karbohidrat_g: 350, serat_g: 33 },
-    10: { energi_kkal: 2150, protein_g: 60, lemak_g: 70, karbohidrat_g: 350, serat_g: 33 },
-    11: { energi_kkal: 2150, protein_g: 60, lemak_g: 70, karbohidrat_g: 350, serat_g: 33 },
-    12: { energi_kkal: 2650, protein_g: 70, lemak_g: 85, karbohidrat_g: 400, serat_g: 38 },
-    13: { energi_kkal: 2650, protein_g: 70, lemak_g: 85, karbohidrat_g: 400, serat_g: 38 },
-    14: { energi_kkal: 2650, protein_g: 70, lemak_g: 85, karbohidrat_g: 400, serat_g: 38 },
+    1: { energi_kkal: 1350, protein_g: 20, lemak_g: 45, karbohidrat_g: 215 },
+    2: { energi_kkal: 1400, protein_g: 25, lemak_g: 50, karbohidrat_g: 250 },
+    3: { energi_kkal: 1650, protein_g: 40, lemak_g: 55, karbohidrat_g: 250 },
+    4: { energi_kkal: 1650, protein_g: 40, lemak_g: 55, karbohidrat_g: 250 },
+    5: { energi_kkal: 1650, protein_g: 40, lemak_g: 55, karbohidrat_g: 250 },
+    6: { energi_kkal: 2000, protein_g: 50, lemak_g: 65, karbohidrat_g: 300 },
+    7: { energi_kkal: 2000, protein_g: 50, lemak_g: 65, karbohidrat_g: 300 },
+    8: { energi_kkal: 2000, protein_g: 50, lemak_g: 65, karbohidrat_g: 300 },
+    9: { energi_kkal: 2400, protein_g: 70, lemak_g: 80, karbohidrat_g: 350 },
+    10: { energi_kkal: 2400, protein_g: 70, lemak_g: 80, karbohidrat_g: 350 },
+    11: { energi_kkal: 2650, protein_g: 75, lemak_g: 85, karbohidrat_g: 400 },
+    12: { energi_kkal: 2650, protein_g: 75, lemak_g: 85, karbohidrat_g: 400 },
+    13: { energi_kkal: 2650, protein_g: 75, lemak_g: 85, karbohidrat_g: 400 },
+    14: { energi_kkal: 2650, protein_g: 75, lemak_g: 85, karbohidrat_g: 400 },
   };
 
-  const targets = goals[targetClass] || goals[1];
+  const targets = goals[targetClass] || goals[6];
+
+  // Multiplier berdasarkan juknis BGN yang merujuk Permenkes 28/2019
+  const multipliers = {
+    1: 0.20,   // TK/PAUD: 20-25% AKG pagi
+    2: 0.20,    // TK/PAUD: 20-25% AKG pagi
+    3: 0.20,   // SD kelas 1-3: 20-25% AKG pagi
+    4: 0.20,   // SD kelas 1-3: 20-25% AKG pagi
+    5: 0.20,   // SD kelas 1-3: 20-25% AKG pagi
+    6: 0.30,   // SD kelas 4-6: 30-35% AKG siang
+    7: 0.30,   // SD kelas 4-6: 30-35% AKG siang 
+    8: 0.30,   // SD kelas 4-6: 30-35% AKG siang
+    9: 0.30,   // SMP/MTs: 30-35% AKG siang 
+    10: 0.30,  // SMP/MTs: 30-35% AKG siang
+    11: 0.30,  // SMP/MTs: 30-35% AKG siang
+    12: 0.30,  // SMA/MA: 30-35% AKG Harian
+    13: 0.30,  // SMA/MA: 30-35% AKG Harian
+    14: 0.30,  // SMA/MA: 30-35% AKG Harian
+  };
+
+  const multiplier = multipliers[targetClass] || multipliers[6];
   
   // Prepare chart data with percentage calculation
   const chartData = [
     {
       nutrient: 'Energi',
       actual: nutrients.energi_kkal || 0,
-      target: (targets.energi_kkal || 0) / 3,
-      percentage: ((nutrients.energi_kkal || 0) / ((targets.energi_kkal || 0) / 3)) * 100,
+      target: (targets.energi_kkal || 0) * multiplier,
+      percentage: ((nutrients.energi_kkal || 0) / ((targets.energi_kkal || 0) * multiplier)) * 100,
       unit: 'kkal'
     },
     {
       nutrient: 'Protein',
       actual: nutrients.protein_g || 0,
-      target: (targets.protein_g || 0) / 3,
-      percentage: ((nutrients.protein_g || 0) / ((targets.protein_g || 0) / 3)) * 100,
+      target: (targets.protein_g || 0) * multiplier,
+      percentage: ((nutrients.protein_g || 0) / ((targets.protein_g || 0) * multiplier)) * 100,
       unit: 'g'
     },
     {
       nutrient: 'Lemak',
       actual: nutrients.lemak_g || 0,
-      target: (targets.lemak_g || 0) / 3,
-      percentage: ((nutrients.lemak_g || 0) / ((targets.lemak_g || 0) / 3)) * 100,
+      target: (targets.lemak_g || 0) * multiplier,
+      percentage: ((nutrients.lemak_g || 0) / ((targets.lemak_g || 0) * multiplier)) * 100,
       unit: 'g'
     },
     {
       nutrient: 'Karbohidrat',
       actual: nutrients.karbohidrat_g || 0,
-      target: (targets.karbohidrat_g || 0) / 3,
-      percentage: ((nutrients.karbohidrat_g || 0) / ((targets.karbohidrat_g || 0) / 3)) * 100,
+      target: (targets.karbohidrat_g || 0) * multiplier,
+      percentage: ((nutrients.karbohidrat_g || 0) / ((targets.karbohidrat_g || 0) * multiplier)) * 100,
       unit: 'g'
     },
-    {
-      nutrient: 'Serat',
-      actual: nutrients.serat_g || 0,
-      target: (targets.serat_g || 0) / 3,
-      percentage: ((nutrients.serat_g || 0) / ((targets.serat_g || 0) / 3)) * 100,
-      unit: 'g'
-    }
   ];
 
   return (
@@ -82,7 +93,7 @@ export default function NutritionChart({ nutrients, targetClass }) {
       {/* Toggle Button */}
       <div className='flex items-center justify-between mb-3'>
         <h5 className='font-semibold text-blue-600'>
-          {showPercentage ? 'Persentase Pencapaian Target' : 'Nilai Nutrisi vs Target'} (1/3 Kebutuhan Harian)
+          {showPercentage ? 'Persentase Pencapaian Target' : 'Nilai Nutrisi vs Target'} ({(multiplier * 100).toFixed(1)}% AKG)
         </h5>
         <button
           onClick={() => setShowPercentage(!showPercentage)}
@@ -178,7 +189,7 @@ export default function NutritionChart({ nutrients, targetClass }) {
               <Bar
                 dataKey='target'
                 fill='#F59E0B'
-                name='Target (1/3)'
+                name={`Target (${(multiplier * 100).toFixed(1)}%)`}
               />
             </>
           )}

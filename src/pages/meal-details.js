@@ -309,8 +309,15 @@ export default function MealDetails() {
       };
 
       const result = await saveMealPlan(mealPlanData);
-      const planId = result.data?.id;
-
+      console.log('Save meal plan result:', result);
+      
+      const planId = result.data.id;
+      
+      if (!planId) {
+        console.error('No ID found in result:', result);
+        throw new Error('Server tidak mengembalikan ID untuk meal plan');
+      }
+      
       setSavedPlanId(planId);
       
       const baseUrl = window.location.origin;

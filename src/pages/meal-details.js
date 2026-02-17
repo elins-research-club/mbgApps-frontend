@@ -309,11 +309,12 @@ export default function MealDetails() {
       };
 
       const result = await saveMealPlan(mealPlanData);
-      setSavedPlanId(result.id);
+      const planId = result.data?.id;
+
+      setSavedPlanId(planId);
       
-      // Generate QR Code using API (we'll use qrcode library client-side)
       const baseUrl = window.location.origin;
-      const planUrl = `${baseUrl}/saved-meal-plan/${result.id}`;
+      const planUrl = `${baseUrl}/saved-meal-plan/${planId}`;
       
       // Use QR Server API for quick QR generation
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(planUrl)}`;
@@ -532,7 +533,7 @@ export default function MealDetails() {
                   />
                 </div>
                 <p className="text-xs text-orange-600 mt-3 text-center">
-                  <span className="font-semibold">ℹ️</span> Persentase berdasarkan kebutuhan harian {classNames[targetClass]}
+                  Persentase berdasarkan kebutuhan harian {classNames[targetClass]}
                 </p>
               </div>
             </div>

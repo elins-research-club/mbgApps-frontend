@@ -11,48 +11,15 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import { goals, multipliers } from '../utils/goals';
 
 export default function NutritionChart({ nutrients, targetClass }) {
   const [showPercentage, setShowPercentage] = useState(true);
-  
-  
-  // Target nutritional values from AKG (same as RecommendationCard)
-  const goals = {
-    1: { energi_kkal: 1350, protein_g: 20, lemak_g: 45, karbohidrat_g: 215 },
-    2: { energi_kkal: 1400, protein_g: 25, lemak_g: 50, karbohidrat_g: 250 },
-    3: { energi_kkal: 1650, protein_g: 40, lemak_g: 55, karbohidrat_g: 250 },
-    4: { energi_kkal: 1650, protein_g: 40, lemak_g: 55, karbohidrat_g: 250 },
-    5: { energi_kkal: 1650, protein_g: 40, lemak_g: 55, karbohidrat_g: 250 },
-    6: { energi_kkal: 2000, protein_g: 50, lemak_g: 65, karbohidrat_g: 300 },
-    7: { energi_kkal: 2000, protein_g: 50, lemak_g: 65, karbohidrat_g: 300 },
-    8: { energi_kkal: 2000, protein_g: 50, lemak_g: 65, karbohidrat_g: 300 },
-    9: { energi_kkal: 2400, protein_g: 70, lemak_g: 80, karbohidrat_g: 350 },
-    10: { energi_kkal: 2400, protein_g: 70, lemak_g: 80, karbohidrat_g: 350 },
-    11: { energi_kkal: 2650, protein_g: 75, lemak_g: 85, karbohidrat_g: 400 },
-    12: { energi_kkal: 2650, protein_g: 75, lemak_g: 85, karbohidrat_g: 400 },
-    13: { energi_kkal: 2650, protein_g: 75, lemak_g: 85, karbohidrat_g: 400 },
-    14: { energi_kkal: 2650, protein_g: 75, lemak_g: 85, karbohidrat_g: 400 },
-  };
 
   const targets = goals[targetClass] || goals[6];
 
   // Multiplier berdasarkan juknis BGN yang merujuk Permenkes 28/2019
-  const multipliers = {
-    1: 0.20,   // TK/PAUD: 20-25% AKG pagi
-    2: 0.20,    // TK/PAUD: 20-25% AKG pagi
-    3: 0.20,   // SD kelas 1-3: 20-25% AKG pagi
-    4: 0.20,   // SD kelas 1-3: 20-25% AKG pagi
-    5: 0.20,   // SD kelas 1-3: 20-25% AKG pagi
-    6: 0.30,   // SD kelas 4-6: 30-35% AKG siang
-    7: 0.30,   // SD kelas 4-6: 30-35% AKG siang 
-    8: 0.30,   // SD kelas 4-6: 30-35% AKG siang
-    9: 0.30,   // SMP/MTs: 30-35% AKG siang 
-    10: 0.30,  // SMP/MTs: 30-35% AKG siang
-    11: 0.30,  // SMP/MTs: 30-35% AKG siang
-    12: 0.30,  // SMA/MA: 30-35% AKG Harian
-    13: 0.30,  // SMA/MA: 30-35% AKG Harian
-    14: 0.30,  // SMA/MA: 30-35% AKG Harian
-  };
+  
 
   const multiplier = multipliers[targetClass] || multipliers[6];
   

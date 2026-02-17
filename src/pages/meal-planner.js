@@ -18,6 +18,17 @@ export default function MealPlanner() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Save to localStorage whenever plateRecipes or targetClass changes
+  useEffect(() => {
+    if (plateRecipes.length > 0) {
+      localStorage.setItem('plateRecipes', JSON.stringify(plateRecipes));
+    }
+  }, [plateRecipes]);
+
+  useEffect(() => {
+    localStorage.setItem('targetClass', targetClass.toString());
+  }, [targetClass]);
+  
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -67,7 +78,7 @@ export default function MealPlanner() {
       if (Array.isArray(recipes)) {
         const recipe = recipes.find(r => r.id === parseInt(active.id));
         if (recipe && !plateRecipes.find(r => r.id === recipe.id)) {
-          setPlateRecipes([...plateRecipes, recipe]);
+          setPlateRecipes([...plateRecipes, { ...recipe, quantity: 1 }]);
         }
       }
     }
@@ -77,6 +88,39 @@ export default function MealPlanner() {
 
   const removeFromPlate = (recipeId) => {
     setPlateRecipes(plateRecipes.filter(r => r.id !== recipeId));
+  };
+
+  const increaseQuantity = (recipeId) => {
+    setPlateRecipes(plateRecipes.map(r => 
+      r.id === recipeId ? { ...r, quantity: parseFloat(((r.quantity || 1) + 0.1).toFixed(1)) } : r
+    ));
+  };
+
+  const decreaseQuantity = (recipeId) => {
+    setPlateRecipes(plateRecipes.map(r => 
+      r.id === recipeId && (r.quantity || 1) > 0.1 
+        ? { ...r, quantity: parseFloat(((r.quantity || 1) - 0.1).toFixed(1)) } 
+        : r
+    ));
+  };
+
+  const updateQuantity = (recipeId, newQuantity) => {
+    setPlateRecipes(plateRecipes.map(r => 
+      r.id === recipeId ? { ...r, quantity: newQuantity } : r
+    ));
+  };
+
+  const handleQuantityBlur = (recipeId, currentQuantity) => {
+    const quantity = parseFloat(currentQuantity);
+    if (currentQuantity === '' || isNaN(quantity) || quantity <= 0) {
+      setPlateRecipes(plateRecipes.map(r => 
+        r.id === recipeId ? { ...r, quantity: 1 } : r
+      ));
+    } else {
+      setPlateRecipes(plateRecipes.map(r => 
+        r.id === recipeId ? { ...r, quantity: parseFloat(quantity.toFixed(1)) } : r
+      ));
+    }
   };
 
   // AKG (Angka Kecukupan Gizi) targets - same as RecommendationCard
@@ -263,7 +307,7 @@ export default function MealPlanner() {
     const target = goals[targetClass];
     
     const totalGramasi = plateRecipes.reduce((sum, recipe) => {
-      return sum + (recipe.total_gramasi || 0);
+      return sum + (recipe.total_gramasi || 0) * (recipe.quantity || 1);
     }, 0);
 
     const calculatePercentage = (actual, goal) => {
@@ -303,17 +347,17 @@ export default function MealPlanner() {
     const result = plateRecipes.reduce((acc, recipe) => {
       console.log('Recipe on plate:', recipe);
       const nutrisi = recipe.nutrisi || {};
-      console.log('Nutrisi from recipe:', nutrisi);
-      acc.energi_kkal += parseFloat(nutrisi.energi_kkal) || 0;
-      acc.protein_g += parseFloat(nutrisi.protein_g) || 0;
-      acc.karbohidrat_g += parseFloat(nutrisi.karbohidrat_g) || 0;
-      acc.lemak_g += parseFloat(nutrisi.lemak_g) || 0;
-      acc.serat_g += parseFloat(nutrisi.serat_g) || 0;
-      acc.natrium_mg += parseFloat(nutrisi.natrium_mg) || 0;
-      acc.kalium_mg += parseFloat(nutrisi.kalium_mg) || 0;
-      acc.kalsium_mg += parseFloat(nutrisi.kalsium_mg) || 0;
-      acc.besi_mg += parseFloat(nutrisi.besi_mg) || 0;
-      acc.vitamin_c_mg += parseFloat(nutrisi.vitamin_c_mg) || 0;
+      const quantity = recipe.quantity || 1;
+      acc.energi_kkal += (parseFloat(nutrisi.energi_kkal) || 0) * quantity;
+      acc.protein_g += (parseFloat(nutrisi.protein_g) || 0) * quantity;
+      acc.karbohidrat_g += (parseFloat(nutrisi.karbohidrat_g) || 0) * quantity;
+      acc.lemak_g += (parseFloat(nutrisi.lemak_g) || 0) * quantity;
+      acc.serat_g += (parseFloat(nutrisi.serat_g) || 0) * quantity;
+      acc.natrium_mg += (parseFloat(nutrisi.natrium_mg) || 0) * quantity;
+      acc.kalium_mg += (parseFloat(nutrisi.kalium_mg) || 0) * quantity;
+      acc.kalsium_mg += (parseFloat(nutrisi.kalsium_mg) || 0) * quantity;
+      acc.besi_mg += (parseFloat(nutrisi.besi_mg) || 0) * quantity;
+      acc.vitamin_c_mg += (parseFloat(nutrisi.vitamin_c_mg) || 0) * quantity;
       return acc;
     }, { 
       energi_kkal: 0, 
@@ -422,7 +466,7 @@ export default function MealPlanner() {
                 ) : !Array.isArray(recipes) || recipes.length === 0 ? (
                   <p className="text-gray-500 text-center py-8">Belum ada resep tersimpan. Silakan tambah resep baru di Dashboard.</p>
                 ) : filteredRecipes.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Tidak ada resep yang cocok dengan pencarian "{searchQuery}"</p>
+                  <p className="text-gray-500 text-center py-8">Tidak ada resep yang cocok dengan pencarian {searchQuery}</p>
                 ) : (
                   filteredRecipes.map(recipe => (
                     <RecipeItem key={recipe.id} recipe={recipe} />
@@ -433,13 +477,34 @@ export default function MealPlanner() {
 
             {/* Plate Area */}
             <div className="lg:col-span-2 flex flex-col">
-              <Plate recipes={plateRecipes} onRemove={removeFromPlate} />
+              <Plate 
+                recipes={plateRecipes} 
+                onRemove={removeFromPlate}
+                onIncrease={increaseQuantity}
+                onDecrease={decreaseQuantity}
+                onUpdateQuantity={updateQuantity}
+                onQuantityBlur={handleQuantityBlur}
+              />
             </div>
           </div>
 
           {/* Bottom Row: AKG and Chart spanning full width */}
           {plateRecipes.length > 0 && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              {/* View Details Button */}
+              <div className="flex justify-center mb-6">
+                <button
+                  onClick={() => router.push('/meal-details')}
+                  className="px-6 py-3 bg-orange-400 hover:bg-orange-500 text-white rounded-lg transition-colors font-medium shadow-md flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Lihat Detail Bahan & Nutrisi
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Nutrition Label */}
               <div className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center">
                 <div className="flex items-center justify-between mb-4 w-full">
@@ -485,6 +550,7 @@ export default function MealPlanner() {
                   nutrients={aggregateNutrients()}
                   targetClass={targetClass}
                 />
+              </div>
               </div>
             </div>
           )}

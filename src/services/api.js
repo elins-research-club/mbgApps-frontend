@@ -78,7 +78,7 @@ export const generateIngredient = async (name) => {
 
 		if (!response.ok) {
 			const errorText = await response.text();
-			console.error(`❌ [API] HTTP Error ${response.status}:`, errorText);
+			console.error(`[API] HTTP Error ${response.status}:`, errorText);
 
 			let errorData;
 			try {
@@ -96,11 +96,11 @@ export const generateIngredient = async (name) => {
 		}
 
 		const data = await response.json();
-		console.log(`✅ [API] Success response:`, data);
+		console.log(`[API] Success response:`, data);
 
 		return data;
 	} catch (error) {
-		console.error(`💥 [API] Exception in generateIngredient:`, error);
+		console.error(`[API] Exception in generateIngredient:`, error);
 		return {
 			success: false,
 			error: error.message,
@@ -201,7 +201,7 @@ export const validateIngredient = async (id, nutritionData, validatorName) => {
 	try {
 		const payload = {
 			ingredientData: nutritionData,
-			validatedBy: validatorName, // ✅ KIRIM NAMA AHLI GIZI
+			validatedBy: validatorName, // KIRIM NAMA AHLI GIZI
 		};
 
 		console.log("Validating ingredient:", payload);
@@ -240,7 +240,7 @@ export const getAllMenus = async () => {
 	}
 };
 
-// ✅ PERBAIKAN: Endpoint yang benar untuk getMenuNutritionById
+// PERBAIKAN: Endpoint yang benar untuk getMenuNutritionById
 export const getMenuNutritionById = async (menuId, target) => {
 	try {
 		console.log(
@@ -260,7 +260,7 @@ export const getMenuNutritionById = async (menuId, target) => {
 		if (!response.ok) {
 			const contentType = response.headers.get("content-type");
 			if (contentType && contentType.includes("text/html")) {
-				console.error("❌ Server returned HTML instead of JSON");
+				console.error("Server returned HTML instead of JSON");
 				throw new Error(
 					"Server error: Endpoint tidak ditemukan atau server crash",
 				);
@@ -302,7 +302,7 @@ export const saveNewMenuComposition = async (formData) => {
 	try {
 		console.log("📤 [API] Menerima formData:", formData);
 
-		// ✅ PERBAIKAN: Validasi dan build payload dengan benar
+		// PERBAIKAN: Validasi dan build payload dengan benar
 		const { nama, komposisi } = formData;
 
 		if (!nama || !nama.trim()) {
@@ -342,15 +342,58 @@ export const saveNewMenuComposition = async (formData) => {
 
 		if (!response.ok) {
 			const errorData = await response.json();
-			console.error("❌ [API] Backend error:", errorData);
+			console.error("[API] Backend error:", errorData);
 			throw new Error(errorData.message || "Gagal menyimpan Menu Komposisi.");
 		}
 
 		const result = await response.json();
-		console.log("✅ [API] Save successful:", result);
+		console.log("[API] Save successful:", result);
 		return result;
 	} catch (error) {
-		console.error("💥 [API] Error di saveNewMenuComposition:", error);
+		console.error("[API] Error di saveNewMenuComposition:", error);
+		throw error;
+	}
+};
+
+// Save meal plan
+export const saveMealPlan = async (mealPlanData) => {
+	try {
+		console.log("📤 [API] Saving meal plan:", mealPlanData);
+		
+		const response = await fetch(`${API_URL}/meal-plans`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(mealPlanData),
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			console.error("[API] Backend error:", errorData);
+			throw new Error(errorData.message || "Gagal menyimpan meal plan.");
+		}
+
+		const result = await response.json();
+		console.log("[API] Meal plan saved:", result);
+		return result;
+	} catch (error) {
+		console.error("[API] Error di saveMealPlan:", error);
+		throw error;
+	}
+};
+
+// Get meal plan by ID
+export const getMealPlanById = async (id) => {
+	try {
+		const response = await fetch(`${API_URL}/meal-plans/${id}`);
+
+		if (!response.ok) {
+			throw new Error("Gagal memuat meal plan.");
+		}
+
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		console.error("[API] Error di getMealPlanById:", error);
 		throw error;
 	}
 };

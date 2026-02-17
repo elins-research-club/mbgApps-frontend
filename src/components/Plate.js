@@ -1,7 +1,7 @@
 // /frontend/src/components/Plate.js
 import { useDroppable } from '@dnd-kit/core';
 
-export default function Plate({ recipes, onRemove }) {
+export default function Plate({ recipes, onRemove, onIncrease, onDecrease, onUpdateQuantity, onQuantityBlur }) {
   const { setNodeRef, isOver } = useDroppable({
     id: 'plate',
   });
@@ -65,8 +65,40 @@ export default function Plate({ recipes, onRemove }) {
                       {recipe.kategori || 'Menu'}
                     </p>
                     <p className="text-xs text-green-700 font-semibold mt-1">
-                      {recipe.total_gramasi || 0}g
+                      {((recipe.total_gramasi || 0) * (recipe.quantity || 1)).toFixed(1)}g
                     </p>
+                    
+                    {/* Quantity Controls */}
+                    <div className="flex items-center justify-center gap-2 mt-2 bg-orange-50 rounded-lg p-1">
+                      <button
+                        onClick={() => onDecrease(recipe.id)}
+                        disabled={recipe.quantity <= 0.1}
+                        className="w-6 h-6 flex items-center justify-center bg-orange-400 text-white rounded-md hover:bg-orange-500 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                        title="Kurangi"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" />
+                        </svg>
+                      </button>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={recipe.quantity === '' || recipe.quantity === undefined ? '' : recipe.quantity}
+                        onChange={(e) => onUpdateQuantity(recipe.id, e.target.value)}
+                        onBlur={(e) => onQuantityBlur(recipe.id, e.target.value)}
+                        className="w-14 text-sm font-bold text-gray-700 text-center border border-orange-200 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <span className="text-xs text-gray-600">×</span>
+                      <button
+                        onClick={() => onIncrease(recipe.id)}
+                        className="w-6 h-6 flex items-center justify-center bg-orange-400 text-white rounded-md hover:bg-orange-500 transition-colors"
+                        title="Tambah"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                   <button
                     onClick={() => onRemove(recipe.id)}

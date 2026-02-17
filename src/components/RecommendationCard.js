@@ -328,16 +328,16 @@ const RecommendationCard = ({ data, totalLabel }) => {
     14: {
       //SMA 3
       energi_kkal: 2650,
-      protein_g: 65,
-      lemak_g: 75,
-      karbohidrat_g: 430,
+      protein_g: 75,
+      lemak_g: 85,
+      karbohidrat_g: 400,
       serat_g: 37,
       // abu_g: 5, // optional, tidak tercantum di AKG resmi
-      kalsium_mg: 1000,
+      kalsium_mg: 1200,
       // fosfor_mg: 700,
       besi_mg: 9,
-      natrium_mg: 1500,
-      kalium_mg: 4700,
+      natrium_mg: 1700,
+      kalium_mg: 5300,
       // tembaga_mg: 900,
       // seng_mg: 11,
       // retinol_mcg: 500,

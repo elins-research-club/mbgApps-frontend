@@ -1,8 +1,11 @@
 // /frontend/src/components/ChefNavbar.js
-import { Utensils, Plus, LogOut } from "lucide-react";
+import { Utensils, Plus, LogOut, LayoutGrid } from "lucide-react";
 import UserMenu from "./UserMenu";
+import { useRouter } from "next/router";
 
 const ChefNavbar = ({ onAddRecipeClick, onNewMenuClick }) => {
+  const router = useRouter();
+  
   return (
     <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,8 +18,17 @@ const ChefNavbar = ({ onAddRecipeClick, onNewMenuClick }) => {
             </span>
           </div>
 
-          {/* Kanan: Tombol Tambah Resep */}
+          {/* Kanan: Tombol Tambah Resep & Meal Planner */}
           <div className="flex items-center gap-3">
+            {/* Tombol Meal Planner */}
+            <button
+              onClick={() => router.push('/meal-planner')}
+              className="flex items-center gap-2 p-2 px-3 rounded-lg text-sm font-semibold bg-green-500 text-white hover:bg-green-600 transition-colors shadow-md"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              <span>Meal Planner</span>
+            </button>
+            
             {/* 1. Tombol Buat Menu Baru (Recipe Composition - Aksi 2) */}
             {/* <button
               onClick={onNewMenuClick} // <-- Tombol baru

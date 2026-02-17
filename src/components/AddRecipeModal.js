@@ -1,6 +1,6 @@
 // /frontend/src/components/AddRecipeModal.js
 import { useState, useCallback, useRef, useEffect } from 'react'
-import RecommendationCard from './RecommendationCard'
+import NutritionLabel from './NutritionLabel'
 
 import {
   checkIngredient,
@@ -1149,10 +1149,13 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
         </form>
       ) : (
         <div className='flex-1 px-8 py-6'>
-          <RecommendationCard
-            data={recommendationData}
-            totalLabel={totalLabel}
-          />
+          <div className='max-w-2xl mx-auto'>
+            <h3 className='text-xl font-bold text-gray-800 mb-4'>Informasi Nilai Gizi Total</h3>
+            <NutritionLabel
+              data={totalLabel}
+              isMini={false}
+            />
+          </div>
 
           {successMessage && (
             <div className='mt-4 p-4 bg-green-50 border-2 border-green-200 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300'>

@@ -398,6 +398,23 @@ export const getMealPlanById = async (id) => {
   }
 };
 
+// Get all meal plans
+export const getAllMealPlans = async () => {
+  try {
+    const response = await fetch(`${API_URL}/meal-plans`);
+
+    if (!response.ok) {
+      throw new Error("Gagal memuat daftar meal plans.");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("[API] Error di getAllMealPlans:", error);
+    throw error;
+  }
+};
+
 export const getAllRecommendations = async (currentFoods) => {
   try {
     const response = await fetch(`${API_URL}/get_all_recommendations`, {

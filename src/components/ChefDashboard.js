@@ -554,12 +554,6 @@ export default function ChefDashboard() {
             </div>
           </div>
 
-          {hasResults && recommendationData && isRecipeView && (
-            <div className="bg-none p-0 mb-8">
-              <RecommendationCard data={recommendationData} totalLabel={totalLabel} />
-            </div>
-          )}
-
           {/* 🔹 ROW 3: Nutrisi per Menu & per Bahan */}
           {hasResults && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

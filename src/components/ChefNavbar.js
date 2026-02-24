@@ -18,7 +18,6 @@ const ChefNavbar = ({ onAddRecipeClick, onNewMenuClick }) => {
             </span>
           </div>
 
-          {/* Kanan: Tombol Tambah Resep & Meal Planner */}
           <div className="flex items-center gap-3">
             {/* Tombol Meal Planner */}
             <button
@@ -26,7 +25,7 @@ const ChefNavbar = ({ onAddRecipeClick, onNewMenuClick }) => {
               className="flex items-center gap-2 p-2 px-3 rounded-lg text-sm font-semibold bg-green-500 text-white hover:bg-green-600 transition-colors shadow-md"
             >
               <LayoutGrid className="w-4 h-4" />
-              <span>Meal Planner</span>
+              <span>Set Menu</span>
             </button>
             
             {/* 1. Tombol Buat Menu Baru (Recipe Composition - Aksi 2) */}

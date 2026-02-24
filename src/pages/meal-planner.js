@@ -153,9 +153,8 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
                 Porsi telah sesuai dengan rekomendasi
               </p>
               <p className="text-gray-400 text-xs text-center">
-                Klik "Perbarui Rekomendasi" untuk melihat analisis terbaru
+                Klik &quot;Perbarui Rekomendasi&quot; untuk melihat analisis terbaru
               </p>
-              {/* Still show portions for reference */}
               <div className="w-full mt-2">
                 <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
                   Porsi yang diterapkan
@@ -534,7 +533,7 @@ function SetMenuItem({ menu, onEdit, onShowQR, onLoadMenu }) {
   );
 }
 
-// ─── QR Modal Component ─────────────────────────────────────────────────────
+// QR Modal Component 
 function QRModal({ qrCodeUrl, menuName, onClose, onDownload }) {
   if (!qrCodeUrl) return null;
 
@@ -627,7 +626,7 @@ function QRModal({ qrCodeUrl, menuName, onClose, onDownload }) {
   );
 }
 
-// ─── Main Page ──────────────────────────────────────────────────────────────
+// Main Page
 export default function MealPlanner() {
   const router = useRouter();
   const [recipes, setRecipes] = useState([]);
@@ -659,7 +658,6 @@ export default function MealPlanner() {
   const [recError, setRecError] = useState(null);
   const [appliedGoalIds, setAppliedGoalIds] = useState(new Set());
 
-  // Save to localStorage whenever plateRecipes or targetClass changes
   useEffect(() => {
     if (plateRecipes.length > 0) {
       localStorage.setItem("plateRecipes", JSON.stringify(plateRecipes));
@@ -1013,7 +1011,7 @@ export default function MealPlanner() {
     setPlateRecipes(
       plateRecipes.map((r) =>
         r.id === recipeId
-          ? { ...r, quantity: parseFloat(((r.quantity || 1) + 0.1).toFixed(1)) }
+          ? { ...r, quantity: parseFloat(((r.quantity || 1) + 0.1).toFixed(2)) }
           : r,
       ),
     );
@@ -1023,7 +1021,7 @@ export default function MealPlanner() {
     setPlateRecipes(
       plateRecipes.map((r) =>
         r.id === recipeId && (r.quantity || 1) > 0.1
-          ? { ...r, quantity: parseFloat(((r.quantity || 1) - 0.1).toFixed(1)) }
+          ? { ...r, quantity: parseFloat(((r.quantity || 1) - 0.1).toFixed(2)) }
           : r,
       ),
     );
@@ -1049,7 +1047,7 @@ export default function MealPlanner() {
       setPlateRecipes(
         plateRecipes.map((r) =>
           r.id === recipeId
-            ? { ...r, quantity: parseFloat(quantity.toFixed(1)) }
+            ? { ...r, quantity: parseFloat(quantity.toFixed(2)) }
             : r,
         ),
       );
@@ -1102,7 +1100,7 @@ export default function MealPlanner() {
         ),
         besi_mg: calculatePercentage(
           aggregated.besi_mg || 0,
-          target.besi_mg || 1,
+          target.besi_mg,
         ),
         vitamin_c_mg: calculatePercentage(
           aggregated.vitamin_c_mg || 0,
@@ -1188,7 +1186,7 @@ export default function MealPlanner() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">
-                  Meal Planner
+                  Buat dan Lihat Set Menu
                 </h1>
                 <p className="text-sm text-gray-600 mt-1">
                   Seret menu ke piring untuk melihat total nutrisi
@@ -1210,10 +1208,9 @@ export default function MealPlanner() {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-              {/* Recipes Sidebar */}
-              <div className="lg:col-span-1 space-y-6">
+          <div className="max-w-[1600px] mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+              <div className="lg:col-span-1">
                 {/* Menu Tersedia */}
                 <div className="bg-white rounded-lg shadow-md p-6 flex flex-col">
                   <h2 className="text-xl font-bold text-gray-800 mb-4">
@@ -1263,7 +1260,7 @@ export default function MealPlanner() {
                       )}
                     </div>
                   </div>
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                  <div className="space-y-3 max-h-[600px] overflow-y-auto">
                     {isLoading ? (
                       <p className="text-gray-500 text-center py-8">
                         Memuat resep...
@@ -1285,8 +1282,24 @@ export default function MealPlanner() {
                     )}
                   </div>
                 </div>
+              </div>
 
-                {/* Saved Meal Plans */}
+              {/* Plate Area - Middle */}
+              <div className="lg:col-span-2 flex flex-col">
+                <Plate
+                  recipes={plateRecipes}
+                  planName={planName}
+                  onPlanNameChange={setPlanName}
+                  onRemove={removeFromPlate}
+                  onIncrease={increaseQuantity}
+                  onDecrease={decreaseQuantity}
+                  onUpdateQuantity={updateQuantity}
+                  onQuantityBlur={handleQuantityBlur}
+                />
+              </div>
+
+              {/* Set Menu Tersedia - Right */}
+              <div className="lg:col-span-1">
                 <div className="bg-white rounded-lg shadow-md p-6 flex flex-col">
                   <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <svg
@@ -1348,7 +1361,7 @@ export default function MealPlanner() {
                       )}
                     </div>
                   </div>
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                  <div className="space-y-3 max-h-[600px] overflow-y-auto">
                     {isLoadingMealPlans ? (
                       <p className="text-gray-500 text-center py-8">
                         Memuat meal plans...
@@ -1373,20 +1386,6 @@ export default function MealPlanner() {
                     )}
                   </div>
                 </div>
-              </div>
-
-              {/* Plate Area */}
-              <div className="lg:col-span-2 flex flex-col">
-                <Plate
-                  recipes={plateRecipes}
-                  planName={planName}
-                  onPlanNameChange={setPlanName}
-                  onRemove={removeFromPlate}
-                  onIncrease={increaseQuantity}
-                  onDecrease={decreaseQuantity}
-                  onUpdateQuantity={updateQuantity}
-                  onQuantityBlur={handleQuantityBlur}
-                />
               </div>
             </div>
 

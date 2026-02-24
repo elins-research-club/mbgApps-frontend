@@ -252,7 +252,7 @@ export default function MealDetails () {
               onClick={() => router.push('/meal-planner')}
               className='px-6 py-3 bg-orange-400 hover:bg-orange-500 text-white rounded-lg transition-colors'
             >
-              ← Kembali ke Meal Planner
+              ← Kembali ke Set Menu
             </button>
           </div>
         </div>
@@ -328,7 +328,7 @@ export default function MealDetails () {
                   onClick={() => router.push('/meal-planner')}
                   className='px-4 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-lg transition-colors'
                 >
-                  ← Kembali ke Meal Planner
+                  ← Kembali ke Set Menu
                 </button>
               </div>
             </div>

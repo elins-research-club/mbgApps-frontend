@@ -14,7 +14,13 @@ import NutritionChart from "../components/NutritionChart";
 import NutritionLabel from "../components/NutritionLabel";
 import ChefNavbar from "../components/ChefNavbar";
 import { useRouter } from "next/router";
-import { getAllRecipes, getAllRecommendations, getAllMenus, getMenuNutritionById, getAllMealPlans } from "../services/api";
+import {
+  getAllRecipes,
+  getAllRecommendations,
+  getAllMenus,
+  getMenuNutritionById,
+  getAllMealPlans,
+} from "../services/api";
 import { goals, classNames } from "../utils/goals";
 
 // ─── Status badge helpers ───────────────────────────────────────────────────
@@ -57,7 +63,7 @@ const NUTRIENT_LABELS = {
 };
 
 // ─── RecommendationCard ─────────────────────────────────────────────────────
-function RecommendationCard({ data, classNames }) {
+function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
   const [expanded, setExpanded] = useState(false);
   const { goal_id, goal_daily, recommendation } = data;
   const className = classNames[parseInt(goal_id)];
@@ -125,75 +131,171 @@ function RecommendationCard({ data, classNames }) {
       {/* Expanded Content */}
       {expanded && (
         <div className="px-5 pb-5 border-t border-gray-100 pt-4">
-          {/* Portions Table */}
-          <div className="mb-5">
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
-              Porsi yang Direkomendasikan
-            </p>
-            <div className="space-y-2">
-              {Object.entries(portions).map(([food, portion]) => (
-                <div
-                  key={food}
-                  className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gray-100"
+          {isApplied ? (
+            /* ── Applied success state ── */
+            <div className="flex flex-col items-center justify-center py-6 gap-3">
+              <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-emerald-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <span className="text-sm text-gray-700 capitalize font-medium">
-                    {food.replace(/([a-z])([A-Z])/g, "$1 $2")}
-                  </span>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <span className="font-bold text-orange-500">
-                      {portion.recommended_grams.toFixed(1)}g
-                    </span>
-                    <span>·</span>
-                    <span>{portion.servings.toFixed(2)}x porsi</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Nutrient Achievement */}
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
-              Pencapaian Nutrisi per Makan
-            </p>
-            <div className="space-y-3">
-              {Object.entries(nutritional_achievement).map(
-                ([key, nutrient]) => {
-                  const nutrientCfg = STATUS_CONFIG[nutrient.status];
-                  const nutrientInfo = NUTRIENT_LABELS[key];
-                  const barWidth = Math.min(nutrient.percentage, 100);
-
-                  return (
-                    <div key={key}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium text-gray-700">
-                          {nutrientInfo?.label || key}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <p className="text-emerald-700 font-bold text-sm text-center">
+                Porsi telah sesuai dengan rekomendasi
+              </p>
+              <p className="text-gray-400 text-xs text-center">
+                Klik "Perbarui Rekomendasi" untuk melihat analisis terbaru
+              </p>
+              {/* Still show portions for reference */}
+              <div className="w-full mt-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
+                  Porsi yang diterapkan
+                </p>
+                <div className="space-y-2">
+                  {Object.entries(portions).map(([food, portion]) => (
+                    <div
+                      key={food}
+                      className="flex items-center justify-between bg-emerald-50 rounded-lg px-3 py-2 border border-emerald-100"
+                    >
+                      <span className="text-sm text-gray-700 capitalize font-medium">
+                        {food.replace(/([a-z])([A-Z])/g, "$1 $2")}
+                      </span>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span className="font-bold text-emerald-600">
+                          {portion.recommended_grams.toFixed(1)}g
                         </span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500">
-                            {nutrient.achieved_per_meal.toFixed(1)} /{" "}
-                            {nutrient.goal_per_meal.toFixed(1)}{" "}
-                            {nutrientInfo?.unit}
-                          </span>
-                          <span
-                            className={`text-xs font-bold px-1.5 py-0.5 rounded ${nutrientCfg.badge}`}
-                          >
-                            {nutrient.percentage.toFixed(0)}%
-                          </span>
-                        </div>
-                      </div>
-                      <div className="w-full bg-gray-100 rounded-full h-2">
-                        <div
-                          className={`h-2 rounded-full transition-all duration-500 ${nutrientCfg.barColor}`}
-                          style={{ width: `${barWidth}%` }}
-                        />
+                        <span>·</span>
+                        <span>{portion.servings.toFixed(2)}x porsi</span>
                       </div>
                     </div>
-                  );
-                },
-              )}
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Portions Table */}
+              <div className="mb-5">
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                  Porsi yang Direkomendasikan
+                </p>
+                <div className="space-y-2">
+                  {Object.entries(portions).map(([food, portion]) => (
+                    <div
+                      key={food}
+                      className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gray-100"
+                    >
+                      <span className="text-sm text-gray-700 capitalize font-medium">
+                        {food.replace(/([a-z])([A-Z])/g, "$1 $2")}
+                      </span>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span className="font-bold text-orange-500">
+                          {portion.recommended_grams.toFixed(1)}g
+                        </span>
+                        <span>·</span>
+                        <span>{portion.servings.toFixed(2)}x porsi</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Nutrient Achievement */}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
+                  Pencapaian Nutrisi per Makan
+                </p>
+                <div className="space-y-3">
+                  {Object.entries(nutritional_achievement).map(
+                    ([key, nutrient]) => {
+                      const nutrientCfg = STATUS_CONFIG[nutrient.status];
+                      const nutrientInfo = NUTRIENT_LABELS[key];
+                      const barWidth = Math.min(nutrient.percentage, 100);
+                      return (
+                        <div key={key}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-medium text-gray-700">
+                              {nutrientInfo?.label || key}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500">
+                                {nutrient.achieved_per_meal.toFixed(1)} /{" "}
+                                {nutrient.goal_per_meal.toFixed(1)}{" "}
+                                {nutrientInfo?.unit}
+                              </span>
+                              <span
+                                className={`text-xs font-bold px-1.5 py-0.5 rounded ${nutrientCfg.badge}`}
+                              >
+                                {nutrient.percentage.toFixed(0)}%
+                              </span>
+                            </div>
+                          </div>
+                          <div className="w-full bg-gray-100 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full transition-all duration-500 ${nutrientCfg.barColor}`}
+                              style={{ width: `${barWidth}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    },
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Apply Portions Button — hidden when already applied */}
+      {onApplyPortions && !isApplied && (
+        <button
+          onClick={() => onApplyPortions(portions, goal_id)}
+          className="mt-4 w-full px-4 py-2.5 bg-gradient-to-r from-orange-400 to-amber-400 hover:from-orange-500 hover:to-amber-500 text-white rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          Terapkan Porsi Ini ke Piring
+        </button>
+      )}
+      {isApplied && (
+        <div className="mt-2 mx-4 mb-4 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-center gap-2">
+          <svg
+            className="w-4 h-4 text-emerald-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          <span className="text-emerald-700 text-xs font-semibold">
+            Porsi telah sesuai dengan rekomendasi
+          </span>
         </div>
       )}
     </div>
@@ -205,6 +307,8 @@ function RecommendationSummaryPanel({
   recommendations,
   classNames,
   targetClass,
+  onApplyPortions,
+  appliedGoalIds,
 }) {
   const [activeTab, setActiveTab] = useState("current");
 
@@ -277,6 +381,8 @@ function RecommendationSummaryPanel({
               <RecommendationCard
                 data={{ ...currentRec, _forceExpanded: true }}
                 classNames={classNames}
+                onApplyPortions={onApplyPortions}
+                isApplied={appliedGoalIds?.has(String(currentRec.goal_id))}
               />
             </div>
           ) : (
@@ -291,6 +397,8 @@ function RecommendationSummaryPanel({
                 key={rec.goal_id}
                 data={rec}
                 classNames={classNames}
+                onApplyPortions={onApplyPortions}
+                isApplied={appliedGoalIds?.has(String(rec.goal_id))}
               />
             ))}
           </div>
@@ -304,10 +412,10 @@ function RecommendationSummaryPanel({
 function MealPlanItem({ plan, onShowQR, onLoadPlan }) {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -324,14 +432,24 @@ function MealPlanItem({ plan, onShowQR, onLoadPlan }) {
           </p>
         </div>
       </div>
-      
+
       <div className="flex gap-2">
         <button
           onClick={() => onLoadPlan(plan)}
           className="flex-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+            />
           </svg>
           Muat
         </button>
@@ -339,8 +457,18 @@ function MealPlanItem({ plan, onShowQR, onLoadPlan }) {
           onClick={() => onShowQR(plan)}
           className="flex-1 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+            />
           </svg>
           QR
         </button>
@@ -361,14 +489,24 @@ function SetMenuItem({ menu, onEdit, onShowQR, onLoadMenu }) {
           </p>
         </div>
       </div>
-      
+
       <div className="flex gap-2">
         <button
           onClick={() => onLoadMenu(menu)}
           className="flex-1 px-3 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           Muat
         </button>
@@ -376,8 +514,18 @@ function SetMenuItem({ menu, onEdit, onShowQR, onLoadMenu }) {
           onClick={() => onShowQR(menu)}
           className="flex-1 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+            />
           </svg>
           QR
         </button>
@@ -397,24 +545,42 @@ function QRModal({ qrCodeUrl, menuName, onClose, onDownload }) {
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
         <div className="text-center">
           <div className="mb-4">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
-              <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+              <svg
+                className="w-8 h-8 text-emerald-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                />
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
               QR Code Menu Set
             </h2>
-            <p className="text-gray-600 mb-2 font-semibold">
-              {menuName}
-            </p>
+            <p className="text-gray-600 mb-2 font-semibold">{menuName}</p>
             <p className="text-sm text-gray-500 mb-6">
               Scan QR code untuk mengakses menu ini
             </p>
@@ -433,8 +599,18 @@ function QRModal({ qrCodeUrl, menuName, onClose, onDownload }) {
               onClick={onDownload}
               className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
               </svg>
               Download QR
             </button>
@@ -466,12 +642,12 @@ export default function MealPlanner() {
   const [menus, setMenus] = useState([]);
   const [isLoadingMenus, setIsLoadingMenus] = useState(true);
   const [menuSearchQuery, setMenuSearchQuery] = useState("");
-  
+
   // Meal Plans state
   const [mealPlans, setMealPlans] = useState([]);
   const [isLoadingMealPlans, setIsLoadingMealPlans] = useState(true);
   const [mealPlanSearchQuery, setMealPlanSearchQuery] = useState("");
-  
+
   // QR Modal state
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
@@ -481,6 +657,7 @@ export default function MealPlanner() {
   const [recommendations, setRecommendations] = useState(null);
   const [isLoadingRecs, setIsLoadingRecs] = useState(false);
   const [recError, setRecError] = useState(null);
+  const [appliedGoalIds, setAppliedGoalIds] = useState(new Set());
 
   // Save to localStorage whenever plateRecipes or targetClass changes
   useEffect(() => {
@@ -564,7 +741,7 @@ export default function MealPlanner() {
       try {
         const response = await getAllMealPlans();
         console.log("Fetched meal plans:", response);
-        
+
         // Handle different response structures
         let plansArray = [];
         if (response?.data && Array.isArray(response.data)) {
@@ -574,7 +751,7 @@ export default function MealPlanner() {
         } else if (Array.isArray(response)) {
           plansArray = response;
         }
-        
+
         setMealPlans(plansArray);
       } catch (error) {
         console.error("Error loading meal plans:", error);
@@ -593,6 +770,7 @@ export default function MealPlanner() {
     setIsLoadingRecs(true);
     setRecError(null);
     setRecommendations(null);
+    setAppliedGoalIds(new Set());
 
     try {
       // Build the payload: keyed by name slug, nutrition fields flattened
@@ -628,15 +806,33 @@ export default function MealPlanner() {
     }
   };
 
+  const handleApplyPortions = (portions, goalId) => {
+    setPlateRecipes((prev) =>
+      prev.map((recipe) => {
+        const slug = (recipe.nama || "")
+          .toLowerCase()
+          .replace(/\s+/g, "")
+          .replace(/[^a-z0-9]/g, "");
+        const match = portions[slug];
+        if (match) {
+          return { ...recipe, quantity: parseFloat(match.servings.toFixed(2)) };
+        }
+        return recipe;
+      }),
+    );
+    // Mark this goal as applied instead of clearing recommendations
+    setAppliedGoalIds((prev) => new Set([...prev, String(goalId)]));
+  };
+
   // ── Load Menu handler ──────────────────────────────────────────────────────
   const handleLoadMenu = async (menu) => {
     try {
       console.log("Loading menu:", menu);
-      
+
       // Get menu details with nutrition info
       const menuData = await getMenuNutritionById(menu.id);
       console.log("Menu data:", menuData);
-      
+
       if (!menuData || !menuData.rincian_per_bahan) {
         alert("Data menu tidak lengkap");
         return;
@@ -644,18 +840,18 @@ export default function MealPlanner() {
 
       // Map menu items to recipes
       const menuRecipes = menuData.rincian_per_bahan
-        .filter(item => item.resep_id) // Only include items with recipe ID
-        .map(item => {
+        .filter((item) => item.resep_id) // Only include items with recipe ID
+        .map((item) => {
           // Find the full recipe data from our recipes array
-          const fullRecipe = recipes.find(r => r.id === item.resep_id);
-          
+          const fullRecipe = recipes.find((r) => r.id === item.resep_id);
+
           if (fullRecipe) {
             return {
               ...fullRecipe,
               quantity: 1,
             };
           }
-          
+
           // If not found in recipes array, create from menu data
           return {
             id: item.resep_id,
@@ -676,7 +872,6 @@ export default function MealPlanner() {
       setPlateRecipes(menuRecipes);
       setPlanName(menu.nama || ""); // Set the plan name to menu name
       setRecommendations(null); // Reset recommendations when loading new menu
-      
     } catch (error) {
       console.error("Error loading menu:", error);
       alert("Gagal memuat menu: " + error.message);
@@ -688,12 +883,12 @@ export default function MealPlanner() {
     try {
       // First load the menu to the plate
       await handleLoadMenu(menu);
-      
+
       // Generate QR code URL (you can encode the menu ID or a full URL)
       const baseUrl = window.location.origin;
       const menuUrl = `${baseUrl}/meal-planner?menuId=${menu.id}`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(menuUrl)}`;
-      
+
       setQrCodeUrl(qrUrl);
       setCurrentMenuName(menu.nama);
       setShowQRModal(true);
@@ -730,10 +925,10 @@ export default function MealPlanner() {
   const handleLoadMealPlan = (plan) => {
     try {
       console.log("Loading meal plan:", plan);
-      
+
       // Get recipes from the meal plan
       const planRecipes = plan.recipes || [];
-      
+
       if (planRecipes.length === 0) {
         alert("Meal plan ini tidak memiliki resep");
         return;
@@ -742,15 +937,15 @@ export default function MealPlanner() {
       // Map meal plan recipes to plate format
       const mappedRecipes = planRecipes.map((planRecipe) => {
         // Find the full recipe data from our recipes array
-        const fullRecipe = recipes.find(r => r.id === planRecipe.id);
-        
+        const fullRecipe = recipes.find((r) => r.id === planRecipe.id);
+
         if (fullRecipe) {
           return {
             ...fullRecipe,
             quantity: planRecipe.quantity || 1,
           };
         }
-        
+
         // If not found, use the data from the meal plan
         return {
           id: planRecipe.id,
@@ -766,7 +961,6 @@ export default function MealPlanner() {
       setTargetClass(plan.targetClass || 6); // Set the target class from the plan
       setPlanName(plan.name || ""); // Set the plan name
       setRecommendations(null); // Reset recommendations when loading new plan
-      
     } catch (error) {
       console.error("Error loading meal plan:", error);
     }
@@ -777,12 +971,12 @@ export default function MealPlanner() {
     try {
       // First load the plan to the plate
       handleLoadMealPlan(plan);
-      
+
       // Generate QR code URL for the saved meal plan
       const baseUrl = window.location.origin;
       const planUrl = `${baseUrl}/saved-meal-plan/${plan.id}`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(planUrl)}`;
-      
+
       setQrCodeUrl(qrUrl);
       setCurrentMenuName(plan.name);
       setShowQRModal(true);
@@ -1081,7 +1275,8 @@ export default function MealPlanner() {
                       </p>
                     ) : filteredRecipes.length === 0 ? (
                       <p className="text-gray-500 text-center py-8">
-                        Tidak ada resep yang cocok dengan pencarian {searchQuery}
+                        Tidak ada resep yang cocok dengan pencarian{" "}
+                        {searchQuery}
                       </p>
                     ) : (
                       filteredRecipes.map((recipe) => (
@@ -1094,8 +1289,18 @@ export default function MealPlanner() {
                 {/* Saved Meal Plans */}
                 <div className="bg-white rounded-lg shadow-md p-6 flex flex-col">
                   <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    <svg
+                      className="w-6 h-6 text-blue-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                      />
                     </svg>
                     Set Menu Tersedia
                   </h2>
@@ -1370,6 +1575,8 @@ export default function MealPlanner() {
                       recommendations={recommendations.combinedSaran}
                       classNames={classNames}
                       targetClass={targetClass}
+                      onApplyPortions={handleApplyPortions}
+                      appliedGoalIds={appliedGoalIds}
                     />
                   </div>
                 )}

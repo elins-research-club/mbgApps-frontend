@@ -357,8 +357,8 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
         console.error(`[Generate] FAILED - Response:`, res)
 
         const errorMessage =
-          res?.error ||
           res?.message ||
+          res?.error ||
           (!res?.predicted_composition
             ? 'AI tidak dapat menghasilkan data nutrisi'
             : 'Gagal generate bahan')
@@ -383,7 +383,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
         icon: null
       },
       checking: {
-        text: 'Mengecek database...',
+        text: item.message || 'Mengecek database...',
         className: 'text-blue-600 font-medium',
         bgColor: 'bg-blue-50',
         borderColor: 'border-blue-200',
@@ -406,7 +406,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
       },
       found: null,
       not_found: {
-        text: 'Tidak ditemukan di database',
+        text: item.message || 'Tidak ditemukan di database',
         className: 'text-amber-700 font-medium',
         bgColor: 'bg-amber-50',
         borderColor: 'border-amber-200',
@@ -422,7 +422,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
         showButton: true
       },
       generating: {
-        text: 'AI sedang menganalisis komposisi nutrisi...',
+        text: item.message || 'AI sedang menganalisis komposisi nutrisi...',
         className: 'text-purple-600 font-medium',
         bgColor: 'bg-purple-50',
         borderColor: 'border-purple-200',
@@ -683,7 +683,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
       const validIngredients = ingredients.filter(item => item.name.trim())
 
       const payload = {
-        nama: menuName.trim(),
+        menuName: menuName.trim(),
         kategori: kategori,
         ingredients: validIngredients.map(item => ({
           id: item.id,

@@ -407,6 +407,13 @@ function RecommendationSummaryPanel({
   );
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+async function deleteMealPlan(id) {
+  const response = await fetch(`${API_URL}/meal-plans/${id}`, { method: 'DELETE' });
+  if (!response.ok) throw new Error('Delete failed');
+}
+
 // ─── MealPlanItem Component ─────────────────────────────────────────────────
 function MealPlanItem({ plan, onShowQR, onLoadPlan }) {
   const formatDate = (dateString) => {
@@ -416,6 +423,22 @@ function MealPlanItem({ plan, onShowQR, onLoadPlan }) {
       month: "short",
       day: "numeric",
     });
+  };
+
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (isDeleting) return;
+    if (!window.confirm("Hapus meal plan ini?")) return;
+    setIsDeleting(true);
+    try {
+      await deleteMealPlan(plan.id);
+      window.location.reload();
+    } catch (err) {
+      alert("Gagal menghapus meal plan: " + (err.message || err));
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -470,6 +493,26 @@ function MealPlanItem({ plan, onShowQR, onLoadPlan }) {
             />
           </svg>
           QR
+        </button>
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className={`flex-1 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1 ${isDeleting ? 'opacity-60 cursor-not-allowed' : ''}`}
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+          {isDeleting ? 'Menghapus...' : 'Hapus'}
         </button>
       </div>
     </div>

@@ -46,7 +46,7 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
         <div className="flex-1 overflow-y-auto p-8 space-y-6">
           {/* Input Nama Ahli Gizi */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
               <svg
                 className="w-4 h-4 text-orange-500"
                 fill="none"

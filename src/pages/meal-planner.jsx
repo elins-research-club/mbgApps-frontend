@@ -429,13 +429,13 @@ function MealPlanItem({ plan, onShowQR, onLoadPlan }) {
 
   const handleDelete = async () => {
     if (isDeleting) return;
-    if (!window.confirm("Hapus meal plan ini?")) return;
+    if (!window.confirm("Hapus set menu ini?")) return;
     setIsDeleting(true);
     try {
       await deleteMealPlan(plan.id);
       window.location.reload();
     } catch (err) {
-      alert("Gagal menghapus meal plan: " + (err.message || err));
+      alert("Gagal menghapus set menu: " + (err.message || err));
     } finally {
       setIsDeleting(false);
     }
@@ -971,7 +971,7 @@ export default function MealPlanner() {
       const planRecipes = plan.recipes || [];
 
       if (planRecipes.length === 0) {
-        alert("Meal plan ini tidak memiliki resep");
+        alert("Set menu ini tidak memiliki menu");
         return;
       }
 

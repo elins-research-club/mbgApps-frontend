@@ -6,7 +6,6 @@ import jsPDF from "jspdf";
 import * as htmlToImage from "html-to-image";
 import NextImage from "next/image";
 import SearchCard from "./SearchCard";
-import ChefNavbar from "./ChefNavbar";
 import Footer from "./Footer";
 import NutritionLabel from "./NutritionLabel";
 import DetailResultCard from "./DetailResultCard";
@@ -23,6 +22,7 @@ import {
   saveNewMenuComposition,
   getRecipeById,
 } from "../services/api";
+import MainNavbar from "./MainNavbar";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -60,7 +60,7 @@ const TARGET_ID_MAP = {
   "SMA Kelas 3": 14,
 };
 
-export default function ChefDashboard() {
+export default function ChefDashboard({ canSave = false, canValidate = false }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [totalLabel, setTotalLabel] = useState(null);
@@ -415,14 +415,7 @@ export default function ChefDashboard() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <ChefNavbar
-        onAddRecipeClick={() => {
-          clearResults();
-          setEditRecipeData(null);
-          setIsRecipeView(false);
-        }}
-        onNewMenuClick={() => setIsNewMenuModalOpen(true)}
-      />
+      <MainNavbar />
 
       {/* {isNewMenuModalOpen && (
         <NewMenuModal
@@ -523,6 +516,7 @@ export default function ChefDashboard() {
               ) : (
                 <AddRecipeModal
                   key={editRecipeData ? editRecipeData.id : 'new'}
+                  canSave={canSave}
                   initialData={editRecipeData}
                   onRecipeAdded={(recipeId) => {
                     const wasEditing = editRecipeData !== null;

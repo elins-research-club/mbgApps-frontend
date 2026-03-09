@@ -1,11 +1,20 @@
 // /frontend/src/services/api.js
+import { createClient } from "@/lib/client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+
+async function getAccessToken() {
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token;
+}
+
 export const generateNutrition = async (payload) => {
   try {
+    const token = await getAccessToken();
     const response = await fetch(`${API_URL}/generate`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
@@ -144,9 +153,10 @@ export const getAllRecipes = async () => {
 export const updateRecipe = async (recipeId, recipeData) => {
   console.log("Updating recipe ID:", recipeId, recipeData);
   try {
+    const token = await getAccessToken();
     const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify(recipeData),
     });
 
@@ -165,9 +175,10 @@ export const updateRecipe = async (recipeId, recipeData) => {
 export const saveRecipe = async (recipeData) => {
   console.log("Menyimpan resep baru ke backend:", recipeData);
   try {
+    const token = await getAccessToken();
     const response = await fetch(`${API_URL}/menu`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify(recipeData),
     });
 
@@ -206,9 +217,10 @@ export const validateIngredient = async (id, nutritionData, validatorName) => {
 
     console.log("Validating ingredient:", payload);
 
+    const token = await getAccessToken();
     const response = await fetch(`${API_URL}/ingredients/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify(payload),
     });
 
@@ -334,9 +346,10 @@ export const saveNewMenuComposition = async (formData) => {
 
     console.log("📦 [API] Sending payload:", JSON.stringify(payload, null, 2));
 
+    const token = await getAccessToken();
     const response = await fetch(`${API_URL}/menu/composition`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify(payload),
     });
 
@@ -360,9 +373,10 @@ export const saveMealPlan = async (mealPlanData) => {
   try {
     console.log("📤 [API] Saving meal plan:", mealPlanData);
 
+    const token = await getAccessToken();
     const response = await fetch(`${API_URL}/meal-plans`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify(mealPlanData),
     });
 
@@ -417,9 +431,10 @@ export const getAllMealPlans = async () => {
 
 export const getAllRecommendations = async (currentFoods) => {
   try {
+    const token = await getAccessToken();
     const response = await fetch(`${API_URL}/get_all_recommendations`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify(currentFoods),
     });
     if (!response.ok) {

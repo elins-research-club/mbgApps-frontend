@@ -1,79 +1,176 @@
-// /frontend/src/contexts/AuthContext.js
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { createClient } from "@/lib/client";
 
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+export function AuthProvider({ children }) {
+  const [user, setUser]               = useState(null);
+  const [profile, setProfile]         = useState(null);
+  const [orgMembership, setOrgMembership] = useState(null); // active membership
+  const [organizations, setOrganizations] = useState([]);
+  const [loading, setLoading]         = useState(true);
 
-  // Load user from sessionStorage on mount
+  const supabaseRef = useRef(null);
+  if (!supabaseRef.current) supabaseRef.current = createClient();
+  const supabase = supabaseRef.current;
+
+  const fetchProfile = useCallback(async (userId) => {
+    const { data } = await supabase
+      .from("Userext")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
+    setProfile(data ?? null);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const fetchOrgMembership = useCallback(async (userId) => {
+    const { data: membership } = await supabase
+      .from("Membership")
+      .select(`
+        id, status, invite_method, role_id,
+        organization:Organizations ( id, name, owner_id, invite_code, description ),
+        role:Roles ( id, name, permissions )
+      `)
+      .eq("user_id", userId)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const { data: ownedOrgs } = await supabase
+      .from("Organizations")
+      .select("id, name, owner_id, invite_code, description")
+      .eq("owner_id", userId)
+      .order("created_at", { ascending: false });
+
+    const orgsFromMembership = membership?.organization ? [membership.organization] : [];
+    const merged = [...orgsFromMembership, ...(ownedOrgs ?? [])];
+    const uniqueOrgs = merged.filter(
+      (org, index, arr) => arr.findIndex((x) => x?.id === org?.id) === index
+    );
+    setOrganizations(uniqueOrgs);
+
+    if (membership) {
+      setOrgMembership(membership);
+      return;
+    }
+
+    // Fallback for owners that do not have an active row in Membership yet.
+    const ownedOrg = uniqueOrgs[0] ?? null;
+
+    if (ownedOrg) {
+      setOrgMembership({
+        id: null,
+        status: "active",
+        invite_method: "owner",
+        role_id: null,
+        organization: ownedOrg,
+        role: null,
+      });
+      return;
+    }
+
+    setOrgMembership(null);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
-    const storedUser = sessionStorage.getItem("user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error("Failed to parse user from session:", error);
-        sessionStorage.removeItem("user");
+    let isMounted = true;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!isMounted) return;
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        if (!currentUser) {
+          setProfile(null);
+          setOrgMembership(null);
+          setOrganizations([]);
+        }
+        setLoading(false); 
       }
-    }
-    setLoading(false);
-  }, []);
+    );
 
-  // Save user to sessionStorage whenever it changes
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
-    if (user) {
-      sessionStorage.setItem("user", JSON.stringify(user));
-    } else {
-      sessionStorage.removeItem("user");
-    }
-  }, [user]);
+    if (!user) return;
+    let isMounted = true;
+    Promise.all([
+      fetchProfile(user.id),
+      fetchOrgMembership(user.id),
+    ]).then(() => {
+    });
+    return () => { isMounted = false; };
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const login = (username, password) => {
-    let loggedInUser = null;
-    let success = false;
-    let message = "Username atau password salah.";
+  const organization =
+    orgMembership?.organization ??
+    orgMembership?.organizations ??
+    orgMembership?.Organizations ??
+    null;
 
-    // Sesuai screenshot: "AhliGizi / chef"
-    if (username === "Chef" && password === "chef") {
-      loggedInUser = { role: "Chef", name: "Chef" };
-      success = true;
-    } else if (username === "AhliGizi" && password === "ahligizi") {
-      loggedInUser = { role: "Ahli Gizi", name: "Ahli Gizi" };
-      success = true;
-    }
+  const role =
+    orgMembership?.role ??
+    orgMembership?.roles ??
+    orgMembership?.Roles ??
+    null;
 
-    setUser(loggedInUser);
+  const isOrgOwner = !!(
+    user &&
+    organization?.owner_id === user.id
+  );
+  const permissions = role?.permissions ?? {};
+  const canSave          = isOrgOwner || !!permissions.can_save_menu;
+  const canValidate      = isOrgOwner || !!permissions.can_validate_ingredients;
+  const canManagePlans   = isOrgOwner || !!permissions.can_manage_meal_plans;
+  const canEditRecipe    = isOrgOwner || !!permissions.can_edit_recipe;
+  const canManageUsers   =
+    isOrgOwner ||
+    !!permissions.can_manage_users ||
+    !!permissions.can_add_users ||
+    !!permissions.can_delete_users ||
+    !!permissions.can_approve_members;
+  const canManageRoles   = isOrgOwner || !!permissions.can_manage_roles;
 
-    if (success) {
-      return { success: true };
-    } else {
-      return { success: false, message };
-    }
+  const logout = async () => {
+    await supabase.auth.signOut();
   };
 
-  const logout = () => {
-    setUser(null);
-  };
-
-  // Show loading state while checking session
-  if (loading) {
-    return null; // or a loading spinner if you prefer
-  }
+  const refresh = useCallback(async () => {
+    if (!user) return;
+    await Promise.all([fetchProfile(user.id), fetchOrgMembership(user.id)]);
+  }, [user, fetchProfile, fetchOrgMembership]);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        orgMembership,
+        organizations,
+        loading,
+        isOrgOwner,
+        canSave,
+        canValidate,
+        canManagePlans,
+        canEditRecipe,
+        canManageUsers,
+        canManageRoles,
+        logout,
+        refresh,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-// Hook kustom untuk memudahkan penggunaan
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth harus digunakan di dalam AuthProvider");
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
 };

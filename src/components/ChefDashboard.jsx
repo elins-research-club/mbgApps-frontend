@@ -475,40 +475,41 @@ export default function ChefDashboard({ canSave = false, canValidate = false }) 
                     )}
                   </button>
 
-                  {/* 🔹 Resep Individual Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      console.log("🔘 Clicking Menu Individual button");
-                      clearResults();
-                      setEditRecipeData(null);
-                      setIsRecipeView(true);
-                    }}
-                    className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-200 border ${
-                      isRecipeView
-                        ? "bg-orange-400 text-white border-orange-400 shadow-md"
-                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                    }`}
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <UtensilsCrossed
-                        className={`w-5 h-5 ${
-                          isRecipeView ? "text-white" : "text-orange-400"
-                        }`}
-                      />
-                      <span>Cari Menu</span>
-                    </div>
-                    {isRecipeView && (
-                      <p className="text-xs mt-1 opacity-90 font-normal">
-                        Lihat gizi satu menu
-                      </p>
-                    )}
-                  </button>
+                  {/* 🔹 Resep Individual Button - Hidden from usual users */}
+                  {(canSave || canValidate) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        console.log("🔘 Clicking Menu Individual button");
+                        clearResults();
+                        setEditRecipeData(null);
+                        setIsRecipeView(true);
+                      }}
+                      className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-200 border ${
+                        isRecipeView
+                          ? "bg-orange-400 text-white border-orange-400 shadow-md"
+                          : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <UtensilsCrossed
+                          className={`w-5 h-5 ${
+                            isRecipeView ? "text-white" : "text-orange-400"
+                          }`}
+                        />
+                        <span>Cari Menu</span>
+                      </div>
+                      {isRecipeView && (
+                        <p className="text-xs mt-1 opacity-90 font-normal">
+                          Lihat gizi satu menu
+                        </p>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* ✅ CONDITIONAL RENDERING: SearchCard atau RecipeSearchCard */}
-              {isRecipeView ? (
+              {isRecipeView && (canSave || canValidate) ? (
                 <RecipeSearchCard
                   onRecipeSelect={handleRecipeSelect}
                   isLoading={isLoading}

@@ -111,6 +111,19 @@ export async function createOrganization({ name, description }) {
   return unwrap(payload);
 }
 
+export async function createSubOrganization(parentOrgId, { name, description }) {
+  if (!parentOrgId) {
+    throw new Error("Parent organization ID is required");
+  }
+
+  const payload = await request(`/organizations/${parentOrgId}/sub-organizations`, {
+    method: "POST",
+    body: JSON.stringify({ name, description }),
+  });
+
+  return unwrap(payload);
+}
+
 export async function getOrganization(orgId) {
   const payload = await request(`/organizations/${orgId}`);
   return pickObject(payload, ["organization", "org"]);

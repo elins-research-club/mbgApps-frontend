@@ -1,7 +1,7 @@
 // /frontend/src/pages/meal-details.js
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import ChefNavbar from '../components/ChefNavbar'
+import MainNavbar from '../components/MainNavbar'
 import NutritionLabel from '../components/NutritionLabel'
 import { saveMealPlan } from '../services/api'
 import { goals, classNames } from '../utils/goals'
@@ -226,7 +226,7 @@ export default function MealDetails () {
   if (plateRecipes.length === 0) {
     return (
       <div className='flex flex-col min-h-screen'>
-        <ChefNavbar />
+        <MainNavbar />
         <div className='flex-grow bg-gray-50 flex items-center justify-center'>
           <div className='text-center'>
             <svg
@@ -262,7 +262,7 @@ export default function MealDetails () {
 
   return (
     <div className='flex flex-col min-h-screen'>
-      <ChefNavbar />
+      <MainNavbar />
 
       <div className='flex-grow bg-gray-50'>
         <div className='bg-white shadow-sm border-b border-gray-200 mb-6'>

@@ -29,7 +29,26 @@ import {
   RefreshCcw,
   AlertCircle,
   CheckCircle,
+  GitBranch,
 } from "lucide-react";
+
+const MAX_ORG_DEPTH = 2;
+
+function resolveOrgDepth(org) {
+  const candidates = [
+    org?.depth,
+    org?.level,
+    org?.hierarchyDepth,
+    org?.hierarchy_depth,
+  ];
+
+  for (const value of candidates) {
+    const num = Number(value);
+    if (Number.isFinite(num)) return num;
+  }
+
+  return 0;
+}
 
 // ─── Permission definitions ───────────────────────────────────────────────────
 const PERMISSION_DEFS = [
@@ -248,6 +267,8 @@ export default function OrgOwnerDashboard({ orgId }) {
 
   const pending  = members.filter((m) => m.status === "pending");
   const active   = members.filter((m) => m.status === "active");
+  const currentOrgDepth = resolveOrgDepth(org);
+  const canCreateSubOrg = currentOrgDepth < MAX_ORG_DEPTH;
   
   // Helper to get user display name from either structure
   const getUserName = (member) => {
@@ -334,6 +355,18 @@ export default function OrgOwnerDashboard({ orgId }) {
     setTimeout(() => setCodeCopied(false), 2000);
   };
 
+  const handleCreateSubOrganization = () => {
+    if (!org?.id || !canCreateSubOrg) return;
+
+    const query = new URLSearchParams({
+      parentId: String(org.id),
+      parentName: String(org.name || ""),
+      parentDepth: String(currentOrgDepth),
+    });
+
+    router.push(`/organization/create?${query.toString()}`);
+  };
+
   // ── Render ───────────────────────────────────────────────────────────────────
   if (loadingData) {
     return (
@@ -393,6 +426,33 @@ export default function OrgOwnerDashboard({ orgId }) {
             </div>
           ))}
         </div>
+
+        {/* Organization hierarchy */}
+        <section className="bg-white rounded-2xl border border-slate-200 p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2 text-slate-800 font-semibold">
+                <GitBranch className="w-4 h-4 text-orange-500" />
+                Struktur Organisasi
+              </div>
+              <p className="text-sm text-slate-500 mt-1">
+                Kedalaman saat ini: {currentOrgDepth}/{MAX_ORG_DEPTH}. Sub-organisasi hanya bisa dibuat hingga kedalaman {MAX_ORG_DEPTH}.
+              </p>
+            </div>
+            <button
+              onClick={handleCreateSubOrganization}
+              disabled={!canCreateSubOrg}
+              className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+              title={
+                canCreateSubOrg
+                  ? "Buat sub-organisasi"
+                  : `Batas kedalaman ${MAX_ORG_DEPTH} sudah tercapai`
+              }
+            >
+              <Plus className="w-4 h-4" /> Buat Sub-Organisasi
+            </button>
+          </div>
+        </section>
 
         {/* Tabs */}
         <div className="flex gap-2 flex-wrap">

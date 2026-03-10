@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 export default function MainNavbar() {
-  const { user, profile, orgMembership, organizations, isOrgOwner, canManageUsers, canManageRoles, refresh, logout } = useAuth();
+  const { user, profile, orgMembership, organizations, isOrgOwner, canManagePlans, canManageUsers, canManageRoles, refresh, logout } = useAuth();
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
@@ -104,17 +104,19 @@ export default function MainNavbar() {
           {/* Right section */}
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2">
-              <Link
-                href="/meal-planner"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
-                  isSetMenuRoute
-                    ? "bg-green-600 text-white border-green-600 ring-2 ring-green-200"
-                    : "bg-green-500 hover:bg-green-600 text-white border-green-500"
-                }`}
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                Set Menu
-              </Link>
+              {canManagePlans && (
+                <Link
+                  href="/meal-planner"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
+                    isSetMenuRoute
+                      ? "bg-green-600 text-white border-green-600 ring-2 ring-green-200"
+                      : "bg-green-500 hover:bg-green-600 text-white border-green-500"
+                  }`}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                  Set Menu
+                </Link>
+              )}
 
               {canOpenDashboard && org && (
                 <Link
@@ -126,23 +128,9 @@ export default function MainNavbar() {
                   }`}
                 >
                   <LayoutDashboard className="w-3.5 h-3.5" />
-                  <span>Dashboard Org</span>
+                  <span>Dashboard</span>
                 </Link>
               )}
-              <button
-                onClick={handleOpenInviteModal}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-sm font-semibold transition shadow-sm"
-              >
-                <Ticket className="w-3.5 h-3.5" />
-                Masukkan Kode
-              </button>
-              <Link
-                href="/organization/create"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-full text-sm font-semibold transition shadow-sm"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Buat Organisasi
-              </Link>
             </div>
 
             {/* User dropdown */}
@@ -187,14 +175,16 @@ export default function MainNavbar() {
                       Profil Saya
                     </Link>
 
-                    <Link
-                      href="/meal-planner"
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-green-700 hover:bg-green-50 transition font-medium"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      <LayoutGrid className="w-4 h-4" />
-                      Set Menu
-                    </Link>
+                    {canManagePlans && (
+                      <Link
+                        href="/meal-planner"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-green-700 hover:bg-green-50 transition font-medium"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <LayoutGrid className="w-4 h-4" />
+                        Set Menu
+                      </Link>
+                    )}
 
                     <div className="border-t border-slate-100 mt-1 pt-1">
                       <button

@@ -12,7 +12,7 @@ import RecipeItem from "../components/RecipeItem";
 import Plate from "../components/Plate";
 import NutritionChart from "../components/NutritionChart";
 import NutritionLabel from "../components/NutritionLabel";
-import ChefNavbar from "../components/ChefNavbar";
+import MainNavbar from "../components/MainNavbar";
 import { useRouter } from "next/router";
 import {
   getAllRecipes,
@@ -1220,7 +1220,7 @@ export default function MealPlanner() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <ChefNavbar />
+      <MainNavbar />
 
       <div className="flex-grow bg-gray-50">
         {/* Page Header */}

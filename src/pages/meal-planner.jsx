@@ -1591,11 +1591,6 @@ export default function MealPlanner() {
                         isMini={false}
                       />
                     </div>
-                    <p className="text-xs text-orange-600 mt-3 text-center">
-                      <span className="font-semibold">ℹ️</span> Persentase
-                      berdasarkan kebutuhan harian {classNames[targetClass]}.
-                      Grafik menampilkan 1/3 kebutuhan harian.
-                    </p>
                   </div>
 
                   {/* Nutrition Chart */}

@@ -503,10 +503,6 @@ export default function MealDetails () {
                     isMini={false}
                   />
                 </div>
-                <p className='text-xs text-orange-600 mt-3 text-center'>
-                  Persentase berdasarkan kebutuhan harian{' '}
-                  {classNames[targetClass]}
-                </p>
               </div>
             </div>
           </div>

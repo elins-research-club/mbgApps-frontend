@@ -10,6 +10,7 @@ import {
   LogOut,
   ChevronDown,
   LayoutDashboard,
+  LayoutGrid,
   Plus,
   Ticket,
   X,
@@ -65,6 +66,7 @@ export default function MainNavbar() {
     ? router.query.id[0]
     : router.query?.id;
   const isDashboardRoute = router.pathname === "/organization/[id]/dashboard";
+  const isSetMenuRoute = router.pathname === "/meal-planner";
   const orgFromRoute = (organizations || []).find((item) => item?.id === routeOrgId);
   const org = orgFromRoute || orgMembership?.organization || organizations?.[0] || null;
   const canOpenDashboard = !!(
@@ -102,6 +104,18 @@ export default function MainNavbar() {
           {/* Right section */}
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2">
+              <Link
+                href="/meal-planner"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
+                  isSetMenuRoute
+                    ? "bg-green-600 text-white border-green-600 ring-2 ring-green-200"
+                    : "bg-green-500 hover:bg-green-600 text-white border-green-500"
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                Set Menu
+              </Link>
+
               {canOpenDashboard && org && (
                 <Link
                   href={`/organization/${org.id}/dashboard`}
@@ -171,6 +185,15 @@ export default function MainNavbar() {
                     >
                       <User className="w-4 h-4 text-slate-400" />
                       Profil Saya
+                    </Link>
+
+                    <Link
+                      href="/meal-planner"
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-green-700 hover:bg-green-50 transition font-medium"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <LayoutGrid className="w-4 h-4" />
+                      Set Menu
                     </Link>
 
                     <div className="border-t border-slate-100 mt-1 pt-1">

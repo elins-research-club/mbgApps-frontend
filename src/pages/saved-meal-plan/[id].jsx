@@ -154,10 +154,6 @@ export default function SavedMealPlan() {
               />
             </div>
           )}
-          
-          <p className="text-xs text-orange-600 mt-4 text-center">
-            Persentase berdasarkan kebutuhan harian {classNames[targetClass]}
-          </p>
         </div>
 
         {/* Recipes List */}

@@ -6,6 +6,7 @@ import {
   getOrganization,
   getOrgMembers,
   getOrgRoles,
+  getSubOrganizations,
   acceptMember,
   rejectMember,
   removeMember,
@@ -208,6 +209,7 @@ export default function OrgOwnerDashboard({ orgId }) {
   const [org, setOrg]               = useState(null);
   const [members, setMembers]       = useState([]);
   const [roles, setRoles]           = useState([]);
+  const [subOrganizations, setSubOrganizations] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [tab, setTab]               = useState("pending");
   const [toast, setToast]           = useState(null);
@@ -235,6 +237,13 @@ export default function OrgOwnerDashboard({ orgId }) {
       setOrg(orgData);
       setMembers(membersData);
       setRoles(rolesData);
+
+      try {
+        const subsData = await getSubOrganizations(orgId);
+        setSubOrganizations(Array.isArray(subsData) ? subsData : []);
+      } catch {
+        setSubOrganizations([]);
+      }
     } catch (err) {
       showToast("error", err.message || "Gagal memuat data");
     } finally {
@@ -452,6 +461,55 @@ export default function OrgOwnerDashboard({ orgId }) {
               <Plus className="w-4 h-4" /> Buat Sub-Organisasi
             </button>
           </div>
+        </section>
+
+        <section className="bg-white rounded-2xl border border-slate-200 p-5">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 className="text-slate-800 font-semibold">Sub-Organisasi</h3>
+              <p className="text-sm text-slate-500 mt-0.5">
+                Daftar organisasi turunan langsung dari organisasi ini.
+              </p>
+            </div>
+            <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">
+              {subOrganizations.length} item
+            </span>
+          </div>
+
+          {subOrganizations.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm text-slate-500 text-center">
+              Belum ada sub-organisasi.
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {subOrganizations.map((sub) => {
+                const subId = sub?.id;
+                const subName = sub?.name || "Sub-organisasi";
+                const subDescription = sub?.description || "Tanpa deskripsi";
+                const subDepth = resolveOrgDepth(sub);
+                return (
+                  <div
+                    key={subId || `${subName}-${subDepth}`}
+                    className="rounded-xl border border-slate-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-800 truncate">{subName}</p>
+                      <p className="text-xs text-slate-500 truncate mt-0.5">{subDescription}</p>
+                      <p className="text-xs text-slate-400 mt-1">Depth: {subDepth}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => subId && router.push(`/organization/${subId}/dashboard`)}
+                      disabled={!subId}
+                      className="px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-white hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Buka Dashboard
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* Tabs */}

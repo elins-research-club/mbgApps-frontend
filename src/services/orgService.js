@@ -183,6 +183,11 @@ export async function getOrgRoles(orgId) {
   return pickArray(payload, ["roles"]);
 }
 
+export async function getSubOrganizations(orgId) {
+  const payload = await request(`/organizations/${orgId}/sub-organizations`);
+  return pickArray(payload, ["subOrganizations", "sub_organizations", "organizations", "items"]);
+}
+
 export async function createRole(orgId, { name, permissions }) {
   const payload = await request(`/organizations/${orgId}/roles`, {
     method: "POST",

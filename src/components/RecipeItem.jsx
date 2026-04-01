@@ -24,14 +24,14 @@ export default function RecipeItem({ recipe }) {
       style={style}
       {...listeners}
       {...attributes}
-      className="recipe-item bg-white border-2 border-gray-200 hover:border-orange-400 rounded-lg p-4 cursor-grab active:cursor-grabbing transition-all hover:shadow-md"
+      className="recipe-item bg-white border-2 border-[#E8D1C5] hover:border-white0 rounded-lg p-4 cursor-grab active:cursor-grabbing transition-all hover:shadow-md"
     >
-      <h4 className="font-bold text-gray-800 mb-2">{recipe.nama}</h4>
-      <p className="text-sm text-gray-600 mb-2">
-        {recipe.kategori && <span className="inline-block bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">{recipe.kategori}</span>}
+      <h4 className="font-bold text-[#17191B] mb-2">{recipe.nama}</h4>
+      <p className="text-sm text-[#452829] mb-2">
+        {recipe.kategori && <span className="inline-block bg-[#E8D1C5] text-orange-800 px-2 py-1 rounded text-xs">{recipe.kategori}</span>}
       </p>
       {totalGramasi > 0 && (
-        <div className="mt-2 text-xs text-gray-500">
+        <div className="mt-2 text-xs text-white0">
           Total: {totalGramasi}g
         </div>
       )}

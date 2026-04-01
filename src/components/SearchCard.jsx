@@ -66,15 +66,15 @@ const SearchCard = ({
   return (
     <div
       ref={wrapperRef}
-      className="bg-white p-6 rounded-2xl shadow-lg border border-slate-200"
+      className="bg-white p-6 rounded-2xl shadow-lg border border-[#E8D1C5]"
     >
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <Boxes className="w-6 h-6 text-orange-500" />
-        <h3 className="text-xl font-bold text-orange-500">Cari Paket Menu</h3>
+        <Boxes className="w-6 h-6 text-white0" />
+        <h3 className="text-xl font-bold text-white0">Cari Paket Menu</h3>
       </div>
 
-      <p className="text-sm text-slate-600 mb-4">
+      <p className="text-sm text-[#452829] mb-4">
         Temukan dan pilih paket komposisi menu dari chef
       </p>
 
@@ -87,18 +87,18 @@ const SearchCard = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           placeholder="Ketik nama paket menu (min. 2 karakter)..."
-          className="w-full p-3 pl-10 pr-10 border border-slate-300 rounded-lg outline-none 
-                     focus:ring-2 focus:ring-orange-500 focus:border-transparent transition 
-                     disabled:bg-slate-100 disabled:cursor-not-allowed text-gray-700 placeholder-gray-400"
+          className="w-full p-3 pl-10 pr-10 border border-[#D9C7B8] rounded-lg outline-none 
+                     focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-transparent transition 
+                     disabled:bg-[#E8D1C5] disabled:cursor-not-allowed text-[#37393B] placeholder-gray-400"
           disabled={currentLoading}
         />
 
-        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#C9A89A]" />
 
         {currentLoading && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
             <svg
-              className="animate-spin h-5 w-5 text-orange-500"
+              className="animate-spin h-5 w-5 text-white0"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -124,8 +124,8 @@ const SearchCard = ({
 
         {/* Dropdown hasil */}
         {isFocused && suggestions.length > 0 && (
-          <div className="absolute z-10 w-full bg-white border border-slate-300 rounded-lg shadow-xl mt-1 max-h-80 overflow-y-auto">
-            <div className="sticky top-0 bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-3 border-b border-orange-100">
+          <div className="absolute z-10 w-full bg-white border border-[#D9C7B8] rounded-lg shadow-xl mt-1 max-h-80 overflow-y-auto">
+            <div className="sticky top-0 bg-gradient-to-r from-slate-50 to-amber-50 px-4 py-3 border-b border-white">
               <div className="flex items-center gap-2 text-sm font-medium text-orange-800">
                 <ListIcon className="w-4 h-4" />
                 Ditemukan {suggestions.length} paket menu
@@ -137,16 +137,16 @@ const SearchCard = ({
                 <li
                   key={menu.id}
                   onClick={() => handleSelect(menu.id, menu.nama)}
-                  className="flex items-start gap-3 px-4 py-3.5 hover:bg-orange-50 cursor-pointer transition-colors group"
+                  className="flex items-start gap-3 px-4 py-3.5 hover:bg-white cursor-pointer transition-colors group"
                 >
-                  <div className="p-1.5 bg-gray-100 rounded-lg group-hover:bg-orange-100 transition-colors mt-0.5">
-                    <Boxes className="w-4 h-4 text-gray-500 group-hover:text-orange-600 transition-colors" />
+                  <div className="p-1.5 bg-[#E8D1C5] rounded-lg group-hover:bg-[#E8D1C5] transition-colors mt-0.5">
+                    <Boxes className="w-4 h-4 text-white0 group-hover:text-[#37393B] transition-colors" />
                   </div>
                   <div className="flex flex-col flex-1 min-w-0">
-                    <span className="text-gray-800 font-medium group-hover:text-orange-600 transition-colors">
+                    <span className="text-[#17191B] font-medium group-hover:text-[#37393B] transition-colors">
                       {menu.nama}
                     </span>
-                    <span className="text-xs text-orange-600 mt-1 font-medium">
+                    <span className="text-xs text-[#37393B] mt-1 font-medium">
                       Paket Komposisi Chef
                     </span>
                   </div>
@@ -161,8 +161,8 @@ const SearchCard = ({
           query.length >= 2 &&
           !currentLoading &&
           suggestions.length === 0 && (
-            <div className="absolute z-10 w-full bg-white border border-slate-300 rounded-lg shadow-xl mt-1 p-4 text-center">
-              <p className="text-sm text-slate-500">
+            <div className="absolute z-10 w-full bg-white border border-[#D9C7B8] rounded-lg shadow-xl mt-1 p-4 text-center">
+              <p className="text-sm text-white0">
                 Tidak ada paket menu dengan nama <b>&quot;{query}&quot;</b>
               </p>
             </div>

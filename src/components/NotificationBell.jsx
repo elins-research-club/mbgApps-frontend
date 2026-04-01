@@ -41,7 +41,7 @@ const NotificationBell = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-100"
+        className="relative p-2 rounded-full text-white0 hover:text-[#17191B] hover:bg-[#E8D1C5]"
       >
         <BellIcon />
         {unreadCount > 0 && (
@@ -53,23 +53,23 @@ const NotificationBell = () => {
 
       {/* Dropdown Notifikasi */}
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-slate-100 z-50 overflow-hidden">
-          <div className="p-3 border-b border-slate-100">
-            <h3 className="text-lg font-bold text-orange-500">Notifikasi</h3>
+        <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-white z-50 overflow-hidden">
+          <div className="p-3 border-b border-white">
+            <h3 className="text-lg font-bold text-white0">Notifikasi</h3>
           </div>
           <div className="max-h-96 overflow-y-auto">
             {notifications.length > 0 ? (
               notifications.map((notif) => (
                 <div
                   key={notif.id}
-                  className="p-3 border-b border-slate-100 hover:bg-slate-50 last:border-b-0"
+                  className="p-3 border-b border-white hover:bg-white last:border-b-0"
                 >
-                  <p className="text-sm text-slate-700">{notif.text}</p>
-                  <p className="text-xs text-slate-400 mt-1">{notif.time}</p>
+                  <p className="text-sm text-[#37393B]">{notif.text}</p>
+                  <p className="text-xs text-[#C9A89A] mt-1">{notif.time}</p>
                 </div>
               ))
             ) : (
-              <p className="p-4 text-center text-sm text-slate-500">
+              <p className="p-4 text-center text-sm text-white0">
                 Tidak ada notifikasi baru.
               </p>
             )}

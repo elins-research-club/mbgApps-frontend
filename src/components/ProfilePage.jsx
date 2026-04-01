@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { createClient } from "@/lib/client";
 import { updateProfile, requestToJoinByCode } from "@/services/orgService";
 import MainNavbar from "./MainNavbar";
 import Footer from "./Footer";
@@ -29,6 +30,9 @@ export default function ProfilePage() {
   const [inviteCode, setInviteCode] = useState("");
   const [joining, setJoining]       = useState(false);
   const [joinMsg, setJoinMsg]       = useState(null);
+  
+  const [allMemberships, setAllMemberships] = useState([]);
+  const [loadingMemberships, setLoadingMemberships] = useState(false);
 
   // Pre-fill form from profile
   useEffect(() => {
@@ -38,6 +42,51 @@ export default function ProfilePage() {
       setBio(profile.bio || "");
     }
   }, [profile]);
+  
+  // Fetch all memberships for this user
+  useEffect(() => {
+    const fetchAllMemberships = async () => {
+      if (!user?.id) return;
+      
+      setLoadingMemberships(true);
+      try {
+        const supabase = createClient();
+        const { data: memberships, error } = await supabase
+          .from("Membership")
+          .select(`
+            id,
+            status,
+            role_id,
+            joined_at,
+            invite_method,
+            organization:Organizations (
+              id,
+              name,
+              description,
+              owner_id,
+              invite_code,
+              status
+            ),
+            role:Roles (
+              id,
+              name,
+              permissions
+            )
+          `)
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+        
+        if (error) throw error;
+        setAllMemberships(memberships || []);
+      } catch (err) {
+        console.error("Failed to fetch memberships:", err);
+      } finally {
+        setLoadingMemberships(false);
+      }
+    };
+    
+    fetchAllMemberships();
+  }, [user?.id]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -78,7 +127,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-white0 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -88,35 +137,35 @@ export default function ProfilePage() {
   const ownedOrganizations = (organizations || []).filter((o) => o?.owner_id === user?.id);
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
+    <div className="flex flex-col min-h-screen bg-white">
       <MainNavbar />
 
       <main className="flex-grow max-w-3xl w-full mx-auto px-4 py-10 space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Profil Saya</h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-[#17191B]">Profil Saya</h1>
+          <p className="text-white0 text-sm mt-1">
             Kelola informasi akun dan keanggotaan organisasi Anda
           </p>
         </div>
 
         {/* Profile form */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <section className="bg-white rounded-2xl shadow-sm border border-[#E8D1C5] p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
-              <User className="w-5 h-5 text-orange-600" />
+            <div className="w-10 h-10 rounded-xl bg-[#E8D1C5] flex items-center justify-center">
+              <User className="w-5 h-5 text-[#37393B]" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-slate-800">
+              <h2 className="text-base font-semibold text-[#17191B]">
                 Informasi Pribadi
               </h2>
-              <p className="text-xs text-slate-500">{user?.email}</p>
+              <p className="text-xs text-white0">{user?.email}</p>
             </div>
           </div>
 
           <form onSubmit={handleSave} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-[#37393B] mb-1">
                 Nama Lengkap
               </label>
               <input
@@ -124,11 +173,11 @@ export default function ProfilePage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Masukkan nama lengkap"
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400 text-sm"
+                className="w-full px-4 py-2.5 border border-[#D9C7B8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D9C7B8] focus:border-white0 text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-[#37393B] mb-1">
                 Nomor Telepon
               </label>
               <input
@@ -136,11 +185,11 @@ export default function ProfilePage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Contoh: 08123456789"
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400 text-sm"
+                className="w-full px-4 py-2.5 border border-[#D9C7B8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D9C7B8] focus:border-white0 text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-[#37393B] mb-1">
                 Bio
               </label>
               <textarea
@@ -148,7 +197,7 @@ export default function ProfilePage() {
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Ceritakan sedikit tentang Anda..."
                 rows={3}
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400 text-sm resize-none"
+                className="w-full px-4 py-2.5 border border-[#D9C7B8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D9C7B8] focus:border-white0 text-sm resize-none"
               />
             </div>
 
@@ -172,91 +221,131 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl text-sm transition disabled:opacity-60"
+              className="px-5 py-2.5 bg-white0 hover:bg-[#37393B] text-white font-semibold rounded-xl text-sm transition disabled:opacity-60"
             >
               {saving ? "Menyimpan..." : "Simpan Perubahan"}
             </button>
           </form>
         </section>
 
-        {/* Organization status */}
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        {/* Organization memberships */}
+        <section className="bg-white rounded-2xl shadow-sm border border-[#E8D1C5] p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 rounded-xl bg-[#452829] flex items-center justify-center">
+              <Building2 className="w-5 h-5 text-white" />
             </div>
-            <h2 className="text-base font-semibold text-slate-800">
-              Organisasi
-            </h2>
+            <div>
+              <h2 className="text-base font-semibold text-[#17191B]">
+                Keanggotaan Organisasi
+              </h2>
+              <p className="text-xs text-white0">
+                {loadingMemberships ? "Memuat..." : `${allMemberships.length} organisasi`}
+              </p>
+            </div>
           </div>
 
-          {org ? (
+          {loadingMemberships ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="w-6 h-6 border-2 border-[#C9A89A] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : allMemberships.length > 0 ? (
             <div className="space-y-3">
-              <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex-1">
-                  <p className="font-semibold text-slate-800">{org.name}</p>
-                  {org.description && (
-                    <p className="text-sm text-slate-500 mt-0.5">{org.description}</p>
-                  )}
-                </div>
-                <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                    memberStatus === "active"
-                      ? "bg-green-100 text-green-700"
-                      : memberStatus === "pending"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {memberStatus === "active" && (
-                    <CheckCircle className="w-3 h-3" />
-                  )}
-                  {memberStatus === "pending" && <Clock className="w-3 h-3" />}
-                  {memberStatus === "active"
-                    ? "Aktif"
-                    : memberStatus === "pending"
-                    ? "Menunggu"
-                    : "Ditolak"}
-                </span>
-              </div>
-              {orgMembership?.role && (
-                <div className="text-sm text-slate-600">
-                  <span className="font-medium">Peran: </span>
-                  {orgMembership.role.name}
-                </div>
-              )}
-
-              {ownedOrganizations.length > 1 && (
-                <div className="mt-4 border-t border-slate-100 pt-4">
-                  <p className="text-sm font-semibold text-slate-700 mb-2">
-                    Organisasi Yang Anda Miliki ({ownedOrganizations.length})
-                  </p>
-                  <div className="space-y-2">
-                    {ownedOrganizations.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-white"
-                      >
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-slate-800 truncate">{item.name}</p>
-                          <p className="text-xs text-slate-500 truncate">{item.id}</p>
-                        </div>
-                        <Link
-                          href={`/organization/${item.id}/dashboard`}
-                          className="ml-3 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition"
-                        >
-                          Dashboard
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
+              {allMemberships.map((membership) => {
+                const membershipOrg = membership.organization;
+                if (!membershipOrg) return null;
+                
+                const isOwner = membershipOrg.owner_id === user?.id;
+                
+                return (
+                  <div
+                    key={membership.id}
+                    className="flex items-start gap-3 p-4 bg-white rounded-xl border border-[#E8D1C5]"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-[#17191B]">{membershipOrg.name}</p>
+                        {isOwner && (
+                          <span className="px-2 py-0.5 bg-[#E8D1C5] text-[#452829] text-xs font-semibold rounded-full">
+                            Pemilik
+                          </span>
+                        )}
                       </div>
-                    ))}
+                      {membershipOrg.description && (
+                        <p className="text-sm text-white0 mt-0.5">{membershipOrg.description}</p>
+                      )}
+                      <p className="text-xs text-[#C9A89A] mt-1">
+                        Kode Undangan: <span className="font-mono font-semibold">{membershipOrg.invite_code}</span>
+                      </p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {/* Membership Status */}
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                            membership.status === "active"
+                              ? "bg-green-100 text-green-700"
+                              : membership.status === "pending"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : membership.status === "rejected"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {membership.status === "active" && <CheckCircle className="w-3 h-3" />}
+                          {membership.status === "pending" && <Clock className="w-3 h-3" />}
+                          {membership.status === "rejected" && <AlertCircle className="w-3 h-3" />}
+                          {membership.status === "active"
+                            ? "Anggota"
+                            : membership.status === "pending"
+                            ? "Menunggu"
+                            : membership.status === "rejected"
+                            ? "Ditolak"
+                            : "Nonaktif"}
+                        </span>
+                        
+                        {/* Organization Status */}
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                            membershipOrg.status === "active"
+                              ? "bg-green-100 text-green-700"
+                              : membershipOrg.status === "pending"
+                              ? "bg-blue-100 text-blue-700"
+                              : membershipOrg.status === "rejected"
+                              ? "bg-red-100 text-red-700"
+                              : membershipOrg.status === "suspended"
+                              ? "bg-orange-100 text-orange-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {membershipOrg.status === "active" && <CheckCircle className="w-3 h-3" />}
+                          {membershipOrg.status === "pending" && <Clock className="w-3 h-3" />}
+                          {membershipOrg.status === "rejected" && <AlertCircle className="w-3 h-3" />}
+                          {membershipOrg.status === "suspended" && <AlertCircle className="w-3 h-3" />}
+                          {membershipOrg.status === "active"
+                            ? "Aktif"
+                            : membershipOrg.status === "pending"
+                            ? "Pending"
+                            : membershipOrg.status === "rejected"
+                            ? "Ditolak"
+                            : membershipOrg.status === "suspended"
+                            ? "Disuspend"
+                            : "Nonaktif"}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <Link
+                      href={`/organization/${membershipOrg.id}/dashboard`}
+                      className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#17191B] hover:bg-[#37393B] text-white text-xs font-semibold transition"
+                    >
+                      Dashboard
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
                   </div>
-                </div>
-              )}
+                );
+              })}
             </div>
           ) : (
             <div className="space-y-4">
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-white0">
                 Anda belum bergabung dengan organisasi manapun. Buat organisasi
                 baru atau masukkan kode undangan untuk bergabung.
               </p>
@@ -264,7 +353,7 @@ export default function ProfilePage() {
               <div className="flex gap-3">
                 <Link
                   href="/organization/create"
-                  className="flex items-center gap-2 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold transition"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-[#452829] hover:bg-[#6C2D19] text-white rounded-xl text-sm font-semibold transition"
                 >
                   <Building2 className="w-4 h-4" />
                   Buat Organisasi
@@ -272,13 +361,13 @@ export default function ProfilePage() {
               </div>
 
               {/* Join by code */}
-              <div className="border-t border-slate-100 pt-4">
-                <p className="text-sm font-medium text-slate-700 mb-3">
+              <div className="border-t border-white pt-4">
+                <p className="text-sm font-medium text-[#37393B] mb-3">
                   Gabung dengan kode undangan
                 </p>
                 <form onSubmit={handleJoinByCode} className="flex gap-2">
                   <div className="relative flex-1">
-                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C9A89A]" />
                     <input
                       type="text"
                       value={inviteCode}
@@ -287,13 +376,13 @@ export default function ProfilePage() {
                       }
                       placeholder="Masukkan kode undangan"
                       maxLength={8}
-                      className="w-full pl-9 pr-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm"
+                      className="w-full pl-9 pr-4 py-2.5 border border-[#D9C7B8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D9C7B8] text-sm"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={joining || !inviteCode.trim()}
-                    className="flex items-center gap-1.5 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition disabled:opacity-60"
+                    className="flex items-center gap-1.5 px-4 py-2.5 bg-[#17191B] hover:bg-[#37393B] text-white rounded-xl text-sm font-semibold transition disabled:opacity-60"
                   >
                     {joining ? "..." : (
                       <>Gabung <ArrowRight className="w-3.5 h-3.5" /></>

@@ -42,17 +42,17 @@ const UserMenu = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-2 rounded-lg text-sm text-left text-slate-600 hover:bg-slate-100 transition-colors"
+        className="flex items-center gap-2 p-2 rounded-lg text-sm text-left text-[#452829] hover:bg-[#E8D1C5] transition-colors"
       >
-        <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-500">
+        <div className="w-8 h-8 rounded-full bg-[#E8D1C5] flex items-center justify-center text-white0">
           <UserIcon />
         </div>
         <div>
-          <div className="font-bold text-slate-800">{user.name}</div>
-          <div className="text-xs text-slate-500">{user.role}</div>
+          <div className="font-bold text-[#17191B]">{user.name}</div>
+          <div className="text-xs text-white0">{user.role}</div>
         </div>
         <ChevronDown
-          className={`w-4 h-4 text-slate-400 transition-transform ${
+          className={`w-4 h-4 text-[#C9A89A] transition-transform ${
             isOpen ? "rotate-180" : ""
           }`}
         />
@@ -60,10 +60,10 @@ const UserMenu = () => {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-lg shadow-xl border border-slate-100 z-50 overflow-hidden">
-          <div className="p-3 border-b border-slate-100">
-            <p className="text-sm font-semibold text-slate-800">{user.name}</p>
-            <p className="text-xs text-slate-500">{user.role}</p>
+        <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-lg shadow-xl border border-white z-50 overflow-hidden">
+          <div className="p-3 border-b border-white">
+            <p className="text-sm font-semibold text-[#17191B]">{user.name}</p>
+            <p className="text-xs text-white0">{user.role}</p>
           </div>
           <nav className="p-1">
             {/* --- 4. Tombol "Ganti Akun" DIHAPUS dari sini --- */}

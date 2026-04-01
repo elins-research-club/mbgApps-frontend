@@ -60,7 +60,7 @@ const TARGET_ID_MAP = {
   "SMA Kelas 3": 14,
 };
 
-export default function ChefDashboard({ canSave = false, canValidate = false }) {
+export default function ChefDashboard({ canSave = false, canValidate = false, isOrgActive = false }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [totalLabel, setTotalLabel] = useState(null);
@@ -427,7 +427,7 @@ export default function ChefDashboard({ canSave = false, canValidate = false }) 
         />
       )} */}
 
-      <main className="flex-grow bg-slate-50 w-full">
+      <main className="flex-grow bg-white w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* 🔹 ROW 1: Input (Kiri) & Total Gizi (Kanan) */}
           <div className="mb-8">
@@ -442,7 +442,7 @@ export default function ChefDashboard({ canSave = false, canValidate = false }) 
               </div>
 
               {/* ✅ TOGGLE BUTTON BARU: Switch Mode */}
-              <div className="bg-white w-full p-4 rounded-2xl shadow-lg border border-slate-200 mb-6">
+              <div className="bg-white w-full p-4 rounded-2xl shadow-lg border border-[#E8D1C5] mb-6">
                 <div className="flex gap-3">
                   {/* 🔸 Paket Menu Button */}
                   <button
@@ -452,18 +452,18 @@ export default function ChefDashboard({ canSave = false, canValidate = false }) 
                       clearResults();
                       setEditRecipeData(null);
                       setIsRecipeView(false);
-                    
+
                     }}
                     className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-200 border ${
                       !isRecipeView
-                        ? "bg-orange-400 text-white border-orange-400 shadow-md"
-                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                        ? "bg-[#452829] text-white border-[#452829] shadow-md"
+                        : "bg-white text-[#452829] border-[#E8D1C5] hover:bg-[#E8D1C5]"
                     }`}
                   >
                     <div className="flex items-center justify-center gap-2">
                       <LayoutList
                         className={`w-5 h-5 ${
-                          !isRecipeView ? "text-white" : "text-orange-400"
+                          !isRecipeView ? "text-white" : "text-[#57595B]"
                         }`}
                       />
                       <span>Hitung Nilai Gizi</span>
@@ -476,7 +476,7 @@ export default function ChefDashboard({ canSave = false, canValidate = false }) 
                   </button>
 
                   {/* 🔹 Resep Individual Button - Hidden from usual users */}
-                  {(canSave || canValidate) && (
+                  {(canSave || canValidate) && isOrgActive && (
                     <button
                       type="button"
                       onClick={() => {
@@ -487,14 +487,14 @@ export default function ChefDashboard({ canSave = false, canValidate = false }) 
                       }}
                       className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-200 border ${
                         isRecipeView
-                          ? "bg-orange-400 text-white border-orange-400 shadow-md"
-                          : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                          ? "bg-[#452829] text-white border-[#452829] shadow-md"
+                          : "bg-white text-[#452829] border-[#E8D1C5] hover:bg-[#E8D1C5]"
                       }`}
                     >
                       <div className="flex items-center justify-center gap-2">
                         <UtensilsCrossed
                           className={`w-5 h-5 ${
-                            isRecipeView ? "text-white" : "text-orange-400"
+                            isRecipeView ? "text-white" : "text-[#57595B]"
                           }`}
                         />
                         <span>Cari Menu</span>
@@ -509,7 +509,7 @@ export default function ChefDashboard({ canSave = false, canValidate = false }) 
                 </div>
               </div>
 
-              {isRecipeView && (canSave || canValidate) ? (
+              {isRecipeView && (canSave || canValidate) && isOrgActive ? (
                 <RecipeSearchCard
                   onRecipeSelect={handleRecipeSelect}
                   isLoading={isLoading}

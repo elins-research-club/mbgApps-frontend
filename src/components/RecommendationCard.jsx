@@ -175,11 +175,11 @@ const RecommendationCard = ({ data, totalLabel }) => {
 		});
 
 	return (
-		<div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
+		<div className="bg-white rounded-xl shadow-lg overflow-hidden border border-[#E8D1C5]">
 			{/* Header */}
-			<div className="border-b-2 border-orange-200 bg-gradient-to-r from-orange-50 to-white px-6 py-5">
+			<div className="border-b-2 border-[#E8D1C5] bg-gradient-to-r from-slate-50 to-white px-6 py-5">
 				<div className="flex items-start gap-3">
-					<div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+					<div className="w-10 h-10 bg-white0 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
 						<svg
 							className="w-6 h-6 text-white"
 							fill="none"
@@ -198,7 +198,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
 						<h3 className="text-xl font-bold text-[#202020]">
 							Analisis & Rekomendasi Nutrisi
 						</h3>
-						<p className="text-sm text-slate-600 mt-1">
+						<p className="text-sm text-[#452829] mt-1">
 							Evaluasi kecukupan gizi dan saran optimalisasi menu untuk berbagai
 							tingkat pendidikan
 						</p>
@@ -300,7 +300,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
               return (
                 <div
                   key={kelas}
-                  className='border-2 border-slate-200 rounded-xl p-4 cursor-pointer'
+                  className='border-2 border-[#E8D1C5] rounded-xl p-4 cursor-pointer'
                   onClick={() => toggleKelas(kelas)}
                 >
                   <div className='flex justify-between'>
@@ -308,7 +308,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
                       <h4 className='text-lg font-semibold text-[#202020]'>
                         {getClassName(Number(kelas))}
                       </h4>
-                      <p className='text-xs text-slate-500 mt-0.5'>
+                      <p className='text-xs text-white0 mt-0.5'>
                         {kekuranganCount > 0
                           ? `${kekuranganCount} kekurangan`
                           : 'Tidak ada kekurangan'}{' '}
@@ -322,7 +322,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
 										<div className="flex items-center gap-3">
 											<span
 												className={`text-lg font-bold ${
-													open ? "text-orange-600" : "text-slate-400"
+													open ? "text-[#37393B]" : "text-[#C9A89A]"
 												}`}
 											>
 												{open ? "Tutup" : "Lihat"}
@@ -331,8 +331,8 @@ const RecommendationCard = ({ data, totalLabel }) => {
 											<svg
 												className={`w-5 h-5 transform transition-transform duration-200 ${
 													open
-														? "rotate-180 text-orange-600"
-														: "rotate-0 text-slate-400"
+														? "rotate-180 text-[#37393B]"
+														: "rotate-0 text-[#C9A89A]"
 												}`}
 												viewBox="0 0 24 24"
 												fill="currentColor"
@@ -357,7 +357,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
 															<h5 className="font-bold text-red-600 mb-1">
 																Kekurangan Nutrisi
 															</h5>
-															<ul className="list-disc list-inside text-sm text-slate-700">
+															<ul className="list-disc list-inside text-sm text-[#37393B]">
 																{groupedKekurangan[kelas].map((item, idx) => (
 																	<li key={idx}>{item.nutrient}</li>
 																))}
@@ -372,7 +372,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
 															<h5 className="font-semibold text-green-600 mb-1">
 																Rekomendasi Menu
 															</h5>
-															<ul className="list-disc list-inside text-sm text-slate-700">
+															<ul className="list-disc list-inside text-sm text-[#37393B]">
 																{groupedSaran[kelas].map((item, idx) => (
 																	<li key={idx}>
 																		{item.nama} - {item.serving} gram
@@ -433,8 +433,8 @@ const RecommendationCard = ({ data, totalLabel }) => {
                                     if (active && payload && payload.length) {
                                       const data = payload[0].payload
                                       return (
-                                        <div className="bg-white p-3 border-2 border-slate-300 rounded-lg shadow-lg">
-                                          <p className="font-bold text-slate-800">{data.nutrient}</p>
+                                        <div className="bg-white p-3 border-2 border-[#D9C7B8] rounded-lg shadow-lg">
+                                          <p className="font-bold text-[#17191B]">{data.nutrient}</p>
                                           <p className="text-sm text-[#10B981]">
                                             Aktual: <span className="font-semibold">{data.actual.toFixed(2)} {data.unit}</span>
                                           </p>
@@ -487,16 +487,16 @@ const RecommendationCard = ({ data, totalLabel }) => {
                               <div className='mt-3 flex items-center gap-4 text-xs'>
                                 <div className='flex items-center gap-2'>
                                   <div className='w-4 h-4 bg-green-500 rounded'></div>
-                                  <span className='text-slate-600'>≥ 100% (Memenuhi target)</span>
+                                  <span className='text-[#452829]'>≥ 100% (Memenuhi target)</span>
                                 </div>
                                 <div className='flex items-center gap-2'>
                                   <div className='w-4 h-4 bg-red-500 rounded'></div>
-                                  <span className='text-slate-600'>&lt; 100% (Kurang dari target)</span>
+                                  <span className='text-[#452829]'>&lt; 100% (Kurang dari target)</span>
                                 </div>
                               </div>
                             )}
                             
-                            <p className='text-xs text-slate-500 mt-2'>
+                            <p className='text-xs text-white0 mt-2'>
                               Target menunjukkan 1/3 dari kebutuhan harian (untuk 1 kali makan).
                               {!showPercentage && ' Hover pada bar untuk melihat persentase pencapaian.'}
                             </p>
@@ -517,7 +517,7 @@ const RecommendationCard = ({ data, totalLabel }) => {
 																className="w-5 h-5 flex-shrink-0"
 																style={{ objectFit: "contain" }}
 															/>
-															<h2 className="text-xl sm:text-2xl font-bold text-orange-500 whitespace-nowrap">
+															<h2 className="text-xl sm:text-2xl font-bold text-white0 whitespace-nowrap">
 																Total Nilai Gizi
 															</h2>
 														</div>
@@ -553,9 +553,9 @@ const RecommendationCard = ({ data, totalLabel }) => {
 					</div>
 				) : (
 					<div className="text-center py-16">
-						<div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+						<div className="w-20 h-20 bg-[#E8D1C5] rounded-full flex items-center justify-center mx-auto mb-4">
 							<svg
-								className="w-10 h-10 text-slate-400"
+								className="w-10 h-10 text-[#C9A89A]"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -568,10 +568,10 @@ const RecommendationCard = ({ data, totalLabel }) => {
 								/>
 							</svg>
 						</div>
-						<h4 className="text-lg font-bold text-slate-600 mb-2">
+						<h4 className="text-lg font-bold text-[#452829] mb-2">
 							Belum Ada Data Rekomendasi
 						</h4>
-						<p className="text-sm text-slate-500">
+						<p className="text-sm text-white0">
 							Sistem akan menampilkan analisis setelah komposisi menu diproses
 						</p>
 					</div>

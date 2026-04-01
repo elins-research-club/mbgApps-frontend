@@ -227,10 +227,10 @@ export default function MealDetails () {
     return (
       <div className='flex flex-col min-h-screen'>
         <MainNavbar />
-        <div className='flex-grow bg-gray-50 flex items-center justify-center'>
+        <div className='flex-grow bg-white flex items-center justify-center'>
           <div className='text-center'>
             <svg
-              className='w-20 h-20 mx-auto text-gray-400 mb-4'
+              className='w-20 h-20 mx-auto text-[#C9A89A] mb-4'
               fill='none'
               stroke='currentColor'
               viewBox='0 0 24 24'
@@ -242,15 +242,15 @@ export default function MealDetails () {
                 d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
               />
             </svg>
-            <h2 className='text-2xl font-bold text-gray-800 mb-2'>
+            <h2 className='text-2xl font-bold text-[#17191B] mb-2'>
               Tidak Ada Menu
             </h2>
-            <p className='text-gray-600 mb-6'>
+            <p className='text-[#452829] mb-6'>
               Silakan tambahkan menu di Meal Planner terlebih dahulu
             </p>
             <button
               onClick={() => router.push('/meal-planner')}
-              className='px-6 py-3 bg-orange-400 hover:bg-orange-500 text-white rounded-lg transition-colors'
+              className='px-6 py-3 bg-white0 hover:bg-white0 text-white rounded-lg transition-colors'
             >
               ← Kembali ke Set Menu
             </button>
@@ -264,15 +264,15 @@ export default function MealDetails () {
     <div className='flex flex-col min-h-screen'>
       <MainNavbar />
 
-      <div className='flex-grow bg-gray-50'>
-        <div className='bg-white shadow-sm border-b border-gray-200 mb-6'>
+      <div className='flex-grow bg-white'>
+        <div className='bg-white shadow-sm border-b border-[#E8D1C5] mb-6'>
           <div className='max-w-7xl mx-auto px-4 py-4'>
             <div className='flex items-center justify-between mb-3'>
               <div>
-                <h1 className='text-2xl font-bold text-gray-800'>
+                <h1 className='text-2xl font-bold text-[#17191B]'>
                   Detail Rencana Makan
                 </h1>
-                <p className='text-sm text-gray-600 mt-1'>
+                <p className='text-sm text-[#452829] mt-1'>
                   Bahan-bahan dan informasi nutrisi untuk setiap menu
                 </p>
               </div>
@@ -280,7 +280,7 @@ export default function MealDetails () {
                 <button
                   onClick={handleSaveMealPlan}
                   disabled={isSaving}
-                  className='px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white rounded-lg transition-colors flex items-center gap-2'
+                  className='px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-[#AA7F7F] text-white rounded-lg transition-colors flex items-center gap-2'
                 >
                   {isSaving ? (
                     <>
@@ -326,7 +326,7 @@ export default function MealDetails () {
                 </button>
                 <button
                   onClick={() => router.push('/meal-planner')}
-                  className='px-4 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-lg transition-colors'
+                  className='px-4 py-2 bg-white0 hover:bg-white0 text-white rounded-lg transition-colors'
                 >
                   ← Kembali ke Set Menu
                 </button>
@@ -334,15 +334,15 @@ export default function MealDetails () {
             </div>
             
             {/* Plan Name Display */}
-            <div className='mt-4 pt-4 border-t border-gray-200'>
+            <div className='mt-4 pt-4 border-t border-[#E8D1C5]'>
               <div className='flex items-center gap-3'>
-                <label className='text-sm font-semibold text-gray-700 flex items-center gap-2'>
-                  <svg className='w-5 h-5 text-orange-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <label className='text-sm font-semibold text-[#37393B] flex items-center gap-2'>
+                  <svg className='w-5 h-5 text-white0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' />
                   </svg>
                   Nama Meal Plan:
                 </label>
-                <span className='text-sm font-medium text-gray-800 bg-orange-50 px-4 py-2 rounded-lg border border-orange-200'>
+                <span className='text-sm font-medium text-[#17191B] bg-white px-4 py-2 rounded-lg border border-[#E8D1C5]'>
                   {planName || 'Belum ada nama (akan dibuat otomatis saat disimpan)'}
                 </span>
               </div>
@@ -355,25 +355,25 @@ export default function MealDetails () {
             {/* Ingredients List - Takes 2 columns */}
             <div className='lg:col-span-2'>
               <div className='bg-white rounded-lg shadow-md p-6'>
-                <h2 className='text-xl font-bold text-gray-800 mb-6'>
+                <h2 className='text-xl font-bold text-[#17191B] mb-6'>
                   Bahan-Bahan Menu
                 </h2>
                 <div className='space-y-6'>
                   {plateRecipes.map((recipe, index) => (
                     <div
                       key={recipe.id}
-                      className='border-b border-gray-200 pb-6 last:border-b-0 last:pb-0'
+                      className='border-b border-[#E8D1C5] pb-6 last:border-b-0 last:pb-0'
                     >
                       <div className='flex items-start justify-between mb-3'>
                         <div className='flex-1'>
-                          <h3 className='text-lg font-bold text-gray-800'>
+                          <h3 className='text-lg font-bold text-[#17191B]'>
                             {index + 1}. {recipe.nama}
                           </h3>
                           <div className='flex items-center gap-3 mt-1'>
-                            <span className='text-sm text-gray-600'>
+                            <span className='text-sm text-[#452829]'>
                               {recipe.kategori || 'Menu'}
                             </span>
-                            <span className='text-sm font-semibold text-orange-600'>
+                            <span className='text-sm font-semibold text-[#37393B]'>
                               {typeof recipe.quantity === 'number'
                                 ? recipe.quantity.toFixed(1)
                                 : recipe.quantity}
@@ -381,8 +381,8 @@ export default function MealDetails () {
                             </span>
                           </div>
                         </div>
-                        <div className='bg-orange-50 px-3 py-1 rounded-lg'>
-                          <p className='text-sm font-semibold text-orange-700'>
+                        <div className='bg-white px-3 py-1 rounded-lg'>
+                          <p className='text-sm font-semibold text-[#17191B]'>
                             {(
                               (recipe.total_gramasi || 0) *
                               (parseFloat(recipe.quantity) || 1)
@@ -393,8 +393,8 @@ export default function MealDetails () {
                       </div>
 
                       {/* Ingredients List */}
-                      <div className='bg-gray-50 rounded-lg p-4 mt-3'>
-                        <h4 className='text-sm font-semibold text-gray-700 mb-3'>
+                      <div className='bg-white rounded-lg p-4 mt-3'>
+                        <h4 className='text-sm font-semibold text-[#37393B] mb-3'>
                           Bahan:
                         </h4>
                         {(() => {
@@ -408,7 +408,7 @@ export default function MealDetails () {
 
                           if (!ingredients) {
                             return (
-                              <p className='text-sm text-gray-500 italic'>
+                              <p className='text-sm text-white0 italic'>
                                 Tidak ada data bahan
                               </p>
                             )
@@ -423,17 +423,17 @@ export default function MealDetails () {
                               <ul className='space-y-2'>
                                 {ingredients.map((ingredient, idx) => (
                                   <li key={idx} className='flex items-start'>
-                                    <span className='text-orange-500 mr-2'>
+                                    <span className='text-white0 mr-2'>
                                       •
                                     </span>
-                                    <span className='text-sm text-gray-700'>
+                                    <span className='text-sm text-[#37393B]'>
                                       <span className='font-medium'>
                                         {ingredient.nama ||
                                           ingredient.name ||
                                           'Bahan'}
                                       </span>
                                       {ingredient.gramasi && (
-                                        <span className='text-gray-600'>
+                                        <span className='text-[#452829]'>
                                           {' '}
                                           -{' '}
                                           {(
@@ -451,7 +451,7 @@ export default function MealDetails () {
                           }
 
                           return (
-                            <p className='text-sm text-gray-500 italic'>
+                            <p className='text-sm text-white0 italic'>
                               Tidak ada data bahan (format tidak valid)
                             </p>
                           )
@@ -467,7 +467,7 @@ export default function MealDetails () {
             <div className='lg:col-span-1'>
               <div className='bg-white rounded-lg shadow-md p-6 sticky top-6'>
                 <div className='flex items-center justify-between mb-4'>
-                  <h3 className='text-lg font-bold text-orange-500'>
+                  <h3 className='text-lg font-bold text-white0'>
                     Total Nilai Gizi
                   </h3>
                 </div>
@@ -478,7 +478,7 @@ export default function MealDetails () {
                     setTargetClass(newClass)
                     localStorage.setItem('targetClass', newClass.toString())
                   }}
-                  className='w-full mb-4 px-4 py-2 border border-orange-300 bg-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm font-medium'
+                  className='w-full mb-4 px-4 py-2 border border-[#D9C7B8] bg-white rounded-lg focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-transparent text-sm font-medium'
                 >
                   <option value={1}>TK A</option>
                   <option value={2}>TK B</option>
@@ -515,7 +515,7 @@ export default function MealDetails () {
           <div className='bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative'>
             <button
               onClick={() => setShowQRModal(false)}
-              className='absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors'
+              className='absolute top-4 right-4 text-[#C9A89A] hover:text-[#452829] transition-colors'
             >
               <svg
                 className='w-6 h-6'
@@ -549,16 +549,16 @@ export default function MealDetails () {
                     />
                   </svg>
                 </div>
-                <h2 className='text-2xl font-bold text-gray-800 mb-2'>
+                <h2 className='text-2xl font-bold text-[#17191B] mb-2'>
                   Meal Plan Tersimpan!
                 </h2>
-                <p className='text-gray-600 mb-6'>
+                <p className='text-[#452829] mb-6'>
                   Scan QR code untuk mengakses meal plan ini kapan saja
                 </p>
               </div>
 
               {qrCodeUrl && (
-                <div className='bg-gray-50 rounded-xl p-6 mb-6'>
+                <div className='bg-white rounded-xl p-6 mb-6'>
                   <img
                     src={qrCodeUrl}
                     alt='QR Code'
@@ -570,7 +570,7 @@ export default function MealDetails () {
               <div className='flex gap-3'>
                 <button
                   onClick={downloadQRCode}
-                  className='flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2'
+                  className='flex-1 px-4 py-3 bg-white0 hover:bg-[#37393B] text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2'
                 >
                   <svg
                     className='w-5 h-5'
@@ -589,7 +589,7 @@ export default function MealDetails () {
                 </button>
                 <button
                   onClick={() => setShowQRModal(false)}
-                  className='flex-1 px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors font-medium'
+                  className='flex-1 px-4 py-3 bg-[#D9C7B8] hover:bg-[#C9A89A] text-[#37393B] rounded-lg transition-colors font-medium'
                 >
                   Tutup
                 </button>

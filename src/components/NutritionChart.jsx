@@ -123,8 +123,8 @@ export default function NutritionChart({ nutrients, targetClass }) {
                 const isOptimal = data.actual >= data.target;
                 
                 return (
-                  <div className="bg-white p-3 border-2 border-slate-300 rounded-lg shadow-lg">
-                    <p className="font-bold text-slate-800">{data.nutrient}</p>
+                  <div className="bg-white p-3 border-2 border-[#D9C7B8] rounded-lg shadow-lg">
+                    <p className="font-bold text-[#17191B]">{data.nutrient}</p>
                     <p className="text-sm text-[#10B981]">
                       Aktual: <span className="font-semibold">{data.actual.toFixed(2)} {data.unit}</span>
                     </p>
@@ -225,22 +225,22 @@ export default function NutritionChart({ nutrients, targetClass }) {
       <div className="mt-4 flex justify-center gap-6 text-sm flex-wrap">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-[#10B981] rounded"></div>
-          <span className="text-slate-600">Tercapai (≥100% target)</span>
+          <span className="text-[#452829]">Tercapai (≥100% target)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-[#EF4444] rounded"></div>
-          <span className="text-slate-600">Kurang (&lt;100%)</span>
+          <span className="text-[#452829]">Kurang (&lt;100%)</span>
         </div>
         {!showPercentage && (
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-[#F59E0B] rounded"></div>
-            <span className="text-slate-600">Target ({(multiplier * 100).toFixed(1)}% AKG)</span>
+            <span className="text-[#452829]">Target ({(multiplier * 100).toFixed(1)}% AKG)</span>
           </div>
         )}
         {hasExceededThreshold && (
           <div className="flex items-center gap-2">
             <div className="w-8 h-0.5 bg-[#DC2626] border-dashed" style={{ borderTop: '2px dashed #DC2626' }}></div>
-            <span className="text-slate-600">
+            <span className="text-[#452829]">
               {showPercentage ? 'Batas Berlebih (105%)' : 'Batas Berlebih (Target +5%)'}
             </span>
           </div>

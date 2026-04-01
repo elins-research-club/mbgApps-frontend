@@ -236,7 +236,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
 
     const badge = badges[kategori] || {
       emoji: "📦",
-      color: "bg-gray-100 text-gray-700",
+      color: "bg-[#E8D1C5] text-[#37393B]",
       label: kategori,
     };
 
@@ -250,10 +250,10 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="relative bg-orange-500 px-8 py-6">
+        <div className="relative bg-white0 px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
@@ -263,7 +263,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
                 <h2 className="text-2xl font-bold text-white">
                   Buat Paket Komposisi
                 </h2>
-                <p className="text-orange-50 text-sm mt-0.5">
+                <p className="text-white text-sm mt-0.5">
                   Kelompokkan resep menjadi satu paket menu
                 </p>
               </div>
@@ -285,7 +285,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
           <div className="space-y-6">
             {/* Nama Menu */}
             <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+              <label className="flex items-center gap-2 text-sm font-semibold text-[#37393B]">
                 Nama Paket Kelompokan
                 <span className="text-red-500">*</span>
               </label>
@@ -294,8 +294,8 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
                 value={namaMenu}
                 onChange={(e) => setNamaMenu(e.target.value)}
                 placeholder="Contoh: Paket Sehat Senin"
-                className="w-full px-4 py-3 border border-orange-200 rounded-xl
-                         focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                className="w-full px-4 py-3 border border-[#E8D1C5] rounded-xl
+                         focus:outline-none focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-transparent
                          disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 disabled={isLoading}
               />
@@ -304,10 +304,10 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
             {/* Divider */}
             <div className="relative py-2">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-orange-200"></div>
+                <div className="w-full border-t border-[#E8D1C5]"></div>
               </div>
               <div className="relative flex justify-center">
-                <span className="px-4 text-sm font-medium text-slate-500 bg-white">
+                <span className="px-4 text-sm font-medium text-white0 bg-white">
                   Menu dalam Paket (
                   {recipes.filter((r) => r.status === "found").length})
                 </span>
@@ -319,13 +319,13 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
               {recipes.map((recipe, index) => (
                 <div
                   key={recipe.id}
-                  className="relative p-4 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 
-                           border border-orange-200 hover:shadow-md transition-all"
+                  className="relative p-4 rounded-xl bg-[#E8D1C5] 
+                           border border-[#E8D1C5] hover:shadow-md transition-all"
                 >
                   <div className="flex items-start gap-3">
                     {/* Number Badge */}
                     <div
-                      className="flex-shrink-0 w-8 h-8 bg-orange-500 text-white rounded-lg 
+                      className="flex-shrink-0 w-8 h-8 bg-white0 text-white rounded-lg 
                                   flex items-center justify-center font-semibold text-sm"
                     >
                       {index + 1}
@@ -353,8 +353,8 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
                           }, 200);
                         }}
                         placeholder={`Cari menu ${index + 1}...`}
-                        className="w-full px-3 py-2 border border-orange-300 rounded-lg 
-                                 focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+                        className="w-full px-3 py-2 border border-[#D9C7B8] rounded-lg 
+                                 focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-transparent 
                                  outline-none transition text-sm"
                       />
 
@@ -362,7 +362,7 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
                       {focusedRecipeId === recipe.id &&
                         suggestions.length > 0 && (
                           <div
-                            className="absolute z-30 left-14 right-14 bg-white border border-slate-300 
+                            className="absolute z-30 left-14 right-14 bg-white border border-[#D9C7B8] 
                                       rounded-lg shadow-xl max-h-48 overflow-y-auto mt-1"
                           >
                             {suggestions.map((suggestion, idx) => (
@@ -376,8 +376,8 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
                                        flex items-center justify-between gap-2
                                        ${
                                          selectedSuggestionIndex === idx
-                                           ? "bg-orange-50 text-orange-700"
-                                           : "hover:bg-slate-50"
+                                           ? "bg-white text-[#17191B]"
+                                           : "hover:bg-white"
                                        }`}
                               >
                                 <span className="font-medium">
@@ -422,8 +422,8 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
               type="button"
               onClick={handleAddRecipe}
               className="w-full flex items-center justify-center gap-2 py-3 
-                       border-2 border-dashed border-orange-300 rounded-xl 
-                       text-orange-600 hover:bg-orange-50 hover:border-orange-400 
+                       border-2 border-dashed border-[#D9C7B8] rounded-xl 
+                       text-[#37393B] hover:bg-white hover:border-white0 
                        transition font-medium"
             >
               <Plus className="w-5 h-5" />
@@ -442,13 +442,13 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
           </div>
 
           {/* Footer */}
-          <div className="pt-6 border-t border-orange-200 mt-6 flex gap-3">
+          <div className="pt-6 border-t border-[#E8D1C5] mt-6 flex gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="flex-1 px-6 py-3 bg-white border border-orange-300 text-slate-700 
-                       font-semibold rounded-xl hover:bg-orange-50 disabled:opacity-50 
+              className="flex-1 px-6 py-3 bg-white border border-[#D9C7B8] text-[#37393B] 
+                       font-semibold rounded-xl hover:bg-white disabled:opacity-50 
                        disabled:cursor-not-allowed transition-colors"
             >
               Batal
@@ -456,9 +456,9 @@ const NewMenuModal = ({ onClose, onSubmit, isLoading, error }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 px-6 py-3 bg-orange-500 text-white font-semibold rounded-xl
-                       hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed
-                       transition-all shadow-lg shadow-orange-500/30 flex items-center 
+              className="flex-1 px-6 py-3 bg-white0 text-white font-semibold rounded-xl
+                       hover:bg-[#37393B] disabled:opacity-50 disabled:cursor-not-allowed
+                       transition-all shadow-lg shadow-slate-500/30 flex items-center 
                        justify-center gap-2"
             >
               {isLoading ? (

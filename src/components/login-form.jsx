@@ -23,22 +23,62 @@ export function LoginForm({ className, ...props }) {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { authChecked } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      console.log('🔐 [LOGIN] Signing in via backend API...');
+      
+      // Use backend API to sign in
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/sign-in`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       });
-      if (error) throw error;
-      router.push("/");
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error('Invalid credentials');
+      }
+
+      console.log('✅ [LOGIN] Sign in successful');
+      console.log('📋 User data:', data.user);
+      console.log('🏢 Organization:', data.organization);
+
+      // Set session in Supabase
+      const supabase = createClient();
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: data.accessToken,
+        refresh_token: data.refreshToken,
+      });
+
+      if (sessionError) throw new Error('Invalid credentials');
+
+      console.log('✅ [LOGIN] Session set');
+
+      // Check if super admin
+      if (data.user.profile?.is_super_admin) {
+        console.log('👑 [LOGIN] Super admin detected');
+        router.push('/admin/dashboard');
+        return;
+      }
+
+      // Always redirect to home - org status checked in app
+      console.log('✅ [LOGIN] Login successful, redirecting to home');
+      router.push('/');
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      console.error('❌ [LOGIN] Error:', error);
+      setError('Invalid credentials');
     } finally {
       setIsLoading(false);
     }
@@ -97,6 +137,14 @@ export function LoginForm({ className, ...props }) {
                 className="underline underline-offset-4"
               >
                 Sign up
+              </Link>
+            </div>
+            <div className="mt-2 text-center text-xs">
+              <Link
+                href="/admin/login"
+                className="text-[#452829] hover:text-black hover:underline underline-offset-4 font-medium"
+              >
+                Admin Login
               </Link>
             </div>
           </form>

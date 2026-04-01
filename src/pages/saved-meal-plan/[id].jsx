@@ -88,10 +88,10 @@ export default function SavedMealPlan() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Memuat meal plan...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white0 mx-auto mb-4"></div>
+          <p className="text-[#452829] text-lg">Memuat meal plan...</p>
         </div>
       </div>
     );
@@ -99,13 +99,13 @@ export default function SavedMealPlan() {
 
   if (error || !mealPlan) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <svg className="w-20 h-20 mx-auto text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Meal Plan Tidak Ditemukan</h2>
-          <p className="text-gray-600 mb-6">{error || 'Meal plan tidak tersedia atau telah dihapus.'}</p>
+          <h2 className="text-2xl font-bold text-[#17191B] mb-2">Meal Plan Tidak Ditemukan</h2>
+          <p className="text-[#452829] mb-6">{error || 'Meal plan tidak tersedia atau telah dihapus.'}</p>
         </div>
       </div>
     );
@@ -115,19 +115,19 @@ export default function SavedMealPlan() {
   const targetClass = mealPlan.targetClass || 6;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-orange-100 sticky top-0 z-10">
+      <div className="bg-white shadow-sm border-b border-white sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="bg-orange-100 p-2 rounded-lg">
-              <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-[#E8D1C5] p-2 rounded-lg">
+              <svg className="w-6 h-6 text-[#37393B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <div className="flex-1">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Rencana Makan</h1>
-              <p className="text-xs sm:text-sm text-gray-600">{classNames[targetClass]}</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-[#17191B]">Rencana Makan</h1>
+              <p className="text-xs sm:text-sm text-[#452829]">{classNames[targetClass]}</p>
             </div>
           </div>
         </div>
@@ -137,7 +137,7 @@ export default function SavedMealPlan() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
         {/* Nutrition Summary Card */}
         <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
-          <h2 className="text-lg sm:text-xl font-bold text-orange-600 mb-4 flex items-center gap-2">
+          <h2 className="text-lg sm:text-xl font-bold text-[#37393B] mb-4 flex items-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
@@ -158,8 +158,8 @@ export default function SavedMealPlan() {
 
         {/* Recipes List */}
         <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <h2 className="text-lg sm:text-xl font-bold text-[#17191B] mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-[#37393B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             Menu & Bahan-Bahan
@@ -167,23 +167,23 @@ export default function SavedMealPlan() {
           
           <div className="space-y-4">
             {mealPlan.recipes.map((recipe, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4 hover:border-orange-300 transition-colors">
+              <div key={index} className="border border-[#E8D1C5] rounded-lg p-4 hover:border-[#D9C7B8] transition-colors">
                 <div className="flex items-start justify-between mb-3 flex-wrap gap-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg font-bold text-gray-800 break-words">
+                    <h3 className="text-base sm:text-lg font-bold text-[#17191B] break-words">
                       {index + 1}. {recipe.nama}
                     </h3>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
-                      <span className="text-xs sm:text-sm px-2 py-1 bg-orange-100 text-orange-700 rounded-full">
+                      <span className="text-xs sm:text-sm px-2 py-1 bg-[#E8D1C5] text-[#17191B] rounded-full">
                         {recipe.kategori || 'Menu'}
                       </span>
-                      <span className="text-xs sm:text-sm font-semibold text-orange-600">
+                      <span className="text-xs sm:text-sm font-semibold text-[#37393B]">
                         {typeof recipe.quantity === 'number' ? recipe.quantity.toFixed(1) : recipe.quantity}× porsi
                       </span>
                     </div>
                   </div>
-                  <div className="bg-orange-50 px-3 py-1 rounded-lg">
-                    <p className="text-sm font-semibold text-orange-700 whitespace-nowrap">
+                  <div className="bg-white px-3 py-1 rounded-lg">
+                    <p className="text-sm font-semibold text-[#17191B] whitespace-nowrap">
                       {((recipe.total_gramasi || 0) * (parseFloat(recipe.quantity) || 1)).toFixed(0)}g
                     </p>
                   </div>
@@ -191,16 +191,16 @@ export default function SavedMealPlan() {
                 
                 {/* Ingredients */}
                 {recipe.rincian_bahan && Array.isArray(recipe.rincian_bahan) && recipe.rincian_bahan.length > 0 && (
-                  <div className="bg-gray-50 rounded-lg p-3 sm:p-4 mt-3">
-                    <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Bahan:</h4>
+                  <div className="bg-white rounded-lg p-3 sm:p-4 mt-3">
+                    <h4 className="text-xs sm:text-sm font-semibold text-[#37393B] mb-2">Bahan:</h4>
                     <ul className="space-y-1.5">
                       {recipe.rincian_bahan.map((ingredient, idx) => (
                         <li key={idx} className="flex items-start text-xs sm:text-sm">
-                          <span className="text-orange-500 mr-2 mt-0.5">•</span>
-                          <span className="text-gray-700 flex-1 break-words">
+                          <span className="text-white0 mr-2 mt-0.5">•</span>
+                          <span className="text-[#37393B] flex-1 break-words">
                             <span className="font-medium">{ingredient.nama || 'Bahan'}</span>
                             {ingredient.gramasi && (
-                              <span className="text-gray-600">
+                              <span className="text-[#452829]">
                                 {' '}- {(parseFloat(ingredient.gramasi) * (parseFloat(recipe.quantity) || 1)).toFixed(1)} g
                               </span>
                             )}
@@ -216,8 +216,8 @@ export default function SavedMealPlan() {
         </div>
 
         {/* Footer Info */}
-        <div className="bg-orange-50 rounded-xl p-4 sm:p-6 text-center border border-orange-100">
-          <p className="text-xs sm:text-sm text-gray-600 mb-2">
+        <div className="bg-white rounded-xl p-4 sm:p-6 text-center border border-white">
+          <p className="text-xs sm:text-sm text-[#452829] mb-2">
             Meal plan dibuat pada {new Date(mealPlan.createdAt).toLocaleDateString('id-ID', { 
               year: 'numeric', 
               month: 'long', 
@@ -226,7 +226,7 @@ export default function SavedMealPlan() {
               minute: '2-digit'
             })}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-white0">
             Powered by MBG Apps
           </p>
         </div>

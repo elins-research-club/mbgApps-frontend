@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { createOrganization, createSubOrganization } from "@/services/orgService";
 import MainNavbar from "./MainNavbar";
 import Footer from "./Footer";
-import { Building2, ArrowRight, Info } from "lucide-react";
+import { Building2, ArrowRight, Info, CheckCircle, AlertCircle } from "lucide-react";
 
 const MAX_ORG_DEPTH = 2;
 
@@ -27,6 +27,7 @@ export default function CreateOrganization() {
   const [description, setDescription] = useState("");
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState(null);
+  const [successOrg, setSuccessOrg]   = useState(null);
 
   const parentId = toStringQueryValue(router.query?.parentId).trim();
   const parentName = toStringQueryValue(router.query?.parentName).trim();
@@ -52,8 +53,13 @@ export default function CreateOrganization() {
 
       const orgId = org?.id || org?.organization?.id || org?.data?.id;
       if (!orgId) throw new Error("Organisasi berhasil dibuat, tapi ID organisasi tidak ditemukan");
+      
+      // Store success org info for display
+      setSuccessOrg(org);
       await refresh();
-      router.push(`/organization/${orgId}/dashboard`);
+      
+      // Don't redirect immediately - let user see the success message
+      // They can click to go to dashboard or continue browsing
     } catch (err) {
       setError(err.message || "Gagal membuat organisasi");
       setLoading(false);
@@ -61,20 +67,20 @@ export default function CreateOrganization() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
+    <div className="flex flex-col min-h-screen bg-white">
       <MainNavbar />
 
       <main className="flex-grow flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-lg">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-orange-600" />
+            <div className="w-12 h-12 rounded-2xl bg-[#E8D1C5] flex items-center justify-center">
+              <Building2 className="w-6 h-6 text-[#37393B]" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-800">
+              <h1 className="text-2xl font-bold text-[#17191B]">
                 {isSubOrgMode ? "Buat Sub-Organisasi" : "Buat Organisasi"}
               </h1>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-white0">
                 {isSubOrgMode
                   ? "Buat unit turunan di dalam organisasi saat ini"
                   : "Kelola tim dan akses anggota dalam satu tempat"}
@@ -82,7 +88,60 @@ export default function CreateOrganization() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          {/* Success Message */}
+          {successOrg && (
+            <div className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-5">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-green-800 mb-2">
+                    {successOrg.status === 'pending' 
+                      ? "Organisasi Berhasil Dibuat!" 
+                      : "Organisasi Berhasil Dibuat!"}
+                  </h3>
+                  {successOrg.status === 'pending' ? (
+                    <div className="space-y-2 text-sm text-green-700">
+                      <p>
+                        <strong>{successOrg.name}</strong> telah berhasil dibuat.
+                      </p>
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-2">
+                        <p className="font-medium text-amber-800 mb-1">Menunggu Persetujuan Admin</p>
+                        <p className="text-xs text-amber-700">
+                          Organisasi Anda sedang menunggu persetujuan dari administrator. 
+                          Anda akan menerima notifikasi setelah organisasi disetujui.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-green-700">
+                      <strong>{successOrg.name}</strong> telah berhasil dibuat dan siap digunakan.
+                    </p>
+                  )}
+                  <div className="mt-4 flex gap-2">
+                    <button
+                      onClick={() => router.push(`/organization/${successOrg.id}/dashboard`)}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <Building2 className="w-4 h-4" />
+                      Lihat Dashboard
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSuccessOrg(null);
+                        setName("");
+                        setDescription("");
+                      }}
+                      className="px-4 py-2 bg-white hover:bg-green-50 text-green-700 border border-green-300 text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Buat Organisasi Lain
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-white rounded-2xl shadow-sm border border-[#E8D1C5] p-6">
             <form onSubmit={handleSubmit} className="space-y-5">
               {isSubOrgMode && (
                 <div className="flex items-start gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
@@ -95,7 +154,7 @@ export default function CreateOrganization() {
               )}
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-[#37393B] mb-1.5">
                   Nama {isSubOrgMode ? "Sub-Organisasi" : "Organisasi"} <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -108,21 +167,21 @@ export default function CreateOrganization() {
                       : "Contoh: SD Negeri Maju Bersama"
                   }
                   required
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400 text-sm"
+                  className="w-full px-4 py-3 border border-[#D9C7B8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D9C7B8] focus:border-white0 text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                <label className="block text-sm font-semibold text-[#37393B] mb-1.5">
                   Deskripsi
-                  <span className="text-slate-400 font-normal ml-1">(opsional)</span>
+                  <span className="text-[#C9A89A] font-normal ml-1">(opsional)</span>
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Jelaskan tujuan atau kegiatan organisasi Anda..."
                   rows={3}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-400 text-sm resize-none"
+                  className="w-full px-4 py-3 border border-[#D9C7B8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D9C7B8] focus:border-white0 text-sm resize-none"
                 />
               </div>
 
@@ -130,9 +189,9 @@ export default function CreateOrganization() {
               <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700">
                 <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <span>
-                  Setelah membuat {isSubOrgMode ? "sub-organisasi" : "organisasi"}, kode undangan akan dibuat secara
-                  otomatis. Anggota dapat bergabung menggunakan kode tersebut,
-                  lalu menunggu persetujuan pemilik organisasi.
+                  Setelah membuat {isSubOrgMode ? "sub-organisasi" : "organisasi"}, 
+                  <strong> organisasi akan menunggu persetujuan dari administrator</strong>. 
+                  Setelah disetujui, Anda dapat mengundang anggota menggunakan kode undangan yang tersedia.
                 </span>
               </div>
 
@@ -147,14 +206,14 @@ export default function CreateOrganization() {
                   type="button"
                   onClick={() => router.back()}
                   disabled={loading}
-                  className="px-5 py-2.5 text-slate-700 font-semibold rounded-xl hover:bg-slate-100 transition text-sm disabled:opacity-60"
+                  className="px-5 py-2.5 bg-[#452829] hover:bg-[#6C2D19] text-white font-semibold rounded-xl text-sm transition disabled:opacity-60"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={loading || !name.trim() || depthLimitReached}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl text-sm transition disabled:opacity-60 shadow-sm"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-[#452829] hover:bg-[#6C2D19] text-white font-semibold rounded-xl text-sm transition disabled:opacity-60 shadow-sm"
                 >
                   {loading ? (
                     <span className="flex items-center gap-2">

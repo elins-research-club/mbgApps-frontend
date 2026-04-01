@@ -18,12 +18,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+    <div className="flex items-center justify-center min-h-screen bg-[#E8D1C5] px-4">
       <div className="w-full max-w-md">
         {/* Main Card */}
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-xl border border-[#E8D1C5] overflow-hidden">
           {/* Header */}
-          <div className="bg-orange-400 px-6 sm:px-8 pt-8 pb-8">
+          <div className="bg-white0 px-6 sm:px-8 pt-8 pb-8">
             <div className="flex items-center gap-3 mb-3">
               <h2 className="text-base sm:text-sm font-semibold text-white/90">
                 MBG Calculator Apps
@@ -32,7 +32,7 @@ export default function LoginPage() {
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">
               Selamat Datang
             </h1>
-            <p className="text-orange-100 text-sm">
+            <p className="text-white text-sm">
               Silakan login untuk melanjutkan
             </p>
           </div>
@@ -43,7 +43,7 @@ export default function LoginPage() {
               <div>
                 <label
                   htmlFor="username"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  className="block text-sm font-semibold text-[#37393B] mb-2"
                 >
                   Username
                 </label>
@@ -53,14 +53,14 @@ export default function LoginPage() {
                   placeholder="Masukkan username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:bg-white transition-all"
+                  className="w-full bg-white border-2 border-white rounded-xl px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-white0 focus:bg-white transition-all"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
+                  className="block text-sm font-semibold text-[#37393B] mb-2"
                 >
                   Password
                 </label>
@@ -71,7 +71,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-400 focus:bg-white transition-all"
+                  className="w-full bg-white border-2 border-white rounded-xl px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-white0 focus:bg-white transition-all"
                 />
               </div>
 
@@ -83,7 +83,7 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                className="w-full bg-orange-400 text-white py-3 rounded-xl font-semibold hover:bg-orange-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 transition-colors"
+                className="w-full bg-white0 text-white py-3 rounded-xl font-semibold hover:bg-white0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F3E8DF]0 focus:ring-offset-2 transition-colors"
               >
                 Login
               </button>
@@ -92,7 +92,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-xs text-center text-gray-500 mt-4">
+        <p className="text-xs text-center text-white0 mt-4">
           © {new Date().getFullYear()} MBGCalc. Semua hak dilindungi.
         </p>
       </div>

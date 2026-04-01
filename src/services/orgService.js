@@ -217,3 +217,34 @@ export async function updateProfile({ fullName, phone, bio }) {
   });
   return unwrap(payload, "profile");
 }
+
+export async function getAllOrganizations(query = {}) {
+  const params = new URLSearchParams();
+  if (query.status) params.append("status", query.status);
+  if (query.page) params.append("page", query.page);
+  if (query.limit) params.append("limit", query.limit);
+
+  const queryString = params.toString();
+  const payload = await request(`/organizations${queryString ? `?${queryString}` : ""}`);
+  return pickArray(payload, ["data", "organizations"]) || [];
+}
+
+export async function getPendingOrganizations() {
+  const payload = await request("/organizations/pending");
+  return pickArray(payload, ["organizations", "data"]) || [];
+}
+
+export async function approveOrganization(orgId) {
+  const payload = await request(`/organizations/${orgId}/approve`, {
+    method: "POST",
+  });
+  return unwrap(payload);
+}
+
+export async function rejectOrganization(orgId, reason = "") {
+  const payload = await request(`/organizations/${orgId}/reject`, {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  });
+  return unwrap(payload);
+}

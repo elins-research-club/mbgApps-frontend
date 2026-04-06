@@ -69,11 +69,11 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
           </div>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center p-12">
-            <div className="grid grid-cols-2 gap-3 max-w-md">
+            <div className="grid grid-cols-3 gap-2 w-full max-w-3xl px-8 md:px-12 justify-items-center">
               {recipes.map(recipe => (
                 <div
                   key={recipe.id}
-                  className="relative group bg-white/95 backdrop-blur-sm border-2 border-green-300 rounded-xl p-3 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                  className="relative group w-full max-w-[170px] bg-white/95 backdrop-blur-sm border-2 border-green-300 rounded-xl p-3 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
                 >
                   <div className="flex flex-col">
                     <h4 className="font-bold text-[#17191B] text-sm line-clamp-2">{recipe.nama}</h4>

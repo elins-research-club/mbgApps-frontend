@@ -16,7 +16,7 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
           Piring Anda
         </h3>
         {recipes.length > 0 && (
-          <span className="text-sm text-[#452829] bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
+          <span className="text-sm text-[#452829] bg-[#F3E8DF]/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
             {recipes.length} resep
           </span>
         )}
@@ -56,14 +56,14 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
         )}
 
         {recipes.length === 0 ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white0">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-[#452829]">
             <svg className="w-16 h-16 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
             </svg>
-            <p className="text-lg font-medium bg-white/80 backdrop-blur-sm px-4 py-2 rounded-lg">
+            <p className="text-lg font-medium bg-[#F3E8DF]/90 backdrop-blur-sm px-4 py-2 rounded-lg">
               Seret menu ke sini
             </p>
-            <p className="text-sm mt-2 bg-white/80 backdrop-blur-sm px-3 py-1 rounded">
+            <p className="text-sm mt-2 bg-[#F3E8DF]/90 backdrop-blur-sm px-3 py-1 rounded">
               Drag and drop untuk menambahkan
             </p>
           </div>
@@ -73,9 +73,9 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
               {recipes.map(recipe => (
                 <div
                   key={recipe.id}
-                  className="relative group w-full max-w-[170px] bg-white/95 backdrop-blur-sm border-2 border-green-300 rounded-xl p-3 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                  className="relative group w-full max-w-[170px] h-full bg-white/95 backdrop-blur-sm border-2 border-[#D9C7B8] rounded-xl p-3 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
                 >
-                  <div className="flex flex-col">
+                  <div className="flex flex-col h-full">
                     <h4 className="font-bold text-[#17191B] text-sm line-clamp-2">{recipe.nama}</h4>
                     <p className="text-xs text-[#452829] mt-1">
                       {recipe.kategori || 'Menu'}
@@ -85,11 +85,11 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
                     </p>
                     
                     {/* Quantity Controls */}
-                    <div className="flex items-center justify-center gap-2 mt-2 bg-white rounded-lg p-1">
+                    <div className="flex items-center justify-center gap-2 mt-auto pt-2 bg-[#E8D1C5] rounded-lg p-1">
                       <button
                         onClick={() => onDecrease(recipe.id)}
                         disabled={recipe.quantity <= 0.1}
-                        className="w-6 h-6 flex items-center justify-center bg-white0 text-white rounded-md hover:bg-white0 disabled:bg-[#C9A89A] disabled:cursor-not-allowed transition-colors"
+                        className="w-6 h-6 flex items-center justify-center bg-[#8B5E4A] text-[#FFF7F2] rounded-md hover:bg-[#6F4A3A] disabled:bg-[#C9A89A] disabled:cursor-not-allowed transition-colors"
                         title="Kurangi"
                       >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +107,7 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
                       <span className="text-xs text-[#452829]">×</span>
                       <button
                         onClick={() => onIncrease(recipe.id)}
-                        className="w-6 h-6 flex items-center justify-center bg-white0 text-white rounded-md hover:bg-white0 transition-colors"
+                        className="w-6 h-6 flex items-center justify-center bg-[#8B5E4A] text-[#FFF7F2] rounded-md hover:bg-[#6F4A3A] transition-colors"
                         title="Tambah"
                       >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

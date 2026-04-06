@@ -1422,7 +1422,7 @@ export default function MealPlanner() {
                   {/* View Details Button */}
                   <button
                     onClick={() => router.push("/meal-details")}
-                    className="px-6 py-3 bg-white0 hover:bg-white0 text-white rounded-lg transition-colors font-medium shadow-md flex items-center gap-2"
+                    className="px-6 py-3 bg-[#452829] hover:bg-[#17191B] text-white rounded-lg transition-colors font-medium shadow-md flex items-center gap-2"
                   >
                     <svg
                       className="w-5 h-5"
@@ -1537,7 +1537,7 @@ export default function MealPlanner() {
                 {/* Nutrition Label + Chart — always side by side */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Nutrition Label */}
-                  <div className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center">
+                  <div className="bg-white rounded-lg border border-[#D9C7B8] shadow-md p-6 flex flex-col items-center">
                     <div className="flex items-center justify-between mb-4 w-full">
                       <h3 className="text-lg font-bold text-white0">
                         Total Nilai Gizi
@@ -1576,7 +1576,7 @@ export default function MealPlanner() {
                   </div>
 
                   {/* Nutrition Chart */}
-                  <div className="bg-white rounded-lg shadow-md p-6">
+                  <div className="bg-white rounded-lg border border-[#D9C7B8] shadow-md p-6">
                     <h2 className="text-xl font-bold text-[#17191B] mb-4">
                       Grafik Nutrisi
                     </h2>

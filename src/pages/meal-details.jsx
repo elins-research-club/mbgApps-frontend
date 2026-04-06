@@ -250,7 +250,7 @@ export default function MealDetails () {
             </p>
             <button
               onClick={() => router.push('/meal-planner')}
-              className='px-6 py-3 bg-white0 hover:bg-white0 text-white rounded-lg transition-colors'
+              className='px-6 py-3 bg-[#452829] hover:bg-[#17191B] text-white rounded-lg transition-colors'
             >
               ← Kembali ke Set Menu
             </button>
@@ -326,7 +326,7 @@ export default function MealDetails () {
                 </button>
                 <button
                   onClick={() => router.push('/meal-planner')}
-                  className='px-4 py-2 bg-white0 hover:bg-white0 text-white rounded-lg transition-colors'
+                  className='px-4 py-2 bg-[#452829] hover:bg-[#17191B] text-white rounded-lg transition-colors'
                 >
                   ← Kembali ke Set Menu
                 </button>
@@ -337,7 +337,7 @@ export default function MealDetails () {
             <div className='mt-4 pt-4 border-t border-[#E8D1C5]'>
               <div className='flex items-center gap-3'>
                 <label className='text-sm font-semibold text-[#37393B] flex items-center gap-2'>
-                  <svg className='w-5 h-5 text-white0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <svg className='w-5 h-5 text-[#452829]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' />
                   </svg>
                   Nama Meal Plan:
@@ -354,7 +354,7 @@ export default function MealDetails () {
           <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
             {/* Ingredients List - Takes 2 columns */}
             <div className='lg:col-span-2'>
-              <div className='bg-white rounded-lg shadow-md p-6'>
+              <div className='bg-white rounded-lg border border-[#D9C7B8] shadow-md p-6'>
                 <h2 className='text-xl font-bold text-[#17191B] mb-6'>
                   Bahan-Bahan Menu
                 </h2>
@@ -381,7 +381,7 @@ export default function MealDetails () {
                             </span>
                           </div>
                         </div>
-                        <div className='bg-white px-3 py-1 rounded-lg'>
+                        <div className='bg-white px-3 py-1 rounded-lg border border-[#E8D1C5]'>
                           <p className='text-sm font-semibold text-[#17191B]'>
                             {(
                               (recipe.total_gramasi || 0) *
@@ -393,7 +393,7 @@ export default function MealDetails () {
                       </div>
 
                       {/* Ingredients List */}
-                      <div className='bg-white rounded-lg p-4 mt-3'>
+                      <div className='bg-white rounded-lg p-4 mt-3 border border-[#E8D1C5]'>
                         <h4 className='text-sm font-semibold text-[#37393B] mb-3'>
                           Bahan:
                         </h4>
@@ -408,7 +408,7 @@ export default function MealDetails () {
 
                           if (!ingredients) {
                             return (
-                              <p className='text-sm text-white0 italic'>
+                              <p className='text-sm text-[#8B5E4A] italic'>
                                 Tidak ada data bahan
                               </p>
                             )
@@ -423,7 +423,7 @@ export default function MealDetails () {
                               <ul className='space-y-2'>
                                 {ingredients.map((ingredient, idx) => (
                                   <li key={idx} className='flex items-start'>
-                                    <span className='text-white0 mr-2'>
+                                    <span className='text-[#8B5E4A] mr-2'>
                                       •
                                     </span>
                                     <span className='text-sm text-[#37393B]'>
@@ -451,7 +451,7 @@ export default function MealDetails () {
                           }
 
                           return (
-                            <p className='text-sm text-white0 italic'>
+                            <p className='text-sm text-[#8B5E4A] italic'>
                               Tidak ada data bahan (format tidak valid)
                             </p>
                           )
@@ -465,9 +465,9 @@ export default function MealDetails () {
 
             {/* Total Nutrition Label - Takes 1 column */}
             <div className='lg:col-span-1'>
-              <div className='bg-white rounded-lg shadow-md p-6 sticky top-6'>
+              <div className='bg-white rounded-lg border border-[#D9C7B8] shadow-md p-6 sticky top-6'>
                 <div className='flex items-center justify-between mb-4'>
-                  <h3 className='text-lg font-bold text-white0'>
+                  <h3 className='text-lg font-bold text-[#452829]'>
                     Total Nilai Gizi
                   </h3>
                 </div>
@@ -570,7 +570,7 @@ export default function MealDetails () {
               <div className='flex gap-3'>
                 <button
                   onClick={downloadQRCode}
-                  className='flex-1 px-4 py-3 bg-white0 hover:bg-[#37393B] text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2'
+                  className='flex-1 px-4 py-3 bg-[#452829] hover:bg-[#17191B] text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2'
                 >
                   <svg
                     className='w-5 h-5'

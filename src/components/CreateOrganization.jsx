@@ -54,8 +54,8 @@ export default function CreateOrganization() {
       const orgId = org?.id || org?.organization?.id || org?.data?.id;
       if (!orgId) throw new Error("Organisasi berhasil dibuat, tapi ID organisasi tidak ditemukan");
       
-      // Store success org info for display
-      setSuccessOrg(org);
+      // Store success org info for display, ensuring id is set
+      setSuccessOrg({ ...org, id: orgId });
       await refresh();
       
       // Don't redirect immediately - let user see the success message

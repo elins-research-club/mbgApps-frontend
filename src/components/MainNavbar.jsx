@@ -25,6 +25,24 @@ export default function MainNavbar() {
   const [inviteSubmitting, setInviteSubmitting] = useState(false);
   const [inviteError, setInviteError] = useState("");
 
+  // Helper to organize orgs hierarchically
+  const getOrganizationTree = () => {
+    if (!allOrganizations.length) return [];
+    
+    const orgsWithDepth = allOrganizations.map(org => ({
+      ...org,
+      depth: org?.depth || org?.level || org?.hierarchyDepth || org?.hierarchy_depth || 0,
+    }));
+    
+    // Sort by depth (roots first) then by name
+    const sorted = orgsWithDepth.sort((a, b) => {
+      if (a.depth !== b.depth) return a.depth - b.depth;
+      return (a.name || '').localeCompare(b.name || '');
+    });
+    
+    return sorted;
+  };
+
   const handleLogout = async () => {
     await logout();
     router.push("/auth/login");
@@ -209,26 +227,48 @@ export default function MainNavbar() {
                       {allOrganizations.length > 0 ? (
                         <>
                           <div className="px-4 py-2">
-                            <p className="text-xs text-black">Organisasi</p>
+                            <p className="text-xs font-semibold text-[#37393B]">Organisasi</p>
                           </div>
 
-                          <div className="px-2 pb-1 space-y-1 max-h-64 overflow-y-auto">
-                            {allOrganizations.map((item) => {
+                          <div className="px-2 pb-1 space-y-0.5 max-h-64 overflow-y-auto">
+                            {getOrganizationTree().map((item) => {
                               const isActiveOrg = item?.id === routeOrgId || (!routeOrgId && item?.id === org?.id);
                               const canOpenItemDashboard =
                                 item?.owner_id === user?.id || isOrgOwner || canManageUsers || canManageRoles;
-                              const isActiveDashboardItem = isDashboardRoute && routeOrgId === item?.id;
+                              const isSubOrg = item.depth > 0;
+                              const isOwner = item?.owner_id === user?.id;
+                              const indentLevel = item.depth;
 
                               return (
                                 <Link
                                   key={item.id}
                                   href={canOpenItemDashboard ? `/organization/${item.id}/dashboard` : "/profile"}
-                                  className={`flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-sm transition bg-[#452829] text-white hover:bg-[#6C2D19]`}
+                                  className={`flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition ${
+                                    isActiveOrg
+                                      ? "bg-green-100 border border-green-300 text-green-900 font-semibold"
+                                      : "bg-[#452829] text-white hover:bg-[#6C2D19]"
+                                  }`}
                                   onClick={() => setDropdownOpen(false)}
+                                  style={{ marginLeft: `${indentLevel * 100}px` }}
                                 >
-                                  <span className="min-w-0 truncate font-medium">{item.name}</span>
+                                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                                    {isSubOrg && (
+                                      <span className="text-xs text-[#C9A89A] flex-shrink-0 font-bold">└</span>
+                                    )}
+                                    <span className="min-w-0 truncate font-medium">{item.name}</span>
+                                    {isActiveOrg && (
+                                      <span className="px-2 py-0.5 bg-green-200 text-green-700 text-xs font-semibold rounded-full flex-shrink-0 whitespace-nowrap">
+                                        Aktif
+                                      </span>
+                                    )}
+                                    {isOwner && !isActiveOrg && (
+                                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full flex-shrink-0 whitespace-nowrap">
+                                        Pemilik
+                                      </span>
+                                    )}
+                                  </div>
                                   {canOpenItemDashboard && (
-                                    <LayoutDashboard className="w-4 h-4 flex-shrink-0 text-white" />
+                                    <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
                                   )}
                                 </Link>
                               );

@@ -18,19 +18,19 @@ import {
 } from "lucide-react";
 
 export default function ProfilePage() {
-  const { user, profile, orgMembership, organizations, loading, refresh } = useAuth();
+  const { user, profile, orgMembership, organizations, loading, refresh, switchOrganization } = useAuth();
   const router = useRouter();
 
-  const [fullName, setFullName]   = useState("");
-  const [phone, setPhone]         = useState("");
-  const [bio, setBio]             = useState("");
-  const [saving, setSaving]       = useState(false);
-  const [saveMsg, setSaveMsg]     = useState(null); // { type: 'success'|'error', text }
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [bio, setBio] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState(null); // { type: 'success'|'error', text }
 
   const [inviteCode, setInviteCode] = useState("");
-  const [joining, setJoining]       = useState(false);
-  const [joinMsg, setJoinMsg]       = useState(null);
-  
+  const [joining, setJoining] = useState(false);
+  const [joinMsg, setJoinMsg] = useState(null);
+
   const [allMemberships, setAllMemberships] = useState([]);
   const [loadingMemberships, setLoadingMemberships] = useState(false);
 
@@ -42,51 +42,60 @@ export default function ProfilePage() {
       setBio(profile.bio || "");
     }
   }, [profile]);
-  
+
   // Fetch all memberships for this user
   useEffect(() => {
-    const fetchAllMemberships = async () => {
-      if (!user?.id) return;
-      
-      setLoadingMemberships(true);
-      try {
-        const supabase = createClient();
-        const { data: memberships, error } = await supabase
-          .from("Membership")
-          .select(`
-            id,
-            status,
-            role_id,
-            joined_at,
-            invite_method,
-            organization:Organizations (
-              id,
-              name,
-              description,
-              owner_id,
-              invite_code,
-              status
-            ),
-            role:Roles (
-              id,
-              name,
-              permissions
-            )
-          `)
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false });
-        
-        if (error) throw error;
-        setAllMemberships(memberships || []);
-      } catch (err) {
-        console.error("Failed to fetch memberships:", err);
-      } finally {
-        setLoadingMemberships(false);
-      }
-    };
-    
-    fetchAllMemberships();
-  }, [user?.id]);
+  const fetchAllMemberships = async () => {
+    if (!user?.id) return;
+    setLoadingMemberships(true);
+    try {
+      const supabase = createClient();
+
+      // Fetch memberships
+      const { data: memberships, error } = await supabase
+        .from("Membership")
+        .select(`
+          id, status, role_id, joined_at, invite_method,
+          organization:Organizations ( id, name, description, owner_id, invite_code, status ),
+          role:Roles ( id, name, permissions )
+        `)
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Fetch owned orgs not already in memberships
+      const { data: ownedOrgs } = await supabase
+        .from("Organizations")
+        .select("id, name, description, owner_id, invite_code, status")
+        .eq("owner_id", user.id)
+        .order("created_at", { ascending: false });
+
+      const membershipOrgIds = new Set((memberships || []).map(m => m.organization?.id));
+
+      // Convert owned orgs to membership-shaped objects for uniform rendering
+      const ownedAsMemberships = (ownedOrgs || [])
+        .filter(org => !membershipOrgIds.has(org.id))
+        .map(org => ({
+          id: `owner-${org.id}`,   // synthetic id
+          status: "active",
+          role_id: null,
+          joined_at: null,
+          invite_method: "owner",
+          organization: org,
+          role: null,
+        }));
+
+      setAllMemberships([...ownedAsMemberships, ...(memberships || [])]);
+    } catch (err) {
+      console.error("Failed to fetch memberships:", err);
+    } finally {
+      setLoadingMemberships(false);
+    }
+  };
+
+  fetchAllMemberships();
+}, [user?.id]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -203,11 +212,10 @@ export default function ProfilePage() {
 
             {saveMsg && (
               <div
-                className={`flex items-center gap-2 p-3 rounded-xl text-sm ${
-                  saveMsg.type === "success"
+                className={`flex items-center gap-2 p-3 rounded-xl text-sm ${saveMsg.type === "success"
                     ? "bg-green-50 border border-green-200 text-green-700"
                     : "bg-red-50 border border-red-200 text-red-700"
-                }`}
+                  }`}
               >
                 {saveMsg.type === "success" ? (
                   <CheckCircle className="w-4 h-4 flex-shrink-0" />
@@ -253,9 +261,9 @@ export default function ProfilePage() {
               {allMemberships.map((membership) => {
                 const membershipOrg = membership.organization;
                 if (!membershipOrg) return null;
-                
+
                 const isOwner = membershipOrg.owner_id === user?.id;
-                
+
                 return (
                   <div
                     key={membership.id}
@@ -279,15 +287,14 @@ export default function ProfilePage() {
                       <div className="flex flex-wrap gap-2 mt-2">
                         {/* Membership Status */}
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            membership.status === "active"
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${membership.status === "active"
                               ? "bg-green-100 text-green-700"
                               : membership.status === "pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : membership.status === "rejected"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-gray-100 text-gray-700"
-                          }`}
+                                ? "bg-yellow-100 text-yellow-700"
+                                : membership.status === "rejected"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-gray-100 text-gray-700"
+                            }`}
                         >
                           {membership.status === "active" && <CheckCircle className="w-3 h-3" />}
                           {membership.status === "pending" && <Clock className="w-3 h-3" />}
@@ -295,25 +302,24 @@ export default function ProfilePage() {
                           {membership.status === "active"
                             ? "Anggota"
                             : membership.status === "pending"
-                            ? "Menunggu"
-                            : membership.status === "rejected"
-                            ? "Ditolak"
-                            : "Nonaktif"}
+                              ? "Menunggu"
+                              : membership.status === "rejected"
+                                ? "Ditolak"
+                                : "Nonaktif"}
                         </span>
-                        
+
                         {/* Organization Status */}
                         <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            membershipOrg.status === "active"
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${membershipOrg.status === "active"
                               ? "bg-green-100 text-green-700"
                               : membershipOrg.status === "pending"
-                              ? "bg-blue-100 text-blue-700"
-                              : membershipOrg.status === "rejected"
-                              ? "bg-red-100 text-red-700"
-                              : membershipOrg.status === "suspended"
-                              ? "bg-orange-100 text-orange-700"
-                              : "bg-gray-100 text-gray-700"
-                          }`}
+                                ? "bg-blue-100 text-blue-700"
+                                : membershipOrg.status === "rejected"
+                                  ? "bg-red-100 text-red-700"
+                                  : membershipOrg.status === "suspended"
+                                    ? "bg-orange-100 text-orange-700"
+                                    : "bg-gray-100 text-gray-700"
+                            }`}
                         >
                           {membershipOrg.status === "active" && <CheckCircle className="w-3 h-3" />}
                           {membershipOrg.status === "pending" && <Clock className="w-3 h-3" />}
@@ -322,23 +328,26 @@ export default function ProfilePage() {
                           {membershipOrg.status === "active"
                             ? "Aktif"
                             : membershipOrg.status === "pending"
-                            ? "Pending"
-                            : membershipOrg.status === "rejected"
-                            ? "Ditolak"
-                            : membershipOrg.status === "suspended"
-                            ? "Disuspend"
-                            : "Nonaktif"}
+                              ? "Pending"
+                              : membershipOrg.status === "rejected"
+                                ? "Ditolak"
+                                : membershipOrg.status === "suspended"
+                                  ? "Disuspend"
+                                  : "Nonaktif"}
                         </span>
                       </div>
                     </div>
-                    
-                    <Link
-                      href={`/organization/${membershipOrg.id}/dashboard`}
-                      className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#17191B] hover:bg-[#37393B] text-white text-xs font-semibold transition"
-                    >
-                      Dashboard
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+
+                    <div className="flex flex-col gap-2 flex-shrink-0">
+                      <Link
+                        href={`/organization/${membershipOrg.id}/dashboard`}
+                        onClick={() => switchOrganization(membershipOrg.id)}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#17191B] hover:bg-[#37393B] text-white text-xs font-semibold transition"
+                      >
+                        Dashboard
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
                   </div>
                 );
               })}
@@ -392,11 +401,10 @@ export default function ProfilePage() {
 
                 {joinMsg && (
                   <div
-                    className={`mt-3 flex items-start gap-2 p-3 rounded-xl text-sm ${
-                      joinMsg.type === "success"
+                    className={`mt-3 flex items-start gap-2 p-3 rounded-xl text-sm ${joinMsg.type === "success"
                         ? "bg-green-50 border border-green-200 text-green-700"
                         : "bg-red-50 border border-red-200 text-red-700"
-                    }`}
+                      }`}
                   >
                     {joinMsg.type === "success" ? (
                       <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />

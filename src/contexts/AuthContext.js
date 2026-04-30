@@ -162,6 +162,10 @@ export function AuthProvider({ children }) {
     await Promise.all([fetchProfile(user.id), fetchOrgMemberships(user.id)]);
   }, [user, fetchProfile, fetchOrgMemberships]);
 
+  const orgStatusMap = Object.fromEntries(
+  organizations.map(org => [org.id, org.status])
+);
+
   return (
     <AuthContext.Provider
       value={{
@@ -184,6 +188,7 @@ export function AuthProvider({ children }) {
         canManageRoles,
         logout,
         refresh,
+        orgStatusMap,
       }}
     >
       {children}

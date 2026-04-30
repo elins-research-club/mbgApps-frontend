@@ -204,7 +204,7 @@ function RoleFormModal({ initial, onSave, onClose, saving }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function OrgOwnerDashboard({ orgId }) {
-  const { user, canManageUsers, canManageRoles, refresh: refreshAuth, isOrgPending, isOrgRejected, organization } = useAuth();
+  const { user, canManageUsers, canManageRoles, refresh: refreshAuth, isOrgPending, isOrgRejected, organization, orgStatusMap } = useAuth();
   const router = useRouter();
 
   const [org, setOrg]               = useState(null);
@@ -403,9 +403,9 @@ export default function OrgOwnerDashboard({ orgId }) {
           saving={roleSaving}
         />
       )}
-
+      {console.log("Org data:", isOrgPending)}
       {/* Pending Approval Overlay */}
-      {isOrgPending && (
+      {orgStatusMap[org?.id] === "pending" && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
             <Clock className="w-16 h-16 text-[#452829] mx-auto mb-4" />

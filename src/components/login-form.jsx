@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/client";
@@ -31,29 +32,32 @@ export function LoginForm({ className, ...props }) {
     setError(null);
 
     try {
-      console.log('🔐 [LOGIN] Signing in via backend API...');
-      
+      console.log("🔐 [LOGIN] Signing in via backend API...");
+
       // Use backend API to sign in
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/sign-in`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/auth/sign-in`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
         },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
 
-      console.log('✅ [LOGIN] Sign in successful');
-      console.log('📋 User data:', data.user);
-      console.log('🏢 Organization:', data.organization);
+      console.log("✅ [LOGIN] Sign in successful");
+      console.log("📋 User data:", data.user);
+      console.log("🏢 Organization:", data.organization);
 
       // Set session in Supabase
       const supabase = createClient();
@@ -62,23 +66,23 @@ export function LoginForm({ className, ...props }) {
         refresh_token: data.refreshToken,
       });
 
-      if (sessionError) throw new Error('Invalid credentials');
+      if (sessionError) throw new Error("Invalid credentials");
 
-      console.log('✅ [LOGIN] Session set');
+      console.log("✅ [LOGIN] Session set");
 
       // Check if super admin
       if (data.user.profile?.is_super_admin) {
-        console.log('👑 [LOGIN] Super admin detected');
-        router.push('/admin/dashboard');
+        console.log("👑 [LOGIN] Super admin detected");
+        router.push("/admin/dashboard");
         return;
       }
 
       // Always redirect to home - org status checked in app
-      console.log('✅ [LOGIN] Login successful, redirecting to home');
-      router.push('/');
+      console.log("✅ [LOGIN] Login successful, redirecting to home");
+      router.push("/");
     } catch (error) {
-      console.error('❌ [LOGIN] Error:', error);
-      setError('Invalid credentials');
+      console.error("❌ [LOGIN] Error:", error);
+      setError("Invalid credentials");
     } finally {
       setIsLoading(false);
     }

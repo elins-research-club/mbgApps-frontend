@@ -213,7 +213,16 @@ export default function SavedMealPlan() {
               </div>
             ))}
           </div>
+          <a
+            href="https://forms.gle/ntQS44oqVdTNcWNJA"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="form-aduan inline-block cursor-pointer text-center mt-6 px-4 py-2 bg-[#E8D1C5] text-[#17191B] rounded-lg text-sm font-semibold hover:bg-[#D9C7B8] transition-colors"
+          >
+            Laporkan Masalah
+          </a>
         </div>
+
 
         {/* Footer Info */}
         <div className="bg-white rounded-xl p-4 sm:p-6 text-center border border-white">

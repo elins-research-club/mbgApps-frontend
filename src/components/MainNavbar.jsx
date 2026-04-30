@@ -117,6 +117,29 @@ export default function MainNavbar() {
               </div>
               <span className="font-bold text-lg text-[#17191B]">MBG Calc</span>
             </Link>
+            {canManagePlans && (
+            <Link href="/" className="flex items-center gap-1.5 bg-[#452829] text-white border-[#452829] px-3 py-1.5 rounded-full text-sm font-semibold transition border">
+              {/* <div className="w-8 h-8 bg-[#452829] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">M</span>
+              </div>
+              <span className="font-bold text-lg text-[#17191B]">MBG Calc</span> */}
+              <LayoutGrid className="w-3.5 h-3.5" />
+               Buat Menu
+            </Link>
+            )
+}
+                <Link
+                  href="/meal-planner"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
+                    isSetMenuRoute
+                      ? "bg-[#452829] text-white border-[#452829]"
+                      : "bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
+                  }`}
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                  Set Menu
+                </Link>
+              
           </div>
 
           {/* Right section */}

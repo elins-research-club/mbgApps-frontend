@@ -150,7 +150,7 @@ const GuestView = ({ onLoginClick }) => {
     <div className="flex flex-col min-h-screen">
       <GuestNavbar onLoginClick={onLoginClick} />
 
-      <main className="flex-grow bg-slate-50 w-full">
+      <main className="flex-grow bg-white w-full">
         {!hasResults ? (
           // Tampilan Search (PNG 1)
           <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
@@ -174,7 +174,7 @@ const GuestView = ({ onLoginClick }) => {
                 <div className="bg-white p-8 rounded-2xl shadow-lg w-fit min-w-[320px] flex flex-col items-center">
                   <div className="flex items-center justify-between mb-6 w-full">
                     <div className="flex items-center gap-3">
-                      <h2 className="text-2xl font-bold text-orange-500">
+                      <h2 className="text-2xl font-bold text-white0">
                         Label Gizi
                       </h2>
                     </div>

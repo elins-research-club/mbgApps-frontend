@@ -527,9 +527,8 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
                 <button
                   type='button'
                   onClick={() => handleGenerateClick(item.id, item.name)}
-                  className='mt-3 w-full group relative overflow-hidden bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]'
+                  className='mt-3 w-full group relative overflow-hidden bg-[#452829] text-white font-bold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]'
                 >
-                  <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000'></div>
 
                   <div className='relative flex items-center justify-center gap-3'>
                     <svg
@@ -808,11 +807,11 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
 
   return (
     <div className='bg-white rounded-2xl shadow-2xl w-full flex flex-col animate-in fade-in duration-200'>
-      <div className='bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-6'>
+      <div className='bg-[#452829] px-8 py-6'>
         <h2 className='text-2xl font-bold text-white'>
           {editingRecipeId ? 'Edit Menu Masakan' : 'Buat Menu Masakan'}
         </h2>
-        <p className='text-orange-50 text-sm mt-1'>
+        <p className='text-white text-sm mt-1'>
           Lengkapi informasi menu dan bahan-bahan yang diperlukan
         </p>
       </div>
@@ -823,7 +822,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
               <div>
                 <label
                   htmlFor='menu-name'
-                  className='block text-sm font-semibold text-slate-700 mb-2'
+                  className='block text-sm font-semibold text-[#37393B] mb-2'
                 >
                   Nama Menu <span className='text-red-500'>*</span>
                 </label>
@@ -833,14 +832,14 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
                   value={menuName}
                   onChange={e => setMenuName(e.target.value)}
                   placeholder='Contoh: Nasi Goreng Spesial'
-                  className='w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-orange-100 focus:border-orange-500 outline-none transition'
+                  className='w-full px-4 py-3 border-2 border-[#D9C7B8] rounded-xl focus:ring-4 focus:ring-[#F3E8DF] focus:border-white0 outline-none transition'
                 />
               </div>
 
               <div>
                 {/* <label
                   htmlFor="kategori"
-                  className="block text-sm font-semibold text-slate-700 mb-2"
+                  className="block text-sm font-semibold text-[#37393B] mb-2"
                 >
                   Kategori Resep <span className="text-red-500">*</span>
                 </label> */}
@@ -848,7 +847,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
                   id="kategori"
                   value={kategori}
                   onChange={(e) => setKategori(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-orange-100 focus:border-orange-500 outline-none transition bg-white"
+                  className="w-full px-4 py-3 border-2 border-[#D9C7B8] rounded-xl focus:ring-4 focus:ring-[#F3E8DF] focus:border-white0 outline-none transition bg-white"
                 >
                   <option value="karbohidrat">Karbohidrat</option>
                   <option value="proteinHewani">Protein Hewani</option>
@@ -859,14 +858,14 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
               </div>
             </div>
 
-            <div className='border-t border-slate-200'></div>
+            <div className='border-t border-[#E8D1C5]'></div>
 
             <div>
               <div className='flex items-center justify-between mb-4'>
-                <label className='text-sm font-semibold text-slate-700'>
+                <label className='text-sm font-semibold text-[#37393B]'>
                   Bahan-bahan <span className='text-red-500'>*</span>
                 </label>
-                <span className='text-xs text-slate-500 bg-slate-100 px-3 py-1 rounded-full font-medium'>
+                <span className='text-xs text-white0 bg-[#E8D1C5] px-3 py-1 rounded-full font-medium'>
                   {ingredients.filter(i => i.name.trim()).length} bahan
                 </span>
               </div>
@@ -877,12 +876,12 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
                     key={item.id}
                     className={`relative p-5 rounded-2xl border-2 shadow-md hover:shadow-xl transition-all duration-300 ${
                       item.status === 'generated'
-                        ? 'bg-gradient-to-br from-purple-50 via-white to-indigo-50 border-purple-300'
+                        ? 'bg-white border-purple-300'
                         : item.status === 'found'
-                        ? 'bg-gradient-to-br from-green-50 via-white to-emerald-50 border-green-300'
+                        ? 'bg-green-50 border-green-300'
                         : item.status === 'generating'
-                        ? 'bg-gradient-to-br from-purple-50 via-white to-blue-50 border-purple-300 animate-pulse'
-                        : 'bg-gradient-to-br from-slate-50 to-white border-slate-300'
+                        ? 'bg-white border-purple-300 animate-pulse'
+                        : 'bg-white border-[#D9C7B8]'
                     }`}
                   >
                     <div className='flex items-start gap-4'>
@@ -890,10 +889,10 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
                         className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-base shadow-lg transition-all duration-300 ${
                           item.status === 'generated' ||
                           item.status === 'generating'
-                            ? 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white'
+                            ? 'bg-[#452829] text-white'
                             : item.status === 'found'
-                            ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white'
-                            : 'bg-gradient-to-br from-orange-400 to-orange-500 text-white'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-[#452829] text-white'
                         }`}
                       >
                         {index + 1}
@@ -930,7 +929,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
                               item.status === 'generated' ||
                               item.status === 'found'
                                 ? 'border-green-300 bg-green-50/50 focus:border-green-500 focus:ring-4 focus:ring-green-100'
-                                : 'border-slate-300 bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-100'
+                                : 'border-[#D9C7B8] bg-white focus:border-white0 focus:ring-4 focus:ring-[#F3E8DF]'
                             }`}
                             disabled={
                               item.status === 'checking' ||
@@ -988,7 +987,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
                                     className={`w-full text-left px-4 py-3 transition-colors ${
                                       idx === selectedSuggestionIndex
                                         ? 'bg-purple-100 border-l-4 border-purple-500'
-                                        : 'hover:bg-slate-50'
+                                        : 'hover:bg-white'
                                     }`}
                                   >
                                     <div className='flex items-center justify-between'>
@@ -1035,11 +1034,11 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
                               )
                             }
                             placeholder='0'
-                            className='w-32 px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-4 focus:ring-orange-100 focus:border-orange-500 outline-none transition-all text-sm font-semibold'
+                            className='w-32 px-4 py-3 border-2 border-[#D9C7B8] rounded-xl focus:ring-4 focus:ring-[#F3E8DF] focus:border-white0 outline-none transition-all text-sm font-semibold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                             min='0'
                             step='0.01'
                           />
-                          <span className='absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none'>
+                          <span className='absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-[#C9A89A] pointer-events-none'>
                             g
                           </span>
                         </div>
@@ -1054,7 +1053,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
                             </svg>
                           </div>
                         )}
-                        {/* <div className="flex items-center gap-2 text-sm text-slate-600">
+                        {/* <div className="flex items-center gap-2 text-sm text-[#452829]">
                             <svg
                               className="w-4 h-4"
                               fill="none"
@@ -1091,7 +1090,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
               <button
                 type='button'
                 onClick={handleAddIngredient}
-                className='w-full mt-4 flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-300 rounded-xl text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition font-medium cursor-pointer'
+                className='w-full mt-4 flex items-center justify-center gap-2 py-3 border-2 border-dashed border-[#D9C7B8] rounded-xl text-[#452829] hover:bg-white hover:border-[#C9A89A] transition font-medium cursor-pointer'
               >
                 <PlusIcon />
                 Tambahkan Bahan
@@ -1105,19 +1104,19 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
             )}
           </div>
 
-          {/* <div className="px-8 py-6 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+          {/* <div className="px-8 py-6 bg-white border-t border-[#E8D1C5] flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={isSaving}
-              className="px-6 py-2.5 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 text-[#37393B] font-semibold rounded-xl hover:bg-[#D9C7B8] transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Batal
             </button> */}
           <button
             type='submit'
             disabled={isSaving}
-            className='px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold shadow-lg hover:shadow-xl hover:from-orange-600 cursor-pointer hover:to-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 w-full'
+            className='px-6 py-2.5 bg-[#452829] text-white font-bold shadow-lg hover:shadow-xl hover:bg-[#6C2D19] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 w-full'
           >
             {isSaving ? (
               <>
@@ -1150,7 +1149,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
       ) : (
         <div className='flex-1 px-8 py-6'>
           <div className='max-w-2xl mx-auto'>
-            <h3 className='text-xl font-bold text-gray-800 mb-4'>Informasi Nilai Gizi Total</h3>
+            <h3 className='text-xl font-bold text-[#17191B] mb-4'>Informasi Nilai Gizi Total</h3>
             <NutritionLabel
               data={totalLabel}
               isMini={false}
@@ -1179,7 +1178,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
               type='button'
               onClick={handleBackToInput}
               disabled={isSaving || !!successMessage}
-              className='px-6 py-2.5 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed'
+              className='px-6 py-2.5 text-[#37393B] font-semibold rounded-xl hover:bg-[#D9C7B8] transition disabled:opacity-50 disabled:cursor-not-allowed'
             >
               Kembali
             </button>
@@ -1188,7 +1187,7 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
                 type='button'
                 onClick={handleSave}
                 disabled={isSaving || !!successMessage}
-                className='px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold shadow-lg hover:shadow-xl hover:from-green-600 hover:to-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
+                className='px-6 py-2.5 bg-green-600 text-white font-bold shadow-lg hover:shadow-xl hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2'
               >
                 {isSaving ? (
                   <>

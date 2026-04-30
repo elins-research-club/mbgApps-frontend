@@ -17,6 +17,7 @@ import {
 } from "@/services/orgService";
 import MainNavbar from "./MainNavbar";
 import Footer from "./Footer";
+import OrgApprovalBanner from "./OrgApprovalBanner";
 import {
   Users,
   Clock,
@@ -72,8 +73,8 @@ function TabButton({ active, onClick, icon: Icon, label, badge }) {
       onClick={onClick}
       className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition whitespace-nowrap ${
         active
-          ? "bg-orange-500 text-white shadow-sm"
-          : "text-slate-600 hover:bg-slate-100"
+          ? "bg-[#452829] text-white shadow-sm"
+          : "text-[#452829] hover:bg-[#E8D1C5]"
       }`}
     >
       <Icon className="w-4 h-4" />
@@ -127,18 +128,18 @@ function RoleFormModal({ initial, onSave, onClose, saving }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-          <h3 className="text-lg font-bold text-slate-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E8D1C5]">
+          <h3 className="text-lg font-bold text-[#17191B]">
             {initial ? "Edit Peran" : "Buat Peran Baru"}
           </h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+          <button onClick={onClose} className="text-[#C9A89A] hover:text-[#452829]">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+            <label className="block text-sm font-semibold text-[#37393B] mb-1.5">
               Nama Peran <span className="text-red-500">*</span>
             </label>
             <input
@@ -147,31 +148,31 @@ function RoleFormModal({ initial, onSave, onClose, saving }) {
               onChange={(e) => setName(e.target.value)}
               placeholder="Contoh: Chef, Ahli Gizi, Pengelola"
               required
-              className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 text-sm"
+              className="w-full px-4 py-2.5 border border-[#D9C7B8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D9C7B8] text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
+            <label className="block text-sm font-semibold text-[#37393B] mb-3">
               Hak Akses
             </label>
             <div className="space-y-2">
               {PERMISSION_DEFS.map((p) => (
                 <label
                   key={p.key}
-                  className="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition"
+                  className="flex items-start gap-3 p-3 rounded-xl border border-[#E8D1C5] hover:bg-white cursor-pointer transition"
                 >
                   <div className="pt-0.5">
                     <input
                       type="checkbox"
                       checked={!!perms[p.key]}
                       onChange={() => toggle(p.key)}
-                      className="w-4 h-4 accent-orange-500"
+                      className="w-4 h-4 accent-slate-500"
                     />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-800">{p.label}</p>
-                    <p className="text-xs text-slate-500">{p.description}</p>
+                    <p className="text-sm font-medium text-[#17191B]">{p.label}</p>
+                    <p className="text-xs text-white0">{p.description}</p>
                   </div>
                 </label>
               ))}
@@ -183,14 +184,14 @@ function RoleFormModal({ initial, onSave, onClose, saving }) {
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-xl transition"
+              className="px-4 py-2 text-sm font-semibold text-white bg-[#452829] hover:bg-[#6C2D19] rounded-xl transition"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={saving || !name.trim()}
-              className="px-4 py-2 text-sm font-semibold bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition disabled:opacity-60"
+              className="px-4 py-2 text-sm font-semibold bg-[#452829] hover:bg-[#6C2D19] text-white rounded-xl transition disabled:opacity-60"
             >
               {saving ? "Menyimpan..." : "Simpan"}
             </button>
@@ -203,7 +204,7 @@ function RoleFormModal({ initial, onSave, onClose, saving }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function OrgOwnerDashboard({ orgId }) {
-  const { user, canManageUsers, canManageRoles, refresh: refreshAuth } = useAuth();
+  const { user, canManageUsers, canManageRoles, refresh: refreshAuth, isOrgPending, isOrgRejected, organization } = useAuth();
   const router = useRouter();
 
   const [org, setOrg]               = useState(null);
@@ -379,18 +380,19 @@ export default function OrgOwnerDashboard({ orgId }) {
   // ── Render ───────────────────────────────────────────────────────────────────
   if (loadingData) {
     return (
-      <div className="flex flex-col min-h-screen bg-slate-50">
+      <div className="flex flex-col min-h-screen bg-white">
         <MainNavbar />
         <main className="flex-grow flex items-center justify-center">
-          <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-white0 border-t-transparent rounded-full animate-spin" />
         </main>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
+    <div className="flex flex-col min-h-screen bg-white">
       <MainNavbar />
+      <OrgApprovalBanner />
       <Toast msg={toast} />
 
       {roleModal !== null && (
@@ -402,20 +404,76 @@ export default function OrgOwnerDashboard({ orgId }) {
         />
       )}
 
+      {/* Pending Approval Overlay */}
+      {isOrgPending && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
+            <Clock className="w-16 h-16 text-[#452829] mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-[#17191B] mb-2">
+              Menunggu Persetujuan Admin
+            </h2>
+            <p className="text-[#452829] text-sm mb-6">
+              Organisasi <strong>{org?.name || organization?.name}</strong> sedang menunggu persetujuan dari administrator. 
+              Anda dapat melihat dashboard ini, tetapi belum dapat mengakses fitur organisasi.
+            </p>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+              <p className="text-xs text-amber-700">
+                💡 Hubungi administrator untuk mempercepat proses persetujuan.
+              </p>
+            </div>
+            <button
+              onClick={loadAll}
+              className="w-full px-4 py-2.5 bg-[#17191B] hover:bg-[#37393B] text-white font-semibold rounded-xl transition"
+            >
+              Refresh Status
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Rejected Overlay */}
+      {isOrgRejected && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
+            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-[#17191B] mb-2">
+              Organisasi Ditolak
+            </h2>
+            <p className="text-[#452829] text-sm mb-6">
+              Organisasi <strong>{org?.name || organization?.name}</strong> telah ditolak oleh administrator.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => router.push("/organization/create")}
+                className="flex-1 px-4 py-2.5 bg-white0 hover:bg-[#37393B] text-white font-semibold rounded-xl transition"
+              >
+                Buat Organisasi Baru
+              </button>
+              <button
+                onClick={loadAll}
+                className="flex-1 px-4 py-2.5 bg-[#D9C7B8] hover:bg-[#C9A89A] text-[#37393B] font-semibold rounded-xl transition"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="flex-grow max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">
+            <h1 className="text-2xl font-bold text-[#17191B]">
               {org?.name ?? "Dashboard Organisasi"}
             </h1>
             {org?.description && (
-              <p className="text-slate-500 text-sm mt-0.5">{org.description}</p>
+              <p className="text-white0 text-sm mt-0.5">{org.description}</p>
             )}
           </div>
           <button
             onClick={loadAll}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-600 hover:bg-slate-200 rounded-xl transition self-start sm:self-auto"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm text-[#452829] hover:bg-[#D9C7B8] rounded-xl transition self-start sm:self-auto"
           >
             <RefreshCcw className="w-4 h-4" /> Refresh
           </button>
@@ -424,34 +482,34 @@ export default function OrgOwnerDashboard({ orgId }) {
         {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: "Anggota Aktif",    value: active.length,      color: "text-green-600" },
-            { label: "Menunggu",         value: pending.length,     color: "text-yellow-600" },
-            { label: "Peran",            value: roles.length,       color: "text-blue-600" },
-            { label: "Total Anggota",    value: members.length,     color: "text-slate-700" },
+            { label: "Anggota Aktif",    value: active.length,      color: "text-black" },
+            { label: "Menunggu",         value: pending.length,     color: "text-black" },
+            { label: "Peran",            value: roles.length,       color: "text-black" },
+            { label: "Total Anggota",    value: members.length,     color: "text-black" },
           ].map((s) => (
-            <div key={s.label} className="bg-white rounded-2xl border border-slate-200 p-4 text-center">
+            <div key={s.label} className="bg-white rounded-2xl border border-[#E8D1C5] p-4 text-center">
               <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-slate-500 mt-0.5">{s.label}</p>
+              <p className="text-xs text-[#57595B] mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* Organization hierarchy */}
-        <section className="bg-white rounded-2xl border border-slate-200 p-5">
+        <section className="bg-white rounded-2xl border border-[#E8D1C5] p-5">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <div className="flex items-center gap-2 text-slate-800 font-semibold">
-                <GitBranch className="w-4 h-4 text-orange-500" />
+              <div className="flex items-center gap-2 text-[#17191B] font-semibold">
+                <GitBranch className="w-4 h-4 text-white0" />
                 Struktur Organisasi
               </div>
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm text-white0 mt-1">
                 Kedalaman saat ini: {currentOrgDepth}/{MAX_ORG_DEPTH}. Sub-organisasi hanya bisa dibuat hingga kedalaman {MAX_ORG_DEPTH}.
               </p>
             </div>
             <button
               onClick={handleCreateSubOrganization}
               disabled={!canCreateSubOrg}
-              className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#452829] hover:bg-[#6C2D19] text-white rounded-xl text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
               title={
                 canCreateSubOrg
                   ? "Buat sub-organisasi"
@@ -463,21 +521,21 @@ export default function OrgOwnerDashboard({ orgId }) {
           </div>
         </section>
 
-        <section className="bg-white rounded-2xl border border-slate-200 p-5">
+        <section className="bg-white rounded-2xl border border-[#E8D1C5] p-5">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
-              <h3 className="text-slate-800 font-semibold">Sub-Organisasi</h3>
-              <p className="text-sm text-slate-500 mt-0.5">
+              <h3 className="text-[#17191B] font-semibold">Sub-Organisasi</h3>
+              <p className="text-sm text-white0 mt-0.5">
                 Daftar organisasi turunan langsung dari organisasi ini.
               </p>
             </div>
-            <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">
+            <span className="px-2.5 py-1 rounded-full bg-[#452829] text-white text-xs font-semibold">
               {subOrganizations.length} item
             </span>
           </div>
 
           {subOrganizations.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm text-slate-500 text-center">
+            <div className="rounded-xl border border-dashed border-[#D9C7B8] bg-white px-4 py-6 text-sm text-white0 text-center">
               Belum ada sub-organisasi.
             </div>
           ) : (
@@ -490,18 +548,18 @@ export default function OrgOwnerDashboard({ orgId }) {
                 return (
                   <div
                     key={subId || `${subName}-${subDepth}`}
-                    className="rounded-xl border border-slate-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                    className="rounded-xl border border-[#E8D1C5] px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-800 truncate">{subName}</p>
-                      <p className="text-xs text-slate-500 truncate mt-0.5">{subDescription}</p>
-                      <p className="text-xs text-slate-400 mt-1">Depth: {subDepth}</p>
+                      <p className="text-sm font-semibold text-[#17191B] truncate">{subName}</p>
+                      <p className="text-xs text-white0 truncate mt-0.5">{subDescription}</p>
+                      <p className="text-xs text-[#C9A89A] mt-1">Depth: {subDepth}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => subId && router.push(`/organization/${subId}/dashboard`)}
                       disabled={!subId}
-                      className="px-3 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-white hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-3 py-2 rounded-lg text-xs font-semibold bg-[#17191B] text-white hover:bg-[#37393B] transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Buka Dashboard
                     </button>
@@ -527,15 +585,15 @@ export default function OrgOwnerDashboard({ orgId }) {
 
         {/* TAB: Pending requests */}
         {tab === "pending" && canManageUsers && (
-          <section className="bg-white rounded-2xl border border-slate-200 shadow-sm">
-            <div className="px-6 py-4 border-b border-slate-100">
-              <h2 className="font-semibold text-slate-800">Permintaan Bergabung</h2>
-              <p className="text-xs text-slate-500 mt-0.5">
+          <section className="bg-white rounded-2xl border border-[#E8D1C5] shadow-sm">
+            <div className="px-6 py-4 border-b border-white">
+              <h2 className="font-semibold text-[#17191B]">Permintaan Bergabung</h2>
+              <p className="text-xs text-white0 mt-0.5">
                 Terima atau tolak pengguna yang ingin bergabung ke organisasi Anda
               </p>
             </div>
             {pending.length === 0 ? (
-              <div className="px-6 py-10 text-center text-slate-400 text-sm">
+              <div className="px-6 py-10 text-center text-[#C9A89A] text-sm">
                 Tidak ada permintaan yang menunggu
               </div>
             ) : (
@@ -546,10 +604,10 @@ export default function OrgOwnerDashboard({ orgId }) {
                   return (
                   <li key={m.id} className="flex items-center justify-between px-6 py-4 gap-4">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-slate-800 truncate">
+                      <p className="font-medium text-[#17191B] truncate">
                         {getUserName(m)}
                       </p>
-                      <p className="text-xs text-slate-500 truncate">
+                      <p className="text-xs text-white0 truncate">
                         ID: {userId?.slice(0, 8)}… · via {inviteMethod}
                       </p>
                     </div>
@@ -577,12 +635,12 @@ export default function OrgOwnerDashboard({ orgId }) {
 
         {/* TAB: Active members */}
         {tab === "members" && canManageUsers && (
-          <section className="bg-white rounded-2xl border border-slate-200 shadow-sm">
-            <div className="px-6 py-4 border-b border-slate-100">
-              <h2 className="font-semibold text-slate-800">Daftar Anggota Aktif</h2>
+          <section className="bg-white rounded-2xl border border-[#E8D1C5] shadow-sm">
+            <div className="px-6 py-4 border-b border-white">
+              <h2 className="font-semibold text-[#17191B]">Daftar Anggota Aktif</h2>
             </div>
             {active.length === 0 ? (
-              <div className="px-6 py-10 text-center text-slate-400 text-sm">
+              <div className="px-6 py-10 text-center text-[#C9A89A] text-sm">
                 Belum ada anggota aktif
               </div>
             ) : (
@@ -595,23 +653,23 @@ export default function OrgOwnerDashboard({ orgId }) {
                   const roleId = m.roleId || m.role_id;
                   return (
                   <li key={m.id} className="flex items-center gap-4 px-6 py-4">
-                    <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-bold text-slate-500">
+                    <div className="w-9 h-9 rounded-full bg-[#E8D1C5] flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-white0">
                         {userName[0].toUpperCase()}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-slate-800 truncate">
+                        <p className="font-medium text-[#17191B] truncate">
                           {userName}
                         </p>
                         {isOwner && (
-                          <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">
+                          <span className="px-2 py-0.5 bg-[#E8D1C5] text-[#17191B] rounded-full text-xs font-semibold">
                             Owner
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-white0">
                         Bergabung {joinedDate ? new Date(joinedDate).toLocaleDateString("id-ID") : "—"}
                       </p>
                     </div>
@@ -619,7 +677,7 @@ export default function OrgOwnerDashboard({ orgId }) {
                       <select
                         value={roleId ?? ""}
                         onChange={(e) => handleAssignRole(m.id, e.target.value)}
-                        className="text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-orange-300 bg-white text-slate-700"
+                        className="text-xs border border-[#D9C7B8] rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#D9C7B8] bg-white text-[#37393B]"
                       >
                         <option value="">Tanpa peran</option>
                         {roles.map((r) => (
@@ -647,17 +705,17 @@ export default function OrgOwnerDashboard({ orgId }) {
         {tab === "roles" && canManageRoles && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-slate-800">Peran & Hak Akses</h2>
+              <h2 className="font-semibold text-[#17191B]">Peran & Hak Akses</h2>
               <button
                 onClick={() => setRoleModal("new")}
-                className="flex items-center gap-1.5 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-semibold transition shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-2 bg-[#452829] hover:bg-[#6C2D19] text-white rounded-xl text-sm font-semibold transition shadow-sm"
               >
                 <Plus className="w-4 h-4" /> Tambah Peran
               </button>
             </div>
 
             {roles.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200 px-6 py-10 text-center text-slate-400 text-sm">
+              <div className="bg-white rounded-2xl border border-[#E8D1C5] px-6 py-10 text-center text-[#C9A89A] text-sm">
                 Belum ada peran. Buat peran untuk mengatur hak akses anggota.
               </div>
             ) : (
@@ -669,23 +727,23 @@ export default function OrgOwnerDashboard({ orgId }) {
                   return (
                     <div
                       key={role.id}
-                      className="bg-white rounded-2xl border border-slate-200 p-5"
+                      className="bg-white rounded-2xl border border-[#E8D1C5] p-5"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <p className="font-semibold text-slate-800">
+                          <p className="font-semibold text-[#17191B]">
                             {role.name}
                           </p>
                           <div className="flex flex-wrap gap-1.5 mt-2">
                             {grantedPerms.length === 0 ? (
-                              <span className="text-xs text-slate-400">
+                              <span className="text-xs text-[#C9A89A]">
                                 Tidak ada hak akses
                               </span>
                             ) : (
                               grantedPerms.map((p) => (
                                 <span
                                   key={p.key}
-                                  className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium"
+                                  className="px-2 py-0.5 bg-[#E8D1C5] text-[#17191B] rounded-full text-xs font-medium"
                                 >
                                   {p.label}
                                 </span>
@@ -696,7 +754,7 @@ export default function OrgOwnerDashboard({ orgId }) {
                         <div className="flex gap-2 flex-shrink-0">
                           <button
                             onClick={() => setRoleModal(role)}
-                            className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition"
+                            className="p-2 text-white0 hover:text-[#37393B] hover:bg-[#E8D1C5] rounded-lg transition"
                             title="Edit peran"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -719,21 +777,21 @@ export default function OrgOwnerDashboard({ orgId }) {
         )}
 
         {/* Invite code card */}
-        <section className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h3 className="font-semibold text-slate-800 mb-1">Kode Undangan</h3>
-          <p className="text-sm text-slate-500 mb-4">
+        <section className="bg-white rounded-2xl border border-[#E8D1C5] p-6">
+          <h3 className="font-semibold text-[#17191B] mb-1">Kode Undangan</h3>
+          <p className="text-sm text-white0 mb-4">
             Bagikan kode ini kepada siapa saja yang ingin Anda ajak bergabung
           </p>
           <div className="flex items-center gap-3">
-            <div className="flex-1 flex items-center justify-center bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl px-6 py-4">
-              <span className="text-2xl font-bold tracking-widest text-slate-800">
+            <div className="flex-1 flex items-center justify-center bg-white border-2 border-dashed border-[#D9C7B8] rounded-xl px-6 py-4">
+              <span className="text-2xl font-bold tracking-widest text-[#17191B]">
                 {org?.inviteCode || org?.invite_code || "—"}
               </span>
             </div>
             <button
               onClick={copyCode}
               disabled={!org?.inviteCode && !org?.invite_code}
-              className="flex items-center gap-2 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-3 bg-[#17191B] hover:bg-[#37393B] text-white rounded-xl text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {codeCopied ? (
                 <><Check className="w-4 h-4" /> Tersalin</>

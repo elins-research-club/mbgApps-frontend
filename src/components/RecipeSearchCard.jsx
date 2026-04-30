@@ -128,16 +128,16 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
   return (
     <div
       ref={wrapperRef}
-      className="bg-white p-6 rounded-2xl shadow-lg border border-slate-200"
+      className="bg-white p-6 rounded-2xl shadow-lg border border-[#E8D1C5]"
     >
       <div className="flex items-center gap-3 mb-4">
-        <SearchIcon className="w-6 h-6 text-orange-500" />
-        <h3 className="text-xl font-bold text-orange-500">
+        <SearchIcon className="w-6 h-6 text-white0" />
+        <h3 className="text-xl font-bold text-white0">
           Cari Resep Individual
         </h3>
       </div>
 
-      <p className="text-sm text-slate-600 mb-4">
+      <p className="text-sm text-[#452829] mb-4">
         Cari dan lihat label nutrisi dari satu resep saja
       </p>
 
@@ -148,16 +148,16 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ketik nama menu (min. 2 karakter)..."
-          className="w-full p-3 pl-10 pr-10 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition disabled:bg-slate-100 disabled:cursor-not-allowed"
+          className="w-full p-3 pl-10 pr-10 border border-[#D9C7B8] rounded-lg outline-none focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-transparent transition disabled:bg-[#E8D1C5] disabled:cursor-not-allowed"
           disabled={isLoading}
         />
 
-        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#C9A89A]" />
 
         {isSearching && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
             <svg
-              className="animate-spin h-5 w-5 text-orange-500"
+              className="animate-spin h-5 w-5 text-white0"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -181,12 +181,12 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
 
         {/* Suggestions Dropdown */}
         {suggestions.length > 0 && (
-          <ul className="absolute z-10 w-full bg-white border border-slate-300 rounded-lg shadow-xl mt-1 max-h-80 overflow-y-auto">
+          <ul className="absolute z-10 w-full bg-white border border-[#D9C7B8] rounded-lg shadow-xl mt-1 max-h-80 overflow-y-auto">
             {suggestions.map((recipe, index) => (
               <li
                 key={recipe.id}
-                className={`p-3 cursor-pointer border-b border-slate-100 last:border-b-0 transition-colors ${
-                  index === selectedIndex ? "bg-orange-50" : "hover:bg-slate-50"
+                className={`p-3 cursor-pointer border-b border-white last:border-b-0 transition-colors ${
+                  index === selectedIndex ? "bg-white" : "hover:bg-white"
                 }`}
                 onClick={() => handleSelect(recipe)}
                 onMouseEnter={() => setSelectedIndex(index)}
@@ -194,13 +194,13 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-slate-800 truncate">
+                      <p className="font-semibold text-[#17191B] truncate">
                         {recipe.nama}
                       </p>
-                      <p className="text-xs text-slate-500">ID: {recipe.id}</p>
+                      <p className="text-xs text-white0">ID: {recipe.id}</p>
                     </div>
                   </div>
-                  <span className="text-xs px-2 py-1 bg-orange-100 text-orange-600 rounded flex-shrink-0">
+                  <span className="text-xs px-2 py-1 bg-[#E8D1C5] text-[#37393B] rounded flex-shrink-0">
                     {recipe.kategori === "karbohidrat" && "Karbohidrat"}
                     {recipe.kategori === "proteinHewani" && "Protein Hewani"}
                     {recipe.kategori === "sayur" && "Sayur"}
@@ -223,8 +223,8 @@ const RecipeSearchCard = ({ onRecipeSelect, isLoading }) => {
 
         {/* No results message */}
         {/* {!isSearching && query.length >= 2 && suggestions.length === 0 && (
-          <div className="absolute z-10 w-full bg-white border border-slate-300 rounded-lg shadow-xl mt-1 p-4">
-            <p className="text-sm text-slate-500 text-center">
+          <div className="absolute z-10 w-full bg-white border border-[#D9C7B8] rounded-lg shadow-xl mt-1 p-4">
+            <p className="text-sm text-white0 text-center">
               Tidak ada resep yang ditemukan dengan kata kunci "{query}"
             </p>
           </div>

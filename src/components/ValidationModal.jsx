@@ -35,7 +35,7 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col m-4">
         {/* Header */}
-        <div className="bg-orange-500 px-8 py-5">
+        <div className="bg-white0 px-8 py-5">
           <h2 className="text-xl font-semibold text-white">
             Validasi Data Gizi
           </h2>
@@ -46,9 +46,9 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
         <div className="flex-1 overflow-y-auto p-8 space-y-6">
           {/* Input Nama Ahli Gizi */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+            <label className="text-sm font-medium text-[#37393B] mb-2 flex items-center gap-2">
               <svg
-                className="w-4 h-4 text-orange-500"
+                className="w-4 h-4 text-white0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -60,7 +60,7 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              Nama Ahli Gizi <span className="text-orange-500">*</span>
+              Nama Ahli Gizi <span className="text-white0">*</span>
             </label>
             <input
               type="text"
@@ -70,7 +70,7 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
                 setError("");
               }}
               placeholder="Contoh: Dr. Budi Santoso, S.Gz"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
+              className="w-full px-4 py-2.5 border border-[#D9C7B8] rounded-lg focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-white0 outline-none transition-all"
             />
           </div>
 
@@ -97,13 +97,13 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
           {/* Nutrition Data Editor */}
           <div>
             <details
-              className="group bg-gray-50 rounded-lg border border-gray-200"
+              className="group bg-white rounded-lg border border-[#E8D1C5]"
               open
             >
-              <summary className="flex items-center justify-between p-4 cursor-pointer select-none hover:bg-gray-100 transition-colors rounded-lg">
+              <summary className="flex items-center justify-between p-4 cursor-pointer select-none hover:bg-[#E8D1C5] transition-colors rounded-lg">
                 <div className="flex items-center gap-3">
                   <svg
-                    className="w-5 h-5 text-orange-500"
+                    className="w-5 h-5 text-white0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -116,16 +116,16 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
                     />
                   </svg>
                   <div>
-                    <p className="font-medium text-gray-900">Data Nutrisi</p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="font-medium text-black">Data Nutrisi</p>
+                    <p className="text-xs text-white0 mt-1">
                       Takaran Saji: {ingredient.nutritionData.takaran_saji_g}g
                     </p>
                   </div>
                 </div>
-                <ChevronDown className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" />
+                <ChevronDown className="w-5 h-5 text-[#C9A89A] group-open:rotate-180 transition-transform" />
               </summary>
 
-              <div className="px-4 pb-4 border-t border-gray-200">
+              <div className="px-4 pb-4 border-t border-[#E8D1C5]">
                 <div className="pt-4">
                   <NutritionLabel
                     data={editableData}
@@ -140,19 +140,19 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="px-8 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3">
+        <div className="px-8 py-4 bg-white border-t border-[#E8D1C5] flex items-center justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
             disabled={isSaving}
-            className="px-5 py-2 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
+            className="px-5 py-2 text-[#37393B] font-medium rounded-lg hover:bg-[#D9C7B8] transition disabled:opacity-50"
           >
             Batal
           </button>
           <button
             onClick={handleValidate}
             disabled={isSaving || !validatorName.trim()}
-            className="px-5 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition disabled:opacity-50 flex items-center gap-2"
+            className="px-5 py-2 bg-white0 text-white font-medium rounded-lg hover:bg-[#37393B] transition disabled:opacity-50 flex items-center gap-2"
           >
             {isSaving ? (
               <>

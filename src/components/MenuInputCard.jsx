@@ -69,7 +69,7 @@ const MenuInputCard = ({ onSubmit, isLoading, error }) => {
 
   return (
     <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8">
-      <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+      <h2 className="text-2xl font-bold text-[#17191B] mb-6 flex items-center gap-3">
         <Image src="/input-icon.png" alt="Icon Menu" width={32} height={32} />
         Input Komposisi Menu
       </h2>
@@ -79,7 +79,7 @@ const MenuInputCard = ({ onSubmit, isLoading, error }) => {
         <div>
           <label
             htmlFor="target"
-            className="block text-sm font-medium text-slate-700"
+            className="block text-sm font-medium text-[#37393B]"
           >
             Target Audiens (Kelompok Usia)
           </label>
@@ -88,7 +88,7 @@ const MenuInputCard = ({ onSubmit, isLoading, error }) => {
             name="target"
             value={target}
             onChange={(e) => setTarget(e.target.value)}
-            className="w-full mt-2 p-3 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none transition"
+            className="w-full mt-2 p-3 bg-white border border-[#D9C7B8] rounded-lg focus:ring-2 focus:ring-green-500 outline-none transition"
             disabled={isLoading}
           >
             {targetOptions.map((option) => (
@@ -101,7 +101,7 @@ const MenuInputCard = ({ onSubmit, isLoading, error }) => {
 
         {/* BARU: Input Menu Komposisi Chef */}
         <div>
-          <label className="block text-md font-semibold text-slate-600 mb-1">
+          <label className="block text-md font-semibold text-[#452829] mb-1">
             Pilih Menu Komposisi Chef
           </label>
           {/* Menggunakan SearchCard dan mengirim type="composition" */}
@@ -124,7 +124,7 @@ const MenuInputCard = ({ onSubmit, isLoading, error }) => {
         <button
           type="submit"
           disabled={isLoading || !selectedMenuId}
-          className="mt-6 w-full py-4 bg-green-500 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-600 transition-colors disabled:bg-slate-400 disabled:cursor-not-allowed"
+          className="mt-6 w-full py-4 bg-green-500 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-green-600 transition-colors disabled:bg-[#AA7F7F] disabled:cursor-not-allowed"
         >
           {isLoading ? "Menganalisis..." : "Generate Nutrisi Menu"}
         </button>

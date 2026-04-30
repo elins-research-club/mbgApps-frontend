@@ -37,7 +37,7 @@ const LoginModal = ({ onClose }) => {
         {/* Tombol Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+          className="absolute top-4 right-4 text-[#C9A89A] hover:text-[#452829]"
         >
           <svg
             className="w-6 h-6"
@@ -55,7 +55,7 @@ const LoginModal = ({ onClose }) => {
         </button>
 
         <form onSubmit={handleSubmit}>
-          <h2 className="text-3xl font-bold text-orange-500 text-center mb-8">
+          <h2 className="text-3xl font-bold text-white0 text-center mb-8">
             LOGIN AKUN
           </h2>
 
@@ -63,7 +63,7 @@ const LoginModal = ({ onClose }) => {
             <div>
               <label
                 htmlFor="username"
-                className="text-lg font-semibold text-slate-700"
+                className="text-lg font-semibold text-[#37393B]"
               >
                 Username
               </label>
@@ -72,13 +72,13 @@ const LoginModal = ({ onClose }) => {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full mt-2 p-4 border-none rounded-lg text-lg bg-orange-100 text-orange-900 placeholder-orange-300 focus:ring-2 focus:ring-orange-500 outline-none"
+                className="w-full mt-2 p-4 border-none rounded-lg text-lg bg-[#E8D1C5] text-orange-900 placeholder-slate-300 focus:ring-2 focus:ring-[#F3E8DF]0 outline-none"
               />
             </div>
             <div>
               <label
                 htmlFor="password"
-                className="text-lg font-semibold text-slate-700"
+                className="text-lg font-semibold text-[#37393B]"
               >
                 Password
               </label>
@@ -87,7 +87,7 @@ const LoginModal = ({ onClose }) => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full mt-2 p-4 border-none rounded-lg text-lg bg-orange-100 text-orange-900 placeholder-orange-300 focus:ring-2 focus:ring-orange-500 outline-none"
+                className="w-full mt-2 p-4 border-none rounded-lg text-lg bg-[#E8D1C5] text-orange-900 placeholder-slate-300 focus:ring-2 focus:ring-[#F3E8DF]0 outline-none"
               />
             </div>
           </div>
@@ -99,7 +99,7 @@ const LoginModal = ({ onClose }) => {
           <button
             type="submit"
             disabled={isLoading}
-            className="mt-8 w-full py-4 bg-orange-500 text-white font-bold text-xl rounded-lg shadow-lg hover:bg-orange-600 transition-colors disabled:bg-slate-400"
+            className="mt-8 w-full py-4 bg-white0 text-white font-bold text-xl rounded-lg shadow-lg hover:bg-[#37393B] transition-colors disabled:bg-[#AA7F7F]"
           >
             {isLoading ? "Loading..." : "LOGIN"}
           </button>

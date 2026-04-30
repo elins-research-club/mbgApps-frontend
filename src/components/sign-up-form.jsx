@@ -29,7 +29,6 @@ export function SignUpForm({
 
   const handleSignUp = async (e) => {
     e.preventDefault()
-    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 
@@ -40,17 +39,51 @@ export function SignUpForm({
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log('📝 [SIGNUP] Creating user via backend API...')
+      
+      // Use backend API to create user
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/sign-up`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          fullName: fullName.trim(),
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create user')
+      }
+
+      console.log('✅ [SIGNUP] User created successfully:', data)
+      console.log('   User ID:', data.userId)
+      console.log('   Has Organization:', data.hasOrganization)
+
+      // Auto-login after signup (user is already confirmed)
+      console.log('🔐 [SIGNUP] Auto-login...')
+      const supabase = createClient()
+      const { error: loginError } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          data: { full_name: fullName.trim() },
-          emailRedirectTo: `${window.location.origin}/`,
-        },
       })
-      if (error) throw error
-      router.push('/auth/sign-up-success')
+
+      if (loginError) {
+        console.error('❌ [SIGNUP] Auto-login failed:', loginError)
+        throw loginError
+      }
+
+      console.log('✅ [SIGNUP] Auto-login successful')
+
+      // Redirect to home page (organization is optional)
+      console.log('🏠 [SIGNUP] Redirecting to home...')
+      router.push('/')
     } catch (err) {
+      console.error('❌ [SIGNUP] Error:', err)
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan')
     } finally {
       setIsLoading(false)

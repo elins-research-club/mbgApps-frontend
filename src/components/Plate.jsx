@@ -9,14 +9,14 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
   return (
     <div className="relative">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-gray-800 flex items-center">
-          <svg className="w-6 h-6 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <h3 className="text-xl font-bold text-[#17191B] flex items-center">
+          <svg className="w-6 h-6 mr-2 text-[#452829]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
           Piring Anda
         </h3>
         {recipes.length > 0 && (
-          <span className="text-sm text-gray-600 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
+          <span className="text-sm text-[#452829] bg-[#F3E8DF]/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
             {recipes.length} resep
           </span>
         )}
@@ -25,7 +25,7 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
       {/* Name Input Field */}
       {recipes.length > 0 && (
         <div className="mb-4">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-[#37393B] mb-2">
             Nama Meal Plan
           </label>
           <input
@@ -33,7 +33,7 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
             value={planName}
             onChange={(e) => onPlanNameChange(e.target.value)}
             placeholder="Contoh: Menu Sehat Anak SD Kelas 4"
-            className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm transition-colors"
+            className="w-full px-4 py-2.5 border-2 border-[#D9C7B8] rounded-lg focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-white0 text-sm transition-colors"
           />
         </div>
       )}
@@ -56,28 +56,28 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
         )}
 
         {recipes.length === 0 ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-[#452829]">
             <svg className="w-16 h-16 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
             </svg>
-            <p className="text-lg font-medium bg-white/80 backdrop-blur-sm px-4 py-2 rounded-lg">
+            <p className="text-lg font-medium bg-[#F3E8DF]/90 backdrop-blur-sm px-4 py-2 rounded-lg">
               Seret menu ke sini
             </p>
-            <p className="text-sm mt-2 bg-white/80 backdrop-blur-sm px-3 py-1 rounded">
+            <p className="text-sm mt-2 bg-[#F3E8DF]/90 backdrop-blur-sm px-3 py-1 rounded">
               Drag and drop untuk menambahkan
             </p>
           </div>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center p-12">
-            <div className="grid grid-cols-2 gap-3 max-w-md">
+            <div className="grid grid-cols-3 gap-2 w-full max-w-3xl px-8 md:px-12 justify-items-center">
               {recipes.map(recipe => (
                 <div
                   key={recipe.id}
-                  className="relative group bg-white/95 backdrop-blur-sm border-2 border-green-300 rounded-xl p-3 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                  className="relative group w-full max-w-[170px] h-full bg-white/95 backdrop-blur-sm border-2 border-[#D9C7B8] rounded-xl p-3 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
                 >
-                  <div className="flex flex-col">
-                    <h4 className="font-bold text-gray-800 text-sm line-clamp-2">{recipe.nama}</h4>
-                    <p className="text-xs text-gray-600 mt-1">
+                  <div className="flex flex-col h-full">
+                    <h4 className="font-bold text-[#17191B] text-sm line-clamp-2">{recipe.nama}</h4>
+                    <p className="text-xs text-[#452829] mt-1">
                       {recipe.kategori || 'Menu'}
                     </p>
                     <p className="text-xs text-green-700 font-semibold mt-1">
@@ -85,11 +85,11 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
                     </p>
                     
                     {/* Quantity Controls */}
-                    <div className="flex items-center justify-center gap-2 mt-2 bg-orange-50 rounded-lg p-1">
+                    <div className="flex items-center justify-center gap-2 mt-auto pt-2 bg-[#E8D1C5] rounded-lg p-1">
                       <button
                         onClick={() => onDecrease(recipe.id)}
                         disabled={recipe.quantity <= 0.1}
-                        className="w-6 h-6 flex items-center justify-center bg-orange-400 text-white rounded-md hover:bg-orange-500 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                        className="w-6 h-6 flex items-center justify-center bg-[#8B5E4A] text-[#FFF7F2] rounded-md hover:bg-[#6F4A3A] disabled:bg-[#C9A89A] disabled:cursor-not-allowed transition-colors"
                         title="Kurangi"
                       >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,12 +102,12 @@ export default function Plate({ recipes, planName, onPlanNameChange, onRemove, o
                         value={recipe.quantity === '' || recipe.quantity === undefined ? '' : recipe.quantity}
                         onChange={(e) => onUpdateQuantity(recipe.id, e.target.value)}
                         onBlur={(e) => onQuantityBlur(recipe.id, e.target.value)}
-                        className="w-14 text-sm font-bold text-gray-700 text-center border border-orange-200 rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-orange-400 focus:border-orange-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-14 text-sm font-bold text-[#37393B] text-center border border-[#E8D1C5] rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#F3E8DF]0 focus:border-white0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
-                      <span className="text-xs text-gray-600">×</span>
+                      <span className="text-xs text-[#452829]">×</span>
                       <button
                         onClick={() => onIncrease(recipe.id)}
-                        className="w-6 h-6 flex items-center justify-center bg-orange-400 text-white rounded-md hover:bg-orange-500 transition-colors"
+                        className="w-6 h-6 flex items-center justify-center bg-[#8B5E4A] text-[#FFF7F2] rounded-md hover:bg-[#6F4A3A] transition-colors"
                         title="Tambah"
                       >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

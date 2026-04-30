@@ -77,7 +77,7 @@ const AutoCompleteInput = ({
 
   return (
     <div className="relative">
-      <label htmlFor={id} className="text-md font-semibold text-slate-600">
+      <label htmlFor={id} className="text-md font-semibold text-[#452829]">
         {label}
       </label>
       <div className="relative mt-2">
@@ -90,25 +90,25 @@ const AutoCompleteInput = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)} // Delay onBlur
           placeholder={placeholder}
-          className="w-full p-3 pl-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none transition"
+          className="w-full p-3 pl-10 border border-[#D9C7B8] rounded-lg focus:ring-2 focus:ring-gray-500 outline-none transition"
           autoComplete="off"
         />
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C9A89A]">
           <SearchIcon />
         </div>
       </div>
 
       {/* Suggestions Dropdown */}
       {isFocused && suggestions.length > 0 && (
-        <ul className="absolute z-10 w-full bg-white rounded-lg mt-1 shadow-xl border border-slate-100 overflow-hidden max-h-60 overflow-y-auto">
+        <ul className="absolute z-10 w-full bg-white rounded-lg mt-1 shadow-xl border border-white overflow-hidden max-h-60 overflow-y-auto">
           {suggestions.map((menu) => (
             <li
               key={menu.id}
               onClick={() => handleSelectSuggestion(menu)}
-              className="px-4 py-2.5 hover:bg-slate-100 cursor-pointer flex items-center gap-2 transition-colors text-sm"
+              className="px-4 py-2.5 hover:bg-[#E8D1C5] cursor-pointer flex items-center gap-2 transition-colors text-sm"
             >
               {/* Anda bisa tambahkan ikon kategori di sini jika mau */}
-              <span className="text-slate-700">{menu.nama}</span>
+              <span className="text-[#37393B]">{menu.nama}</span>
             </li>
           ))}
         </ul>

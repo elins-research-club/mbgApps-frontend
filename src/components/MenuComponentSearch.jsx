@@ -121,22 +121,22 @@ const MenuComponentSearch = ({
         onChange={handleQueryChange}
         onFocus={() => query.length >= 2 || suggestions.length > 0}
         placeholder={placeholder}
-        className="w-full p-3 pl-10 border border-slate-300 rounded-lg outline-none transition disabled:bg-slate-100"
+        className="w-full p-3 pl-10 border border-[#D9C7B8] rounded-lg outline-none transition disabled:bg-[#E8D1C5]"
         disabled={disabled || propIsLoading}
       />
-      <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+      <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#C9A89A]" />
 
       {/* Saran Menu (Suggestions) */}
       {suggestions.length > 0 && (
-        <ul className="absolute z-10 w-full bg-white border border-slate-300 rounded-lg shadow-xl mt-1 max-h-60 overflow-y-auto">
+        <ul className="absolute z-10 w-full bg-white border border-[#D9C7B8] rounded-lg shadow-xl mt-1 max-h-60 overflow-y-auto">
           {suggestions.map((menu) => (
             <li
               key={menu.id}
-              className="p-3 cursor-pointer hover:bg-slate-100 transition-colors"
+              className="p-3 cursor-pointer hover:bg-[#E8D1C5] transition-colors"
               onClick={() => handleSelect(menu.id, menu.nama)}
             >
-              <span className="text-slate-700 font-semibold">{menu.nama}</span>
-              <span className="text-xs text-slate-500 ml-2">
+              <span className="text-[#37393B] font-semibold">{menu.nama}</span>
+              <span className="text-xs text-white0 ml-2">
                 ({menu.kategori})
               </span>
             </li>

@@ -18,7 +18,7 @@ const NutritionPerRecipeCard = ({ data }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#E8D1C5]">
       <div className="p-6 lg:p-8">
         <div className="flex items-center gap-3 mb-5">
           <Image
@@ -29,7 +29,7 @@ const NutritionPerRecipeCard = ({ data }) => {
             className="w-10 h-10"
             style={{ objectFit: "contain" }}
           />
-          <h3 className="text-2xl font-bold text-orange-500">
+          <h3 className="text-2xl font-bold text-white0">
             Nutrisi Per Resep
           </h3>
         </div>
@@ -38,7 +38,7 @@ const NutritionPerRecipeCard = ({ data }) => {
           {data.map((resep, index) => (
             <details
               key={index}
-              className="group bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200"
+              className="group bg-white rounded-xl shadow-sm border border-[#E8D1C5] hover:shadow-md transition-all duration-200"
             >
               <summary className="flex items-center justify-between p-4 cursor-pointer select-none">
                 <div className="flex items-center gap-3">
@@ -46,54 +46,54 @@ const NutritionPerRecipeCard = ({ data }) => {
                     {categoryIcons[resep.kategori] || "🍽️"}
                   </span>
                   <div>
-                    <p className="font-semibold text-slate-800 group-hover:text-orange-500 transition-colors">
+                    <p className="font-semibold text-[#17191B] group-hover:text-white0 transition-colors">
                       {resep.kategori_label}: {resep.nama_menu}
                     </p>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-white0 mt-0.5">
                       {resep.gramasi}g •{" "}
                       {Math.round(resep.nutrisi.energi_kkal || 0)} kkal
                     </p>
                   </div>
                 </div>
-                <ChevronDown className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform duration-200" />
+                <ChevronDown className="w-5 h-5 text-[#C9A89A] group-open:rotate-180 transition-transform duration-200" />
               </summary>
 
-              <div className="px-4 pb-4 border-t border-slate-100">
+              <div className="px-4 pb-4 border-t border-white">
                 <div className="pt-4 space-y-2">
                   {/* Grid 2 kolom untuk nutrisi */}
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Energi:</span>
+                      <span className="text-[#452829]">Energi:</span>
                       <span className="font-semibold">
                         {Math.round(resep.nutrisi.energi_kkal || 0)} kkal
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Protein:</span>
+                      <span className="text-[#452829]">Protein:</span>
                       <span className="font-semibold">
                         {(resep.nutrisi.protein_g || 0).toFixed(1)}g
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Lemak:</span>
+                      <span className="text-[#452829]">Lemak:</span>
                       <span className="font-semibold">
                         {(resep.nutrisi.lemak_g || 0).toFixed(1)}g
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Karbohidrat:</span>
+                      <span className="text-[#452829]">Karbohidrat:</span>
                       <span className="font-semibold">
                         {(resep.nutrisi.karbohidrat_g || 0).toFixed(1)}g
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Serat:</span>
+                      <span className="text-[#452829]">Serat:</span>
                       <span className="font-semibold">
                         {(resep.nutrisi.serat_g || 0).toFixed(1)}g
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Natrium:</span>
+                      <span className="text-[#452829]">Natrium:</span>
                       <span className="font-semibold">
                         {Math.round(resep.nutrisi.natrium_mg || 0)}mg
                       </span>
@@ -101,10 +101,10 @@ const NutritionPerRecipeCard = ({ data }) => {
                   </div>
 
                   {/* Divider */}
-                  <div className="border-t border-slate-200 my-2"></div>
+                  <div className="border-t border-[#E8D1C5] my-2"></div>
 
                   {/* Micronutrients - 2 columns */}
-                  <div className="text-xs text-slate-600 grid grid-cols-2 gap-x-4 gap-y-1">
+                  <div className="text-xs text-[#452829] grid grid-cols-2 gap-x-4 gap-y-1">
                     <div className="flex justify-between">
                       <span>Kalsium:</span>
                       <span>{Math.round(resep.nutrisi.kalsium_mg || 0)}mg</span>

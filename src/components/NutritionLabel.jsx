@@ -13,7 +13,7 @@ const EditableRow = ({ label, value, unit, onChange }) => (
         type="number"
         value={value}
         onChange={onChange}
-        className="w-24 p-1 border border-slate-300 rounded-md text-right focus:ring-2 focus:ring-orange-500 outline-none"
+        className="w-24 p-1 border border-[#D9C7B8] rounded-md text-right focus:ring-2 focus:ring-[#F3E8DF]0 outline-none"
       />
       <span>{unit}</span>
     </div>
@@ -30,7 +30,7 @@ const ReadOnlyRow = ({ label, value, unit, akgValue }) => (
       </span>
       {akgValue && <span className="font-bold">{akgValue}</span>}
     </div>
-    <div className="w-full h-px bg-gray-300 my-1"></div>
+    <div className="w-full h-px bg-[#C9A89A] my-1"></div>
   </>
 );
 
@@ -136,7 +136,7 @@ const NutritionLabel = forwardRef(
                     : gizi.energi_kkal || 0
                 }
                 onChange={(e) => handleChange("energi_kkal", e.target.value)}
-                className="w-24 p-1 border border-slate-300 rounded-md text-right focus:ring-2 focus:ring-orange-500 outline-none"
+                className="w-24 p-1 border border-[#D9C7B8] rounded-md text-right focus:ring-2 focus:ring-[#F3E8DF]0 outline-none"
               />
               <span>kkal</span>
             </div>
@@ -155,7 +155,7 @@ const NutritionLabel = forwardRef(
         {!isEditable && (
           <>
             <div className="text-right font-bold">% AKG*</div>
-            <div className="w-full h-px bg-gray-800 my-1"></div>
+            <div className="w-full h-px bg-[#17191B] my-1"></div>
           </>
         )}
 

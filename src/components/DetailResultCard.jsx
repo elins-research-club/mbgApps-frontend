@@ -24,9 +24,9 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData, selectedR
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-200">
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-[#E8D1C5]">
       {/* Bagian: Rincian Gizi Bahan */}
-      <div className="p-6 lg:p-8 bg-slate-50/50">
+      <div className="p-6 lg:p-8 bg-white/50">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
             <Image
@@ -37,7 +37,7 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData, selectedR
               className="w-10 h-10"
               style={{ objectFit: "contain" }}
             />
-            <h3 className="text-2xl font-bold text-orange-500">
+            <h3 className="text-2xl font-bold text-white0">
               Nutrisi per Bahan
             </h3>
           </div>
@@ -45,7 +45,7 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData, selectedR
             <button
               type="button"
               onClick={() => onRecipeEdit({ id: selectedRecipeId })}
-              className="flex items-center gap-2 px-4 py-2 border-2 border-orange-400 text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200 font-semibold hover:shadow-md"
+              className="flex items-center gap-2 px-4 py-2 border-2 border-white0 text-[#37393B] hover:bg-white rounded-lg transition-all duration-200 font-semibold hover:shadow-md"
               title="Edit menu ini"
             >
               <Pencil className="w-4 h-4" />
@@ -61,19 +61,19 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData, selectedR
                 detailPerResep.map((resep, resepIndex) => (
                   <div
                     key={resepIndex}
-                    className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
+                    className="bg-white rounded-xl shadow-sm border border-[#E8D1C5] overflow-hidden"
                   >
                     {/* Header Resep */}
-                    <div className="bg-gradient-to-r from-orange-50 to-orange-100 px-4 py-3 border-b border-orange-200">
+                    <div className="bg-[#E8D1C5] px-4 py-3 border-b border-[#E8D1C5]">
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">
                           {categoryIcons[resep.kategori] || "🍽️"}
                         </span>
                         <div>
-                          <p className="font-bold text-orange-600">
+                          <p className="font-bold text-[#37393B]">
                             {resep.kategori_label}
                           </p>
-                          <p className="text-sm text-slate-600">
+                          <p className="text-sm text-[#452829]">
                             {resep.nama_menu}
                           </p>
                         </div>
@@ -86,26 +86,26 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData, selectedR
                         resep.rincian_bahan.map((item, itemIndex) => (
                           <details
                             key={itemIndex}
-                            className="group bg-slate-50 rounded-lg border border-slate-200 hover:shadow-md transition-all duration-200"
+                            className="group bg-white rounded-lg border border-[#E8D1C5] hover:shadow-md transition-all duration-200"
                           >
                             <summary className="flex items-center justify-between p-3 cursor-pointer select-none">
                               <div className="flex items-center gap-2">
-                                <span className="flex items-center justify-center w-6 h-6 bg-orange-100 text-orange-600 rounded-full text-xs font-bold">
+                                <span className="flex items-center justify-center w-6 h-6 bg-[#E8D1C5] text-[#37393B] rounded-full text-xs font-bold">
                                   {itemIndex + 1}
                                 </span>
                                 <div>
-                                  <p className="font-semibold text-slate-800 text-sm group-hover:text-orange-500 transition-colors">
+                                  <p className="font-semibold text-[#17191B] text-sm group-hover:text-white0 transition-colors">
                                     {item.nama}
                                   </p>
-                                  <p className="text-xs text-slate-500">
+                                  <p className="text-xs text-white0">
                                     {item.gramasi}g
                                   </p>
                                 </div>
                               </div>
-                              <ChevronDown className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform duration-200" />
+                              <ChevronDown className="w-4 h-4 text-[#C9A89A] group-open:rotate-180 transition-transform duration-200" />
                             </summary>
 
-                            <div className="px-3 pb-3 border-t border-slate-200">
+                            <div className="px-3 pb-3 border-t border-[#E8D1C5]">
                               <div className="pt-3">
                                 <NutritionLabel
                                   data={{
@@ -119,7 +119,7 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData, selectedR
                           </details>
                         ))
                       ) : (
-                        <p className="text-center text-slate-400 text-sm py-2">
+                        <p className="text-center text-[#C9A89A] text-sm py-2">
                           Tidak ada rincian bahan
                         </p>
                       )}
@@ -130,7 +130,7 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData, selectedR
                 ingredientDetails.map((item, index) => (
                   <details
                     key={index}
-                    className="group bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200"
+                    className="group bg-white rounded-xl shadow-sm border border-[#E8D1C5] hover:shadow-md transition-all duration-200"
                   >
                     <summary className="flex items-center justify-between p-4 cursor-pointer select-none">
                       <div className="flex items-center gap-3">
@@ -138,18 +138,18 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData, selectedR
                           {index + 1}
                         </span>
                         <div>
-                          <p className="font-semibold text-slate-800 group-hover:text-orange-500 transition-colors">
+                          <p className="font-semibold text-[#17191B] group-hover:text-white0 transition-colors">
                             {item.nama}
                           </p>
-                          <p className="text-xs text-slate-500 mt-0.5">
+                          <p className="text-xs text-white0 mt-0.5">
                             {item.gramasi}g
                           </p>
                         </div>
                       </div>
-                      <ChevronDown className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform duration-200" />
+                      <ChevronDown className="w-5 h-5 text-[#C9A89A] group-open:rotate-180 transition-transform duration-200" />
                     </summary>
 
-                    <div className="px-4 pb-4 border-t border-slate-100">
+                    <div className="px-4 pb-4 border-t border-white">
                       <div className="pt-4">
                         <NutritionLabel
                           data={{
@@ -164,8 +164,8 @@ const DetailResultCard = ({ log, details, detailPerResep, groupedData, selectedR
                 ))}
           </div>
         ) : (
-          <div className="flex items-center justify-center h-32 bg-white rounded-xl border-2 border-dashed border-slate-300">
-            <p className="text-slate-400 text-sm">
+          <div className="flex items-center justify-center h-32 bg-white rounded-xl border-2 border-dashed border-[#D9C7B8]">
+            <p className="text-[#C9A89A] text-sm">
               Rincian bahan tidak tersedia
             </p>
           </div>

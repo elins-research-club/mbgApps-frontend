@@ -190,13 +190,13 @@ export default function AhliGiziDashboard() {
       )}
 
       {/* Konten Utama Halaman */}
-      <main className="flex-grow bg-slate-50 w-full">
+      <main className="flex-grow bg-white w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
-            <h2 className="text-3xl font-bold text-orange-500 mb-2">
+          <div className="bg-white p-8 rounded-2xl shadow-lg border border-[#E8D1C5]">
+            <h2 className="text-3xl font-bold text-white0 mb-2">
               Validasi Data Gizi
             </h2>
-            <p className="text-slate-500 mb-8">
+            <p className="text-white0 mb-8">
               Berikut adalah daftar bahan hasil generate AI yang membutuhkan
               validasi Anda.
             </p>
@@ -205,7 +205,7 @@ export default function AhliGiziDashboard() {
             <div className="space-y-3">
               {/* --- BARU: Tampilkan status Loading / Error --- */}
               {isLoading && (
-                <p className="text-slate-500 text-center py-4">
+                <p className="text-white0 text-center py-4">
                   Memuat data...
                 </p>
               )}
@@ -230,13 +230,13 @@ export default function AhliGiziDashboard() {
                   return (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between p-4 bg-orange-50 border border-orange-200 rounded-lg"
+                      className="flex items-center justify-between p-4 bg-white border border-[#E8D1C5] rounded-lg"
                     >
                       <div>
-                        <h3 className="font-bold text-slate-800">
+                        <h3 className="font-bold text-[#17191B]">
                           {item.nama}
                         </h3>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-[#452829]">
                           {item.deskripsi}
                         </p>
                       </div>

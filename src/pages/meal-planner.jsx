@@ -41,7 +41,7 @@ const STATUS_CONFIG = {
     badge: "bg-amber-100 text-amber-700",
     icon: "~",
     label: "Hampir",
-    barColor: "bg-amber-400",
+    barColor: "bg-white0",
   },
   short: {
     bg: "bg-red-50",
@@ -99,8 +99,8 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
             {cfg.icon}
           </div>
           <div>
-            <p className="font-bold text-gray-800 text-sm">{className}</p>
-            <p className="text-xs text-gray-500">
+            <p className="font-bold text-[#17191B] text-sm">{className}</p>
+            <p className="text-xs text-white0">
               {goal_daily.energi_kkal} kkal/hari · {Math.round(total_weight_g)}g
               total sajian
             </p>
@@ -113,7 +113,7 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
             {cfg.label}
           </span>
           <svg
-            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+            className={`w-4 h-4 text-[#C9A89A] transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -130,7 +130,7 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
 
       {/* Expanded Content */}
       {expanded && (
-        <div className="px-5 pb-5 border-t border-gray-100 pt-4">
+        <div className="px-5 pb-5 border-t border-white pt-4">
           {isApplied ? (
             /* ── Applied success state ── */
             <div className="flex flex-col items-center justify-center py-6 gap-3">
@@ -152,11 +152,11 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
               <p className="text-emerald-700 font-bold text-sm text-center">
                 Porsi telah sesuai dengan rekomendasi
               </p>
-              <p className="text-gray-400 text-xs text-center">
+              <p className="text-[#C9A89A] text-xs text-center">
                 Klik &quot;Perbarui Rekomendasi&quot; untuk melihat analisis terbaru
               </p>
               <div className="w-full mt-2">
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#C9A89A] mb-2">
                   Porsi yang diterapkan
                 </p>
                 <div className="space-y-2">
@@ -165,10 +165,10 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
                       key={food}
                       className="flex items-center justify-between bg-emerald-50 rounded-lg px-3 py-2 border border-emerald-100"
                     >
-                      <span className="text-sm text-gray-700 capitalize font-medium">
+                      <span className="text-sm text-[#37393B] capitalize font-medium">
                         {food.replace(/([a-z])([A-Z])/g, "$1 $2")}
                       </span>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <div className="flex items-center gap-2 text-xs text-white0">
                         <span className="font-bold text-emerald-600">
                           {portion.recommended_grams.toFixed(1)}g
                         </span>
@@ -184,20 +184,20 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
             <>
               {/* Portions Table */}
               <div className="mb-5">
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-white0 mb-2">
                   Porsi yang Direkomendasikan
                 </p>
                 <div className="space-y-2">
                   {Object.entries(portions).map(([food, portion]) => (
                     <div
                       key={food}
-                      className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gray-100"
+                      className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-white"
                     >
-                      <span className="text-sm text-gray-700 capitalize font-medium">
+                      <span className="text-sm text-[#37393B] capitalize font-medium">
                         {food.replace(/([a-z])([A-Z])/g, "$1 $2")}
                       </span>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <span className="font-bold text-orange-500">
+                      <div className="flex items-center gap-2 text-xs text-white0">
+                        <span className="font-bold text-white0">
                           {portion.recommended_grams.toFixed(1)}g
                         </span>
                         <span>·</span>
@@ -210,7 +210,7 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
 
               {/* Nutrient Achievement */}
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-white0 mb-3">
                   Pencapaian Nutrisi per Makan
                 </p>
                 <div className="space-y-3">
@@ -222,11 +222,11 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
                       return (
                         <div key={key}>
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs font-medium text-gray-700">
+                            <span className="text-xs font-medium text-[#37393B]">
                               {nutrientInfo?.label || key}
                             </span>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-white0">
                                 {nutrient.achieved_per_meal.toFixed(1)} /{" "}
                                 {nutrient.goal_per_meal.toFixed(1)}{" "}
                                 {nutrientInfo?.unit}
@@ -238,7 +238,7 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
                               </span>
                             </div>
                           </div>
-                          <div className="w-full bg-gray-100 rounded-full h-2">
+                          <div className="w-full bg-[#E8D1C5] rounded-full h-2">
                             <div
                               className={`h-2 rounded-full transition-all duration-500 ${nutrientCfg.barColor}`}
                               style={{ width: `${barWidth}%` }}
@@ -259,7 +259,7 @@ function RecommendationCard({ data, classNames, onApplyPortions, isApplied }) {
       {onApplyPortions && !isApplied && (
         <button
           onClick={() => onApplyPortions(portions, goal_id)}
-          className="mt-4 w-full px-4 py-2.5 bg-gradient-to-r from-orange-400 to-amber-400 hover:from-orange-500 hover:to-amber-500 text-white rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+          className="mt-4 w-full px-4 py-2.5 bg-[#452829] hover:bg-[#37393B] text-white rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
         >
           <svg
             className="w-4 h-4"
@@ -319,7 +319,7 @@ function RecommendationSummaryPanel({
   return (
     <div className="bg-white rounded-2xl shadow-md overflow-hidden">
       {/* Panel Header */}
-      <div className="bg-gradient-to-r from-orange-400 to-amber-400 px-6 py-4">
+      <div className="bg-[#452829] px-6 py-4">
         <h3 className="text-white font-bold text-lg flex items-center gap-2">
           <svg
             className="w-5 h-5"
@@ -336,19 +336,19 @@ function RecommendationSummaryPanel({
           </svg>
           Rekomendasi AI
         </h3>
-        <p className="text-orange-100 text-sm mt-1">
+        <p className="text-white text-sm mt-1">
           Porsi optimal berdasarkan kebutuhan per kelas
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-100">
+      <div className="flex border-b border-white">
         <button
           onClick={() => setActiveTab("current")}
           className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
             activeTab === "current"
-              ? "text-orange-500 border-b-2 border-orange-400 bg-orange-50"
-              : "text-gray-500 hover:text-gray-700"
+              ? "text-white0 border-b-2 border-white0 bg-white"
+              : "text-white0 hover:text-[#37393B]"
           }`}
         >
           Kelas Aktif
@@ -357,8 +357,8 @@ function RecommendationSummaryPanel({
           onClick={() => setActiveTab("all")}
           className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
             activeTab === "all"
-              ? "text-orange-500 border-b-2 border-orange-400 bg-orange-50"
-              : "text-gray-500 hover:text-gray-700"
+              ? "text-white0 border-b-2 border-white0 bg-white"
+              : "text-white0 hover:text-[#37393B]"
           }`}
         >
           Semua Kelas
@@ -370,10 +370,10 @@ function RecommendationSummaryPanel({
           currentRec ? (
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <span className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1 rounded-full">
+                <span className="bg-[#E8D1C5] text-[#37393B] text-xs font-bold px-3 py-1 rounded-full">
                   {classNames[targetClass]}
                 </span>
-                <span className="text-gray-400 text-xs">
+                <span className="text-[#C9A89A] text-xs">
                   {currentRec.goal_daily.energi_kkal} kkal/hari
                 </span>
               </div>
@@ -385,7 +385,7 @@ function RecommendationSummaryPanel({
               />
             </div>
           ) : (
-            <p className="text-gray-400 text-sm text-center py-8">
+            <p className="text-[#C9A89A] text-sm text-center py-8">
               Tidak ada rekomendasi untuk kelas ini.
             </p>
           )
@@ -442,14 +442,14 @@ function MealPlanItem({ plan, onShowQR, onLoadPlan }) {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+    <div className="bg-white border border-[#E8D1C5] rounded-lg p-4 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-3">
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-800 text-sm">{plan.name}</h3>
-          <p className="text-xs text-gray-500 mt-1">
+          <h3 className="font-semibold text-[#17191B] text-sm">{plan.name}</h3>
+          <p className="text-xs text-white0 mt-1">
             {classNames[plan.targetClass]} · {formatDate(plan.createdAt)}
           </p>
-          <p className="text-xs text-orange-600 mt-1">
+          <p className="text-xs text-[#37393B] mt-1">
             {plan.recipes?.length || 0} resep
           </p>
         </div>
@@ -522,11 +522,11 @@ function MealPlanItem({ plan, onShowQR, onLoadPlan }) {
 // ─── SetMenuItem Component ──────────────────────────────────────────────────
 function SetMenuItem({ menu, onEdit, onShowQR, onLoadMenu }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+    <div className="bg-white border border-[#E8D1C5] rounded-lg p-4 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-3">
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-800 text-sm">{menu.nama}</h3>
-          <p className="text-xs text-gray-500 mt-1">
+          <h3 className="font-semibold text-[#17191B] text-sm">{menu.nama}</h3>
+          <p className="text-xs text-white0 mt-1">
             {menu.kategori || "Menu Set"}
           </p>
         </div>
@@ -535,7 +535,7 @@ function SetMenuItem({ menu, onEdit, onShowQR, onLoadMenu }) {
       <div className="flex gap-2">
         <button
           onClick={() => onLoadMenu(menu)}
-          className="flex-1 px-3 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1"
+          className="flex-1 px-3 py-2 bg-white0 hover:bg-white0 text-white rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1"
         >
           <svg
             className="w-4 h-4"
@@ -585,7 +585,7 @@ function QRModal({ qrCodeUrl, menuName, onClose, onDownload }) {
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-4 right-4 text-[#C9A89A] hover:text-[#452829] transition-colors"
         >
           <svg
             className="w-6 h-6"
@@ -619,16 +619,16 @@ function QRModal({ qrCodeUrl, menuName, onClose, onDownload }) {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            <h2 className="text-2xl font-bold text-[#17191B] mb-2">
               QR Code Menu Set
             </h2>
-            <p className="text-gray-600 mb-2 font-semibold">{menuName}</p>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-[#452829] mb-2 font-semibold">{menuName}</p>
+            <p className="text-sm text-white0 mb-6">
               Scan QR code untuk mengakses menu ini
             </p>
           </div>
 
-          <div className="bg-gray-50 rounded-xl p-6 mb-6">
+          <div className="bg-white rounded-xl p-6 mb-6">
             <img
               src={qrCodeUrl}
               alt="QR Code"
@@ -639,7 +639,7 @@ function QRModal({ qrCodeUrl, menuName, onClose, onDownload }) {
           <div className="flex gap-3">
             <button
               onClick={onDownload}
-              className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-3 bg-white0 hover:bg-[#37393B] text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
             >
               <svg
                 className="w-5 h-5"
@@ -658,7 +658,7 @@ function QRModal({ qrCodeUrl, menuName, onClose, onDownload }) {
             </button>
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium transition-colors"
+              className="flex-1 px-4 py-3 bg-[#D9C7B8] hover:bg-[#C9A89A] text-[#37393B] rounded-lg font-medium transition-colors"
             >
               Tutup
             </button>
@@ -1222,27 +1222,9 @@ export default function MealPlanner() {
     <div className="flex flex-col min-h-screen">
       <MainNavbar />
 
-      <div className="flex-grow bg-gray-50">
+      <div className="flex-grow bg-white">
         {/* Page Header */}
-        <div className="bg-white shadow-sm border-b border-gray-200 mb-6">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">
-                  Buat dan Lihat Set Menu
-                </h1>
-                <p className="text-sm text-gray-600 mt-1">
-                  Seret menu ke piring untuk melihat total nutrisi
-                </p>
-              </div>
-              <button
-                onClick={() => router.push("/")}
-                className="px-4 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-lg transition-colors"
-              >
-                ← Kembali ke Dashboard
-              </button>
-            </div>
-          </div>
+        <div className="bg-white shadow-sm border-b border-[#E8D1C5] mb-6">
         </div>
 
         <DndContext
@@ -1256,7 +1238,7 @@ export default function MealPlanner() {
               <div className="lg:col-span-1">
                 {/* Menu Tersedia */}
                 <div className="bg-white rounded-lg shadow-md p-6 flex flex-col">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4">
+                  <h2 className="text-xl font-bold text-[#17191B] mb-4">
                     Menu Tersedia
                   </h2>
                   <div className="mb-4">
@@ -1266,10 +1248,10 @@ export default function MealPlanner() {
                         placeholder="Cari menu..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                        className="w-full px-4 py-2 pl-10 border border-[#D9C7B8] rounded-lg focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-transparent text-sm"
                       />
                       <svg
-                        className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                        className="absolute left-3 top-2.5 h-5 w-5 text-[#C9A89A]"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -1284,7 +1266,7 @@ export default function MealPlanner() {
                       {searchQuery && (
                         <button
                           onClick={() => setSearchQuery("")}
-                          className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-2.5 text-[#C9A89A] hover:text-[#452829]"
                         >
                           <svg
                             className="h-5 w-5"
@@ -1305,16 +1287,16 @@ export default function MealPlanner() {
                   </div>
                   <div className="space-y-3 max-h-[600px] overflow-y-auto">
                     {isLoading ? (
-                      <p className="text-gray-500 text-center py-8">
+                      <p className="text-white0 text-center py-8">
                         Memuat resep...
                       </p>
                     ) : !Array.isArray(recipes) || recipes.length === 0 ? (
-                      <p className="text-gray-500 text-center py-8">
+                      <p className="text-white0 text-center py-8">
                         Belum ada resep tersimpan. Silakan tambah resep baru di
                         Dashboard.
                       </p>
                     ) : filteredRecipes.length === 0 ? (
-                      <p className="text-gray-500 text-center py-8">
+                      <p className="text-white0 text-center py-8">
                         Tidak ada resep yang cocok dengan pencarian{" "}
                         {searchQuery}
                       </p>
@@ -1344,7 +1326,7 @@ export default function MealPlanner() {
               {/* Set Menu Tersedia - Right */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-lg shadow-md p-6 flex flex-col">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-[#17191B] mb-4 flex items-center gap-2">
                     <svg
                       className="w-6 h-6 text-blue-500"
                       fill="none"
@@ -1367,10 +1349,10 @@ export default function MealPlanner() {
                         placeholder="Cari meal plan..."
                         value={mealPlanSearchQuery}
                         onChange={(e) => setMealPlanSearchQuery(e.target.value)}
-                        className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        className="w-full px-4 py-2 pl-10 border border-[#D9C7B8] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                       />
                       <svg
-                        className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                        className="absolute left-3 top-2.5 h-5 w-5 text-[#C9A89A]"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -1385,7 +1367,7 @@ export default function MealPlanner() {
                       {mealPlanSearchQuery && (
                         <button
                           onClick={() => setMealPlanSearchQuery("")}
-                          className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-2.5 text-[#C9A89A] hover:text-[#452829]"
                         >
                           <svg
                             className="h-5 w-5"
@@ -1406,15 +1388,15 @@ export default function MealPlanner() {
                   </div>
                   <div className="space-y-3 max-h-[600px] overflow-y-auto">
                     {isLoadingMealPlans ? (
-                      <p className="text-gray-500 text-center py-8">
+                      <p className="text-white0 text-center py-8">
                         Memuat meal plans...
                       </p>
                     ) : !Array.isArray(mealPlans) || mealPlans.length === 0 ? (
-                      <p className="text-gray-500 text-center py-8">
+                      <p className="text-white0 text-center py-8">
                         Belum ada meal plan tersimpan.
                       </p>
                     ) : filteredMealPlans.length === 0 ? (
-                      <p className="text-gray-500 text-center py-8">
+                      <p className="text-white0 text-center py-8">
                         Tidak ada meal plan yang cocok dengan pencarian
                       </p>
                     ) : (
@@ -1440,7 +1422,7 @@ export default function MealPlanner() {
                   {/* View Details Button */}
                   <button
                     onClick={() => router.push("/meal-details")}
-                    className="px-6 py-3 bg-orange-400 hover:bg-orange-500 text-white rounded-lg transition-colors font-medium shadow-md flex items-center gap-2"
+                    className="px-6 py-3 bg-[#452829] hover:bg-[#17191B] text-white rounded-lg transition-colors font-medium shadow-md flex items-center gap-2"
                   >
                     <svg
                       className="w-5 h-5"
@@ -1465,10 +1447,10 @@ export default function MealPlanner() {
                     className={`px-6 py-3 rounded-lg font-medium shadow-md flex items-center gap-2 transition-all duration-200
                       ${
                         isLoadingRecs
-                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          ? "bg-[#D9C7B8] text-[#C9A89A] cursor-not-allowed"
                           : recommendations
                             ? "bg-emerald-500 hover:bg-emerald-600 text-white"
-                            : "bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
+                            : "bg-[#452829] hover:bg-[#17191B] text-white"
                       }`}
                   >
                     {isLoadingRecs ? (
@@ -1555,9 +1537,9 @@ export default function MealPlanner() {
                 {/* Nutrition Label + Chart — always side by side */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Nutrition Label */}
-                  <div className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center">
+                  <div className="bg-white rounded-lg border border-[#D9C7B8] shadow-md p-6 flex flex-col items-center">
                     <div className="flex items-center justify-between mb-4 w-full">
-                      <h3 className="text-lg font-bold text-orange-500">
+                      <h3 className="text-lg font-bold text-white0">
                         Total Nilai Gizi
                       </h3>
                       <select
@@ -1565,7 +1547,7 @@ export default function MealPlanner() {
                         onChange={(e) =>
                           setTargetClass(parseInt(e.target.value))
                         }
-                        className="px-4 py-2 border border-orange-300 bg-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm font-medium"
+                        className="px-4 py-2 border border-[#D9C7B8] bg-white rounded-lg focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-transparent text-sm font-medium"
                       >
                         <option value={1}>TK A</option>
                         <option value={2}>TK B</option>
@@ -1594,8 +1576,8 @@ export default function MealPlanner() {
                   </div>
 
                   {/* Nutrition Chart */}
-                  <div className="bg-white rounded-lg shadow-md p-6">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4">
+                  <div className="bg-white rounded-lg border border-[#D9C7B8] shadow-md p-6">
+                    <h2 className="text-xl font-bold text-[#17191B] mb-4">
                       Grafik Nutrisi
                     </h2>
                     <NutritionChart
@@ -1623,7 +1605,7 @@ export default function MealPlanner() {
 
           <DragOverlay>
             {activeRecipe ? (
-              <div className="bg-orange-100 border-2 border-orange-400 rounded-lg p-4 shadow-lg opacity-80">
+              <div className="bg-[#E8D1C5] border-2 border-white0 rounded-lg p-4 shadow-lg opacity-80">
                 <RecipeItem recipe={activeRecipe} />
               </div>
             ) : null}

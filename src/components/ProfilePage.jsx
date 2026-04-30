@@ -221,7 +221,7 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2.5 bg-white0 hover:bg-[#37393B] text-white font-semibold rounded-xl text-sm transition disabled:opacity-60"
+              className="px-5 py-2.5 bg-[#17191B] hover:bg-[#37393B] text-white font-semibold rounded-xl text-sm transition disabled:opacity-60"
             >
               {saving ? "Menyimpan..." : "Simpan Perubahan"}
             </button>
@@ -382,7 +382,7 @@ export default function ProfilePage() {
                   <button
                     type="submit"
                     disabled={joining || !inviteCode.trim()}
-                    className="flex items-center gap-1.5 px-4 py-2.5 bg-[#17191B] hover:bg-[#37393B] text-white rounded-xl text-sm font-semibold transition disabled:opacity-60"
+                    className="flex items-center gap-1.5 px-4 py-2.5 bg-[#17191B] hover:bg-[#37393B] text-white rounded-xl text-sm font-semibold transition"
                   >
                     {joining ? "..." : (
                       <>Gabung <ArrowRight className="w-3.5 h-3.5" /></>

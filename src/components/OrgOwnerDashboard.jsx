@@ -432,7 +432,7 @@ export default function OrgOwnerDashboard({ orgId }) {
       )}
 
       {/* Rejected Overlay */}
-      {isOrgRejected && (
+      {orgStatusMap[org?.id] === "rejected" && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />

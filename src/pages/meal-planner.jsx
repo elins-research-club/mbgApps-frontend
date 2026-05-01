@@ -451,7 +451,7 @@ function MealPlanItem({ plan, onShowQR, onLoadPlan }) {
             {classNames[plan.targetClass]} · {formatDate(plan.createdAt)}
           </p>
           <p className="text-xs text-[#37393B] mt-1">
-            {plan.recipes?.length || 0} resep
+            {plan.recipes?.length || 0} menu
           </p>
         </div>
       </div>
@@ -1297,16 +1297,15 @@ export default function MealPlanner() {
                   <div className="space-y-3 max-h-[600px] overflow-y-auto">
                     {isLoading ? (
                       <p className="text-white0 text-center py-8">
-                        Memuat resep...
+                        Memuat menu...
                       </p>
                     ) : !Array.isArray(recipes) || recipes.length === 0 ? (
                       <p className="text-white0 text-center py-8">
-                        Belum ada resep tersimpan. Silakan tambah resep baru di
-                        Dashboard.
+                        Belum ada menu tersimpan. Silakan tambah menu baru.
                       </p>
                     ) : filteredRecipes.length === 0 ? (
                       <p className="text-white0 text-center py-8">
-                        Tidak ada resep yang cocok dengan pencarian{" "}
+                        Tidak ada menu yang cocok dengan pencarian{" "}
                         {searchQuery}
                       </p>
                     ) : (
@@ -1402,11 +1401,11 @@ export default function MealPlanner() {
                       </p>
                     ) : !Array.isArray(mealPlans) || mealPlans.length === 0 ? (
                       <p className="text-white0 text-center py-8">
-                        Belum ada meal plan tersimpan.
+                        Belum ada set menu tersimpan.
                       </p>
                     ) : filteredMealPlans.length === 0 ? (
                       <p className="text-white0 text-center py-8">
-                        Tidak ada meal plan yang cocok dengan pencarian
+                        Tidak ada set menu yang cocok dengan pencarian
                       </p>
                     ) : (
                       filteredMealPlans.map((plan) => (

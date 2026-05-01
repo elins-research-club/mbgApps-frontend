@@ -4,10 +4,11 @@ import { useRouter } from 'next/router'
 import { useAuth } from '@/contexts/AuthContext'
 import MainNavbar from '../components/MainNavbar'
 import NutritionLabel from '../components/NutritionLabel'
-import { saveMealPlan } from '../services/api'
+import { saveMealPlan, calculateTotalIngredients } from '../services/api'
 import { goals, classNames } from '../utils/goals'
+import { utils, writeFile } from "xlsx";
 
-export default function MealDetails () {
+export default function MealDetails() {
   const router = useRouter()
   const { user, orgMembership, organizations } = useAuth()
   const [plateRecipes, setPlateRecipes] = useState([])
@@ -20,6 +21,8 @@ export default function MealDetails () {
   const orgId = Array.isArray(router.query?.orgId)
     ? router.query.orgId[0]
     : router.query?.orgId || orgMembership?.organization?.id || organizations?.[0]?.id || null
+  const [showPortionModal, setShowPortionModal] = useState(false)
+  const [portion, setPortion] = useState(1)
 
   useEffect(() => {
     // Load plate recipes from localStorage
@@ -230,6 +233,36 @@ export default function MealDetails () {
     }
   }
 
+  // ── NEW: Export all ingredients across all recipes to Excel ──
+  const handleExportExcel = async (portionValue = 1) => {
+    const storedRecipes = JSON.parse(localStorage.getItem('plateRecipes'))
+    const parsedRecipes = storedRecipes.map(recipe => ({
+      ...recipe,
+      rincian_bahan:
+        typeof recipe.rincian_bahan === 'string'
+          ? JSON.parse(recipe.rincian_bahan)
+          : recipe.rincian_bahan,
+      nutrisi:
+        typeof recipe.nutrisi === 'string'
+          ? JSON.parse(recipe.nutrisi)
+          : recipe.nutrisi
+    }))
+    console.log('Parsed recipes for Excel export:', parsedRecipes) // Debug log
+    const wb = utils.book_new();
+    const totalIngredients = await calculateTotalIngredients(parsedRecipes, portionValue)
+    console.log('Total ingredients for Excel export:', totalIngredients) // Debug log
+    const rows = [['Bahan', 'Gramasi (kg)']];
+    Object.entries(totalIngredients).forEach(([nama, value]) => {
+      const gramasi = (value / 1000).toFixed(2);
+      rows.push([nama, gramasi]);
+    });
+    const ws = utils.aoa_to_sheet(rows);
+    utils.book_append_sheet(wb, ws, 'Total Bahan');
+    const fileName = 'meal-plan-bahan.xlsx'
+    writeFile(wb, fileName)
+  }
+  // ────────────────────────────────────────────────────────────
+
   if (plateRecipes.length === 0) {
     return (
       <div className='flex flex-col min-h-screen'>
@@ -331,6 +364,15 @@ export default function MealDetails () {
                     </>
                   )}
                 </button>
+
+                {/* ── NEW: Export Excel button ── */}
+                <button
+                  onClick={() => setShowPortionModal(true)}
+                  className='px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2'
+                >
+                  Export Excel
+                </button>                {/* ─────────────────────────── */}
+
                 <button
                   onClick={() => router.push('/meal-planner')}
                   className='px-4 py-2 bg-[#452829] hover:bg-[#17191B] text-white rounded-lg transition-colors'
@@ -339,7 +381,39 @@ export default function MealDetails () {
                 </button>
               </div>
             </div>
-            
+
+            {/* Portion Size Adjustment */}
+            {showPortionModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg w-80">
+                  <h2 className="text-lg font-semibold mb-4">Enter Portion</h2>
+
+                  <input
+                    type="number"
+                    value={portion}
+                    onChange={(e) => setPortion(e.target.value)}
+                    className="w-full border px-3 py-2 rounded mb-4"
+                  />
+
+                  <div className="flex justify-end gap-2">
+                    <button onClick={() => setShowPortionModal(false)}>
+                      Cancel
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        handleExportExcel(portion)
+                        setShowPortionModal(false)
+                      }}
+                      className="bg-blue-600 text-white px-4 py-2 rounded"
+                    >
+                      Export
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Plan Name Display */}
             <div className='mt-4 pt-4 border-t border-[#E8D1C5]'>
               <div className='flex items-center gap-3'>

@@ -530,3 +530,23 @@ export const getAllRecommendations = async (currentFoods) => {
     throw error;
   }
 };
+
+export const calculateTotalIngredients = async (plateRecipes, portion) => {
+  try {
+    const token = await getAccessToken();
+    const response = await fetch(`${API_URL}/generate-total-ingredients`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify({ plateRecipes, portion }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("[API] Backend error:", errorData);
+      throw new Error(errorData.message || "Gagal menghitung total bahan.");
+    }
+    return response.json(); // ✅ add this line 
+  } catch (error) {    
+    console.error("[API] Error di calculateTotalIngredients:", error);
+    throw error;
+  }
+};

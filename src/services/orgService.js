@@ -103,22 +103,22 @@ function pickArray(payload, keys) {
   return [];
 }
 
-export async function createOrganization({ name, description }) {
+export async function createOrganization({ name, description, memberEmails = [] }) {
   const payload = await request("/organizations", {
     method: "POST",
-    body: JSON.stringify({ name, description }),
+    body: JSON.stringify({ name, description, memberEmails }),
   });
   return unwrap(payload);
 }
 
-export async function createSubOrganization(parentOrgId, { name, description }) {
+export async function createSubOrganization(parentOrgId, { name, description, memberEmails = [] }) {
   if (!parentOrgId) {
     throw new Error("Parent organization ID is required");
   }
 
   const payload = await request(`/organizations/${parentOrgId}/sub-organizations`, {
     method: "POST",
-    body: JSON.stringify({ name, description }),
+    body: JSON.stringify({ name, description, memberEmails }),
   });
 
   return unwrap(payload);

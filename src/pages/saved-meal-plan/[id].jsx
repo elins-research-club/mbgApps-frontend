@@ -1,24 +1,29 @@
 // /frontend/src/pages/saved-meal-plan/[id].js
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useAuth } from '@/contexts/AuthContext';
 import NutritionLabel from '../../components/NutritionLabel';
 import { getMealPlanById } from '../../services/api';
 import { goals, classNames } from '../../utils/goals';
 
 export default function SavedMealPlan() {
   const router = useRouter();
+  const { user, orgMembership, organizations, loading: authLoading } = useAuth();
   const { id } = router.query;
+  const orgId = Array.isArray(router.query?.orgId)
+    ? router.query.orgId[0]
+    : router.query?.orgId || orgMembership?.organization?.id || organizations?.[0]?.id || null;
   const [mealPlan, setMealPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || authLoading) return;
 
     const fetchMealPlan = async () => {
       try {
         setLoading(true);
-        const response = await getMealPlanById(id);
+        const response = await getMealPlanById(id, { userId: user?.id, orgId });
         console.log('Fetched meal plan response:', response);
         
         const data = response.data || response;
@@ -40,7 +45,7 @@ export default function SavedMealPlan() {
     };
 
     fetchMealPlan();
-  }, [id]);
+  }, [id, authLoading, user?.id, orgId]);
 
   const getPlateNutritionData = () => {
     if (!mealPlan || !mealPlan.totalNutrition) return null;

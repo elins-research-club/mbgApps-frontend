@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/client";
@@ -24,7 +23,6 @@ export function LoginForm({ className, ...props }) {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { authChecked } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -77,9 +75,9 @@ export function LoginForm({ className, ...props }) {
         return;
       }
 
-      // Always redirect to home - org status checked in app
-      console.log("✅ [LOGIN] Login successful, redirecting to home");
-      router.push("/");
+      // Always let the home/auth guard decide destination using fresh org state.
+      console.log("✅ [LOGIN] Login successful, redirecting through home");
+      router.replace("/");
     } catch (error) {
       console.error("❌ [LOGIN] Error:", error);
       setError("Invalid credentials");

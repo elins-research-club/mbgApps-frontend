@@ -1,6 +1,7 @@
 // /frontend/src/pages/meal-details.js
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useAuth } from '@/contexts/AuthContext'
 import MainNavbar from '../components/MainNavbar'
 import NutritionLabel from '../components/NutritionLabel'
 import { saveMealPlan } from '../services/api'
@@ -8,6 +9,7 @@ import { goals, classNames } from '../utils/goals'
 
 export default function MealDetails () {
   const router = useRouter()
+  const { user, orgMembership, organizations } = useAuth()
   const [plateRecipes, setPlateRecipes] = useState([])
   const [targetClass, setTargetClass] = useState(6)
   const [planName, setPlanName] = useState('')
@@ -15,6 +17,9 @@ export default function MealDetails () {
   const [savedPlanId, setSavedPlanId] = useState(null)
   const [qrCodeUrl, setQrCodeUrl] = useState(null)
   const [showQRModal, setShowQRModal] = useState(false)
+  const orgId = Array.isArray(router.query?.orgId)
+    ? router.query.orgId[0]
+    : router.query?.orgId || orgMembership?.organization?.id || organizations?.[0]?.id || null
 
   useEffect(() => {
     // Load plate recipes from localStorage
@@ -169,7 +174,7 @@ export default function MealDetails () {
         createdAt: new Date().toISOString()
       }
 
-      const result = await saveMealPlan(mealPlanData)
+      const result = await saveMealPlan(mealPlanData, { userId: user?.id, orgId })
       console.log('Save meal plan result:', result)
 
       const planId = result.data.id
@@ -182,7 +187,9 @@ export default function MealDetails () {
       setSavedPlanId(planId)
 
       const baseUrl = window.location.origin
-      const planUrl = `${baseUrl}/saved-meal-plan/${planId}`
+      const planUrl = orgId
+        ? `${baseUrl}/saved-meal-plan/${planId}?orgId=${encodeURIComponent(orgId)}`
+        : `${baseUrl}/saved-meal-plan/${planId}`
 
       // Use QR Server API for quick QR generation
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(

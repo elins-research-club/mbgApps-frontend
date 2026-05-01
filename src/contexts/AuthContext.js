@@ -91,9 +91,14 @@ export function AuthProvider({ children }) {
           setProfile(null);
           setOrgMembership(null);
           setOrganizations([]);
+          setLoading(false);
+          setAuthChecked(true);
+          return;
         }
+
+        // User exists: mark loading false but defer "authChecked"
+        // until profile and org membership fetch completes.
         setLoading(false);
-        setAuthChecked(true);
       }
     );
 
@@ -130,6 +135,9 @@ export function AuthProvider({ children }) {
     orgMembership?.Roles ??
     null;
 
+  const isChef = (role?.name || "").toLowerCase() === "chef";
+  const isAhliGizi = ["ahli gizi", "nutritionist"].includes((role?.name || "").toLowerCase());
+
   const isOrgOwner = !!(
     user &&
     organization?.owner_id === user.id
@@ -163,8 +171,8 @@ export function AuthProvider({ children }) {
   }, [user, fetchProfile, fetchOrgMemberships]);
 
   const orgStatusMap = Object.fromEntries(
-  organizations.map(org => [org.id, org.status])
-);
+    organizations.map(org => [org.id, org.status])
+  );
 
   return (
     <AuthContext.Provider
@@ -180,6 +188,8 @@ export function AuthProvider({ children }) {
         isOrgRejected,
         isOrgActive,
         orgStatus,
+        isChef,
+        isAhliGizi,
         canSave,
         canValidate,
         canManagePlans,
@@ -189,6 +199,7 @@ export function AuthProvider({ children }) {
         logout,
         refresh,
         orgStatusMap,
+        organization,
       }}
     >
       {children}

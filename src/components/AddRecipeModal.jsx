@@ -23,7 +23,7 @@ function debounce (func, timeout = 300) {
   }
 }
 
-const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initialData, canSave = false }) => {
+const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initialData, canSave = false, userId = null, orgId = null }) => {
   const [menuName, setMenuName] = useState('')
   const [kategori, setKategori] = useState('karbohidrat')
   const [ingredients, setIngredients] = useState([
@@ -674,6 +674,11 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
   const handleSave = async () => {
     if (isSaving) return
 
+    if (!orgId) {
+      setError('Organisasi aktif tidak ditemukan. Pilih organisasi terlebih dahulu.')
+      return
+    }
+
     setError('')
     setSuccessMessage('')
     setIsSaving(true)
@@ -699,9 +704,9 @@ const AddRecipeModal = ({ onClose, onRecipeAdded, onNutritionCalculated, initial
       let res;
       if (editingRecipeId) {
         console.log('Updating recipe ID:', editingRecipeId)
-        res = await updateRecipe(editingRecipeId, payload)
+        res = await updateRecipe(editingRecipeId, payload, { userId, orgId })
       } else {
-        res = await saveRecipe(payload)
+        res = await saveRecipe(payload, { userId, orgId })
       }
       
       console.log('Save response:', res)

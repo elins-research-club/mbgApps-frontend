@@ -14,6 +14,7 @@ import NutritionChart from "../components/NutritionChart";
 import NutritionLabel from "../components/NutritionLabel";
 import MainNavbar from "../components/MainNavbar";
 import { useRouter } from "next/router";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   getAllRecipes,
   getAllRecommendations,
@@ -672,6 +673,7 @@ function QRModal({ qrCodeUrl, menuName, onClose, onDownload }) {
 // Main Page
 export default function MealPlanner() {
   const router = useRouter();
+  const { user, orgMembership, organizations, loading: authLoading } = useAuth();
   const [recipes, setRecipes] = useState([]);
   const [plateRecipes, setPlateRecipes] = useState([]);
   const [targetClass, setTargetClass] = useState(6);
@@ -700,6 +702,10 @@ export default function MealPlanner() {
   const [isLoadingRecs, setIsLoadingRecs] = useState(false);
   const [recError, setRecError] = useState(null);
   const [appliedGoalIds, setAppliedGoalIds] = useState(new Set());
+  const activeOrgId = Array.isArray(router.query?.orgId)
+    ? router.query.orgId[0]
+    : router.query?.orgId || orgMembership?.organization?.id || organizations?.[0]?.id || null;
+  const requestContext = { userId: user?.id, orgId: activeOrgId };
 
   useEffect(() => {
     if (plateRecipes.length > 0) {
@@ -732,10 +738,11 @@ export default function MealPlanner() {
   );
 
   useEffect(() => {
+    if (authLoading) return;
     const fetchRecipes = async () => {
       setIsLoading(true);
       try {
-        const recipeData = await getAllRecipes();
+        const recipeData = await getAllRecipes(requestContext);
         let recipesArray = Array.isArray(recipeData)
           ? recipeData
           : recipeData?.recipes || [];
@@ -755,14 +762,15 @@ export default function MealPlanner() {
       }
     };
     fetchRecipes();
-  }, []);
+  }, [authLoading, requestContext.userId, requestContext.orgId]);
 
   // Fetch menus on mount
   useEffect(() => {
+    if (authLoading) return;
     const fetchMenus = async () => {
       setIsLoadingMenus(true);
       try {
-        const menuData = await getAllMenus();
+        const menuData = await getAllMenus(requestContext);
         console.log("Fetched menus:", menuData);
         setMenus(Array.isArray(menuData) ? menuData : []);
       } catch (error) {
@@ -773,14 +781,15 @@ export default function MealPlanner() {
       }
     };
     fetchMenus();
-  }, []);
+  }, [authLoading, requestContext.userId, requestContext.orgId]);
 
   // Fetch meal plans on mount
   useEffect(() => {
+    if (authLoading) return;
     const fetchMealPlans = async () => {
       setIsLoadingMealPlans(true);
       try {
-        const response = await getAllMealPlans();
+        const response = await getAllMealPlans(requestContext);
         console.log("Fetched meal plans:", response);
 
         // Handle different response structures
@@ -802,7 +811,7 @@ export default function MealPlanner() {
       }
     };
     fetchMealPlans();
-  }, []);
+  }, [authLoading, requestContext.userId, requestContext.orgId]);
 
   // ── Recommendation handler ────────────────────────────────────────────────
   const handleGetRecommendations = async () => {
@@ -871,7 +880,7 @@ export default function MealPlanner() {
       console.log("Loading menu:", menu);
 
       // Get menu details with nutrition info
-      const menuData = await getMenuNutritionById(menu.id);
+      const menuData = await getMenuNutritionById(menu.id, requestContext);
       console.log("Menu data:", menuData);
 
       if (!menuData || !menuData.rincian_per_bahan) {

@@ -14,10 +14,12 @@ import {
   Plus,
   Ticket,
   X,
+  Utensils,
+  CheckCircle2,
 } from "lucide-react";
 
 export default function MainNavbar() {
-  const { user, profile, orgMembership, organizations, isOrgOwner, canManagePlans, canManageUsers, canManageRoles, refresh, logout, isActiveOrg } = useAuth();
+  const { user, profile, orgMembership, organizations, isOrgOwner, canManagePlans, canManageUsers, canManageRoles, canSave, refresh, logout, isActiveOrg, isChef, isAhliGizi } = useAuth();
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
@@ -82,11 +84,14 @@ export default function MainNavbar() {
 
   const routeOrgId = Array.isArray(router.query?.id)
     ? router.query.id[0]
-    : router.query?.id;
+    : router.query?.id || router.query?.orgId;
   const isDashboardRoute = router.pathname === "/organization/[id]/dashboard";
   const isSetMenuRoute = router.pathname === "/meal-planner";
+  const showChefActions = isChef || canSave || canManagePlans;
+  const showValidationAction = isAhliGizi;
   const orgFromRoute = (organizations || []).find((item) => item?.id === routeOrgId);
   const org = orgFromRoute || orgMembership?.organization || organizations?.[0] || null;
+  const activeOrgId = routeOrgId || org?.id || null;
   const canOpenDashboard = !!(
     org &&
     (org.owner_id === user?.id || isOrgOwner || canManageUsers || canManageRoles)
@@ -117,40 +122,27 @@ export default function MainNavbar() {
               </div>
               <span className="font-bold text-lg text-[#17191B]">MBG Calc</span>
             </Link>
-            {canManagePlans && (
-              <>
-            <Link href="/" className="flex items-center gap-1.5 bg-[#452829] text-white border-[#452829] px-3 py-1.5 rounded-full text-sm font-semibold transition border">
-              {/* <div className="w-8 h-8 bg-[#452829] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">M</span>
-              </div>
-              <span className="font-bold text-lg text-[#17191B]">MBG Calc</span> */}
-              <LayoutGrid className="w-3.5 h-3.5" />
-               Buat Menu
-            </Link>
-            
-
-                <Link
-                  href="/meal-planner"
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
-                    isSetMenuRoute
-                      ? "bg-[#452829] text-white border-[#452829]"
-                      : "bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
-                  }`}
-                >
-                  <LayoutGrid className="w-3.5 h-3.5" />
-                  Set Menu
-                </Link>
-                </>
-            )
-              }
+            {/* {showChefActions && (
+              <Link
+                href={activeOrgId ? `/meal-planner?orgId=${activeOrgId}` : "/meal-planner"}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
+                  isSetMenuRoute
+                    ? "bg-[#452829] text-white border-[#452829]"
+                    : "bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                Set Menu
+              </Link>
+            )} */}
           </div>
 
           {/* Right section */}
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2">
-              {canManagePlans && isActiveOrg && (
+              {/* {showChefActions && isActiveOrg && (
                 <Link
-                  href="/meal-planner"
+                  href={activeOrgId ? `/meal-planner?orgId=${activeOrgId}` : "/meal-planner"}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
                     isSetMenuRoute
                       ? "bg-[#452829] text-white border-[#452829]"
@@ -160,9 +152,29 @@ export default function MainNavbar() {
                   <LayoutGrid className="w-3.5 h-3.5" />
                   Set Menu
                 </Link>
+              )} */}
+
+              {showChefActions && isActiveOrg && (
+                <Link
+                  href={activeOrgId ? `/create-menu?orgId=${activeOrgId}` : "/create-menu"}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
+                >
+                  <Utensils className="w-3.5 h-3.5" />
+                  Create Menu
+                </Link>
               )}
 
-              {canOpenDashboard && org && (
+              {showValidationAction && isActiveOrg && (
+                <Link
+                  href="/ahli-gizi"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Verify Bahan
+                </Link>
+              )}
+
+              {/* {canOpenDashboard && org && (
                 <Link
                   href={`/organization/${org.id}/dashboard`}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition border ${
@@ -174,7 +186,33 @@ export default function MainNavbar() {
                   <LayoutDashboard className="w-3.5 h-3.5" />
                   <span>Dashboard</span>
                 </Link>
-              )}
+              )} */}
+              {showChefActions && (
+              <>
+              <Link
+                href={activeOrgId ? `/meal-planner?orgId=${activeOrgId}` : "/meal-planner"}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
+                  isSetMenuRoute
+                    ? "bg-[#452829] text-white border-[#452829]"
+                    : "bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                Set Menu
+              </Link>
+              <Link
+                href={activeOrgId ? `/create-menu?orgId=${activeOrgId}` : "/create-menu"}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
+                  isSetMenuRoute
+                    ? "bg-[#452829] text-white border-[#452829]"
+                    : "bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                Create Menu
+              </Link>
+              </>
+            )}
             </div>
 
             {/* User dropdown */}
@@ -219,14 +257,36 @@ export default function MainNavbar() {
                       Profil Saya
                     </Link>
 
-                    {canManagePlans && (
+                    {showChefActions && (
                       <Link
-                        href="/meal-planner"
+                        href={activeOrgId ? `/meal-planner?orgId=${activeOrgId}` : "/meal-planner"}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-black hover:bg-[#E8D1C5] hover:text-white transition font-medium rounded-xl"
                         onClick={() => setDropdownOpen(false)}
                       >
                         <LayoutGrid className="w-4 h-4" />
                         Set Menu
+                      </Link>
+                    )}
+
+                    {showChefActions && (
+                      <Link
+                        href={activeOrgId ? `/create-menu?orgId=${activeOrgId}` : "/create-menu"}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-black hover:bg-[#E8D1C5] hover:text-white transition font-medium rounded-xl"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <Utensils className="w-4 h-4" />
+                        Create Menu
+                      </Link>
+                    )}
+
+                    {showValidationAction && (
+                      <Link
+                        href="/ahli-gizi"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-black hover:bg-[#E8D1C5] hover:text-white transition font-medium rounded-xl"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        Verify Bahan
                       </Link>
                     )}
 
@@ -238,7 +298,7 @@ export default function MainNavbar() {
                         <Ticket className="w-4 h-4" />
                         Masukkan Kode Undangan
                       </button>
-
+{/* 
                       <Link
                         href="/organization/create"
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-black hover:bg-[#E8D1C5] hover:text-white transition font-medium rounded-xl"
@@ -246,12 +306,13 @@ export default function MainNavbar() {
                       >
                         <Plus className="w-4 h-4" />
                         Buat Organisasi
-                      </Link>
+                      </Link> */}
 
                       <div className="border-t border-[#E8D1C5] mt-1 pt-1" />
 
                       {allOrganizations.length > 0 ? (
                         <>
+                        
                           <div className="px-4 py-2">
                             <p className="text-xs font-semibold text-[#37393B]">Organisasi</p>
                           </div>
@@ -264,6 +325,7 @@ export default function MainNavbar() {
                               const isSubOrg = item.depth > 0;
                               const isOwner = item?.owner_id === user?.id;
                               const indentLevel = item.depth;
+                              const totalMembers = item?.memberCounts?.totalCount;
 
                               return (
                                 <Link
@@ -282,14 +344,18 @@ export default function MainNavbar() {
                                       <span className="text-xs text-[#C9A89A] flex-shrink-0 font-bold">└</span>
                                     )}
                                     <span className="min-w-0 truncate font-medium">{item.name}</span>
-                                    {isActiveOrg && (
-                                      <span className="px-2 py-0.5 bg-green-200 text-green-700 text-xs font-semibold rounded-full flex-shrink-0 whitespace-nowrap">
-                                        Aktif
-                                      </span>
-                                    )}
                                     {isOwner && !isActiveOrg && (
                                       <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full flex-shrink-0 whitespace-nowrap">
                                         Pemilik
+                                      </span>
+                                    )}
+                                    {typeof totalMembers === "number" && (
+                                      <span className={`px-2 py-0.5 text-xs font-semibold rounded-full flex-shrink-0 whitespace-nowrap ${
+                                        isActiveOrg
+                                          ? "bg-white/80 text-[#17191B]"
+                                          : "bg-white/15 text-white"
+                                      }`}>
+                                        {totalMembers} anggota
                                       </span>
                                     )}
                                   </div>

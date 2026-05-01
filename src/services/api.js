@@ -9,6 +9,37 @@ async function getAccessToken() {
   return session?.access_token;
 }
 
+function normalizeRequestContext(context = {}) {
+  if (!context || typeof context !== "object") {
+    return { userId: null, orgId: null };
+  }
+
+  return {
+    userId: context.userId || context.user_id || null,
+    orgId:
+      context.orgId ||
+      context.org_id ||
+      context.organizationId ||
+      context.organization_id ||
+      null,
+  };
+}
+
+function buildContextHeaders(context = {}) {
+  const { userId, orgId } = normalizeRequestContext(context);
+  return {
+    ...(userId ? { "x-user-id": String(userId) } : {}),
+    ...(orgId ? { "x-org-id": String(orgId) } : {}),
+  };
+}
+
+function requireOrgId(context = {}, action = "operation") {
+  const { orgId } = normalizeRequestContext(context);
+  if (!orgId) {
+    throw new Error(`orgId is required to ${action}`);
+  }
+}
+
 export const generateNutrition = async (payload) => {
   try {
     const token = await getAccessToken();
@@ -118,10 +149,14 @@ export const generateIngredient = async (name) => {
   }
 };
 
-export const getRecipeById = async (recipeId) => {
+export const getRecipeById = async (recipeId, context = {}) => {
   try {
     console.log("[API] Fetching recipe details for ID:", recipeId);
-    const response = await fetch(`${API_URL}/recipes/${recipeId}`);
+    const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
+      headers: {
+        ...buildContextHeaders(context),
+      },
+    });
     if (!response.ok) {
       throw new Error("Gagal mengambil detail resep");
     }
@@ -133,10 +168,14 @@ export const getRecipeById = async (recipeId) => {
     return null;
   }
 };
-export const getAllRecipes = async () => {
+export const getAllRecipes = async (context = {}) => {
   try {
     console.log("[API] Fetching all recipes");
-    const response = await fetch(`${API_URL}/recipes`);
+    const response = await fetch(`${API_URL}/recipes`, {
+      headers: {
+        ...buildContextHeaders(context),
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Gagal mengambil daftar resep.");
@@ -150,13 +189,18 @@ export const getAllRecipes = async () => {
     return [];
   }
 };
-export const updateRecipe = async (recipeId, recipeData) => {
+export const updateRecipe = async (recipeId, recipeData, context = {}) => {
   console.log("Updating recipe ID:", recipeId, recipeData);
   try {
+    requireOrgId(context, "update a menu");
     const token = await getAccessToken();
     const response = await fetch(`${API_URL}/recipes/${recipeId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...buildContextHeaders(context),
+      },
       body: JSON.stringify(recipeData),
     });
 
@@ -172,13 +216,18 @@ export const updateRecipe = async (recipeId, recipeData) => {
   }
 };
 
-export const saveRecipe = async (recipeData) => {
+export const saveRecipe = async (recipeData, context = {}) => {
   console.log("Menyimpan resep baru ke backend:", recipeData);
   try {
+    requireOrgId(context, "create a menu");
     const token = await getAccessToken();
     const response = await fetch(`${API_URL}/menu`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...buildContextHeaders(context),
+      },
       body: JSON.stringify(recipeData),
     });
 
@@ -236,9 +285,13 @@ export const validateIngredient = async (id, nutritionData, validatorName) => {
   }
 };
 
-export const getAllMenus = async () => {
+export const getAllMenus = async (context = {}) => {
   try {
-    const response = await fetch(`${API_URL}/menus`);
+    const response = await fetch(`${API_URL}/menus`, {
+      headers: {
+        ...buildContextHeaders(context),
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Gagal mengambil daftar menu.");
@@ -253,8 +306,12 @@ export const getAllMenus = async () => {
 };
 
 // PERBAIKAN: Endpoint yang benar untuk getMenuNutritionById
-export const getMenuNutritionById = async (menuId, target) => {
+export const getMenuNutritionById = async (menuId, targetOrContext, maybeContext) => {
   try {
+    const hasTarget = typeof targetOrContext === "string" || typeof targetOrContext === "number";
+    const target = hasTarget ? targetOrContext : null;
+    const context = hasTarget ? maybeContext : targetOrContext;
+
     console.log(
       "[API] Fetching nutrition for menu ID:",
       menuId,
@@ -263,11 +320,16 @@ export const getMenuNutritionById = async (menuId, target) => {
     );
 
     // 🔹 Kirim query target kalau tersedia
-    const url = target
-      ? `${API_URL}/menu/${menuId}?target=${target}`
-      : `${API_URL}/menu/${menuId}`;
+    const url =
+      target
+        ? `${API_URL}/menu/${menuId}?target=${target}`
+        : `${API_URL}/menu/${menuId}`;
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        ...buildContextHeaders(context),
+      },
+    });
 
     if (!response.ok) {
       const contentType = response.headers.get("content-type");
@@ -310,8 +372,10 @@ const getMenuIdByName = async (name) => {
 };
 
 // --- FUNGSI BARU: Menyimpan Komposisi Menu Baru ---
-export const saveNewMenuComposition = async (formData) => {
+export const saveNewMenuComposition = async (formData, context = {}) => {
   try {
+    requireOrgId(context, "create a menu composition");
+    const { orgId, userId } = normalizeRequestContext(context);
     console.log("📤 [API] Menerima formData:", formData);
 
     // PERBAIKAN: Validasi dan build payload dengan benar
@@ -342,6 +406,8 @@ export const saveNewMenuComposition = async (formData) => {
     const payload = {
       nama: nama.trim(),
       komposisi: komposisi,
+      orgId,
+      ...(userId ? { userId } : {}),
     };
 
     console.log("📦 [API] Sending payload:", JSON.stringify(payload, null, 2));
@@ -349,7 +415,11 @@ export const saveNewMenuComposition = async (formData) => {
     const token = await getAccessToken();
     const response = await fetch(`${API_URL}/menu/composition`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...buildContextHeaders(context),
+      },
       body: JSON.stringify(payload),
     });
 
@@ -369,14 +439,18 @@ export const saveNewMenuComposition = async (formData) => {
 };
 
 // Save meal plan
-export const saveMealPlan = async (mealPlanData) => {
+export const saveMealPlan = async (mealPlanData, context = {}) => {
   try {
     console.log("📤 [API] Saving meal plan:", mealPlanData);
 
     const token = await getAccessToken();
     const response = await fetch(`${API_URL}/meal-plans`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...buildContextHeaders(context),
+      },
       body: JSON.stringify(mealPlanData),
     });
 
@@ -396,9 +470,13 @@ export const saveMealPlan = async (mealPlanData) => {
 };
 
 // Get meal plan by ID
-export const getMealPlanById = async (id) => {
+export const getMealPlanById = async (id, context = {}) => {
   try {
-    const response = await fetch(`${API_URL}/meal-plans/${id}`);
+    const response = await fetch(`${API_URL}/meal-plans/${id}`, {
+      headers: {
+        ...buildContextHeaders(context),
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Gagal memuat meal plan.");
@@ -413,9 +491,13 @@ export const getMealPlanById = async (id) => {
 };
 
 // Get all meal plans
-export const getAllMealPlans = async () => {
+export const getAllMealPlans = async (context = {}) => {
   try {
-    const response = await fetch(`${API_URL}/meal-plans`);
+    const response = await fetch(`${API_URL}/meal-plans`, {
+      headers: {
+        ...buildContextHeaders(context),
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Gagal memuat daftar meal plans.");

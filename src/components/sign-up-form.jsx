@@ -79,9 +79,15 @@ export function SignUpForm({
 
       console.log('✅ [SIGNUP] Auto-login successful')
 
-      // Redirect to home page (organization is optional)
-      console.log('🏠 [SIGNUP] Redirecting to home...')
-      router.push('/')
+      if (data.hasOrganization) {
+        console.log('🏠 [SIGNUP] Redirecting through home...')
+        router.replace('/')
+        return
+      }
+
+      // New users without an org land on onboarding with create/join options.
+      console.log('🏠 [SIGNUP] Redirecting to organization onboarding...')
+      router.replace('/organization/create')
     } catch (err) {
       console.error('❌ [SIGNUP] Error:', err)
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan')

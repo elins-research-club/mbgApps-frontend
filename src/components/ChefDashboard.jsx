@@ -22,6 +22,7 @@ import {
   saveNewMenuComposition,
   getRecipeById,
 } from "../services/api";
+import { useAuth } from "@/contexts/AuthContext";
 import MainNavbar from "./MainNavbar";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -60,7 +61,8 @@ const TARGET_ID_MAP = {
   "SMA Kelas 3": 14,
 };
 
-export default function ChefDashboard({ canSave = false, canValidate = false, isOrgActive = false }) {
+export default function ChefDashboard({ canSave = false, canValidate = false, isOrgActive = false, isChef = false }) {
+  const { user, orgMembership, organizations } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [totalLabel, setTotalLabel] = useState(null);
@@ -78,6 +80,8 @@ export default function ChefDashboard({ canSave = false, canValidate = false, is
   const [isRecipeView, setIsRecipeView] = useState(false);
   const [selectedRecipeId, setSelectedRecipeId] = useState(null);
   const [editRecipeData, setEditRecipeData] = useState(null);
+  const activeOrgId = orgMembership?.organization?.id || organizations?.[0]?.id || null;
+  const requestContext = { userId: user?.id, orgId: activeOrgId };
 
   // ✅ UPDATE: clearResults sekarang reset recipe mode juga
   const clearResults = () => {
@@ -273,7 +277,7 @@ export default function ChefDashboard({ canSave = false, canValidate = false, is
     setError("");
 
     try {
-      const result = await getMenuNutritionById(menuId, targetId);
+      const result = await getMenuNutritionById(menuId, targetId, requestContext);
 
       if (!result || !result.totalLabel) {
         throw new Error("Gagal menghitung gizi atau respons tidak valid.");
@@ -306,7 +310,12 @@ export default function ChefDashboard({ canSave = false, canValidate = false, is
 
       const API_URL =
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-      const response = await fetch(`${API_URL}/recipes/${recipeId}/nutrition`);
+      const response = await fetch(
+        `${API_URL}/recipes/${recipeId}/nutrition${requestContext.userId || requestContext.orgId ? `?${new URLSearchParams({
+          ...(requestContext.userId ? { userId: requestContext.userId } : {}),
+          ...(requestContext.orgId ? { orgId: requestContext.orgId } : {}),
+        }).toString()}` : ""}`
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -347,7 +356,7 @@ export default function ChefDashboard({ canSave = false, canValidate = false, is
     setError("");
 
     try {
-      const details = await getRecipeById(recipe.id);
+      const details = await getRecipeById(recipe.id, requestContext);
       console.log("📦 Recipe details for edit:", details);
 
       const recipeData = {
@@ -389,7 +398,7 @@ export default function ChefDashboard({ canSave = false, canValidate = false, is
     try {
       console.log("[ChefDashboard] Menyimpan menu baru:", formData);
 
-      const result = await saveNewMenuComposition(formData);
+      const result = await saveNewMenuComposition(formData, requestContext);
 
       if (result?.id) {
         alert(
@@ -476,7 +485,7 @@ export default function ChefDashboard({ canSave = false, canValidate = false, is
                   </button>
 
                   {/* 🔹 Resep Individual Button - Hidden from usual users */}
-                  {(canSave || canValidate) && isOrgActive && (
+                  {isChef && isOrgActive && (
                     <button
                       type="button"
                       onClick={() => {
@@ -509,7 +518,7 @@ export default function ChefDashboard({ canSave = false, canValidate = false, is
                 </div>
               </div>
 
-              {isRecipeView && (canSave || canValidate) && isOrgActive ? (
+              {isRecipeView && isChef && isOrgActive ? (
                 <RecipeSearchCard
                   onRecipeSelect={handleRecipeSelect}
                   isLoading={isLoading}

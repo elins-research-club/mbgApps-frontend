@@ -52,6 +52,104 @@ function resolveOrgDepth(org) {
   return 0;
 }
 
+function getOrgDisplayName(org) {
+  return org?.name || org?.organizationName || org?.title || "Sub-organisasi";
+}
+
+function getOrgMemberCount(org) {
+  const direct = Number(org?.memberCounts?.totalCount);
+  return Number.isFinite(direct) ? direct : 0;
+}
+
+function summarizeMembers(members) {
+  const list = Array.isArray(members) ? members : [];
+  const activeCount = list.filter((member) => (member?.status || "").toLowerCase() === "active").length;
+  const pendingCount = list.filter((member) => (member?.status || "").toLowerCase() === "pending").length;
+  return {
+    activeCount,
+    pendingCount,
+    totalCount: list.length,
+  };
+}
+
+function combineMemberCounts(baseCounts, childNodes) {
+  const base = {
+    activeCount: Number(baseCounts?.activeCount) || 0,
+    pendingCount: Number(baseCounts?.pendingCount) || 0,
+    totalCount: Number(baseCounts?.totalCount) || 0,
+  };
+
+  const childTotals = (Array.isArray(childNodes) ? childNodes : []).reduce(
+    (sum, child) => {
+      const childCounts = child?.memberCounts || {};
+      return {
+        activeCount: sum.activeCount + (Number(childCounts.activeCount) || 0),
+        pendingCount: sum.pendingCount + (Number(childCounts.pendingCount) || 0),
+        totalCount: sum.totalCount + (Number(childCounts.totalCount) || 0),
+      };
+    },
+    { activeCount: 0, pendingCount: 0, totalCount: 0 }
+  );
+
+  return {
+    activeCount: base.activeCount + childTotals.activeCount,
+    pendingCount: base.pendingCount + childTotals.pendingCount,
+    totalCount: base.totalCount + childTotals.totalCount,
+  };
+}
+
+async function loadOrgTree(orgNode, visited = new Set(), preloadedMembers = null) {
+  if (!orgNode?.id || visited.has(orgNode.id)) {
+    return {
+      ...orgNode,
+      memberCounts: orgNode?.memberCounts ?? summarizeMembers(preloadedMembers),
+      children: [],
+    };
+  }
+
+  const nextVisited = new Set(visited);
+  nextVisited.add(orgNode.id);
+
+  const [members, children] = await Promise.all([
+    preloadedMembers ? Promise.resolve(preloadedMembers) : getOrgMembers(orgNode.id).catch(() => []),
+    getSubOrganizations(orgNode.id).catch(() => []),
+  ]);
+
+  const enrichedChildren = await Promise.all(
+    (Array.isArray(children) ? children : []).map(async (child) => {
+      return loadOrgTree(child, nextVisited);
+    })
+  );
+
+  const backendCounts = orgNode?.memberCounts;
+  const resolvedMemberCounts = Number.isFinite(Number(backendCounts?.totalCount))
+    ? backendCounts
+    : combineMemberCounts(summarizeMembers(members), enrichedChildren);
+
+  return {
+    ...orgNode,
+    memberCounts: resolvedMemberCounts,
+    children: enrichedChildren,
+    computedMemberCounts: combineMemberCounts(summarizeMembers(members), enrichedChildren),
+    rawMemberCounts: backendCounts ?? null,
+  };
+}
+
+function flattenOrgTree(nodes, parentChain = []) {
+  return (nodes || []).flatMap((node) => {
+    const name = getOrgDisplayName(node);
+    const chain = [...parentChain, name];
+    const children = flattenOrgTree(node?.children || [], chain);
+    return [
+      {
+        ...node,
+        displayChain: chain,
+      },
+      ...children,
+    ];
+  });
+}
+
 // ─── Permission definitions ───────────────────────────────────────────────────
 const PERMISSION_DEFS = [
   { key: "can_manage_users",          label: "Kelola Pengguna",        description: "Akses manajemen anggota organisasi" },
@@ -206,10 +304,15 @@ function RoleFormModal({ initial, onSave, onClose, saving }) {
 export default function OrgOwnerDashboard({ orgId }) {
   const { user, canManageUsers, canManageRoles, refresh: refreshAuth, isOrgPending, isOrgRejected, organization, orgStatusMap } = useAuth();
   const router = useRouter();
+  const debugFlag = (process.env.NEXT_PUBLIC_DEBUG_ORG_PAYLOAD || "").toLowerCase();
+  const showDebug = debugFlag === "true" || debugFlag === "1";
+  const appEnv = process.env.NEXT_PUBLIC_APP_ENV;
+
 
   const [org, setOrg]               = useState(null);
   const [members, setMembers]       = useState([]);
   const [roles, setRoles]           = useState([]);
+  const [subOrganizationTree, setSubOrganizationTree] = useState([]);
   const [subOrganizations, setSubOrganizations] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [tab, setTab]               = useState("pending");
@@ -235,14 +338,27 @@ export default function OrgOwnerDashboard({ orgId }) {
         getOrgMembers(orgId),
         getOrgRoles(orgId),
       ]);
-      setOrg(orgData);
+      const enrichedRoot = await loadOrgTree(orgData, new Set(), membersData);
+      setOrg(enrichedRoot);
       setMembers(membersData);
       setRoles(rolesData);
 
+      if (showDebug) {
+        console.log("[OrgOwnerDashboard] orgData", orgData);
+        console.log("[OrgOwnerDashboard] enrichedRoot", enrichedRoot);
+        console.log("[OrgOwnerDashboard] membersData", membersData);
+        console.log("[OrgOwnerDashboard] rolesData", rolesData);
+      }
+
       try {
-        const subsData = await getSubOrganizations(orgId);
-        setSubOrganizations(Array.isArray(subsData) ? subsData : []);
+        const subsTree = Array.isArray(enrichedRoot?.children) ? enrichedRoot.children : [];
+        setSubOrganizationTree(subsTree);
+        setSubOrganizations(flattenOrgTree(subsTree));
+        if (showDebug) {
+          console.log("[OrgOwnerDashboard] subOrganizationTree", subsTree);
+        }
       } catch {
+        setSubOrganizationTree([]);
         setSubOrganizations([]);
       }
     } catch (err) {
@@ -257,6 +373,15 @@ export default function OrgOwnerDashboard({ orgId }) {
   }, [orgId, loadAll]);
 
   useEffect(() => {
+    if (!showDebug) return;
+    console.log("[OrgOwnerDashboard] env", {
+      NODE_ENV: process.env.NODE_ENV,
+      NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+      NEXT_PUBLIC_DEBUG_ORG_PAYLOAD: process.env.NEXT_PUBLIC_DEBUG_ORG_PAYLOAD,
+    });
+  }, [showDebug]);
+
+  useEffect(() => {
     if (!canManageUsers && canManageRoles && tab !== "roles") {
       setTab("roles");
     }
@@ -265,20 +390,26 @@ export default function OrgOwnerDashboard({ orgId }) {
     }
   }, [canManageUsers, canManageRoles, tab]);
 
-  // Guard: owner or delegated manager can access this page
-  useEffect(() => {
-    const orgOwnerId = org?.ownerId || org?.owner_id || org?.owner?.id;
-    const isOwner = !!(orgOwnerId && user && orgOwnerId === user.id);
-    const canAccessDashboard = isOwner || canManageUsers || canManageRoles;
-    if (!loadingData && org && user && !canAccessDashboard) {
-      router.replace("/");
-    }
-  }, [loadingData, org, user, canManageUsers, canManageRoles, router]);
-
   const pending  = members.filter((m) => m.status === "pending");
   const active   = members.filter((m) => m.status === "active");
   const currentOrgDepth = resolveOrgDepth(org);
   const canCreateSubOrg = currentOrgDepth < MAX_ORG_DEPTH;
+  const rootOrgName = getOrgDisplayName(org);
+  const rootMemberCounts = org?.memberCounts || {};
+  const rootActiveCount = Number(rootMemberCounts.activeCount);
+  const rootPendingCount = Number(rootMemberCounts.pendingCount);
+  const rootTotalCount = Number(rootMemberCounts.totalCount);
+  const fallbackRootCounts = combineMemberCounts(summarizeMembers(members), subOrganizationTree);
+  const resolvedRootCounts = Number.isFinite(rootTotalCount)
+    ? {
+        activeCount: Number.isFinite(rootActiveCount) ? rootActiveCount : active.length,
+        pendingCount: Number.isFinite(rootPendingCount) ? rootPendingCount : pending.length,
+        totalCount: rootTotalCount,
+      }
+    : fallbackRootCounts;
+  const displayRootActiveCount = resolvedRootCounts.activeCount;
+  const displayRootPendingCount = resolvedRootCounts.pendingCount;
+  const displayRootTotalCount = resolvedRootCounts.totalCount;
   
   // Helper to get user display name from either structure
   const getUserName = (member) => {
@@ -461,6 +592,51 @@ export default function OrgOwnerDashboard({ orgId }) {
       )}
 
       <main className="flex-grow max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
+        {showDebug && (
+          <section className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-900 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="font-semibold text-sm">Debug Org Payload</h2>
+              <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 font-semibold">
+                {appEnv}
+              </span>
+            </div>
+            <div>
+              <p className="font-semibold mb-1">org.memberCounts (resolved)</p>
+              <pre className="overflow-auto whitespace-pre-wrap break-words bg-white/70 border border-amber-200 rounded-xl p-3">
+{JSON.stringify(org?.memberCounts ?? null, null, 2)}
+              </pre>
+            </div>
+            <div>
+              <p className="font-semibold mb-1">org.memberCounts (raw backend)</p>
+              <pre className="overflow-auto whitespace-pre-wrap break-words bg-white/70 border border-amber-200 rounded-xl p-3 max-h-40">
+{JSON.stringify(org?.rawMemberCounts ?? null, null, 2)}
+              </pre>
+            </div>
+            <div>
+              <p className="font-semibold mb-1">subOrganizations raw</p>
+              <pre className="overflow-auto whitespace-pre-wrap break-words bg-white/70 border border-amber-200 rounded-xl p-3 max-h-64">
+{JSON.stringify(subOrganizations, null, 2)}
+              </pre>
+            </div>
+            <div>
+              <p className="font-semibold mb-1">subOrganizations memberCounts summary</p>
+              <pre className="overflow-auto whitespace-pre-wrap break-words bg-white/70 border border-amber-200 rounded-xl p-3 max-h-64">
+{JSON.stringify(
+  subOrganizations.map((sub) => ({
+    id: sub.id,
+    name: sub.name,
+    memberCounts: sub.memberCounts ?? null,
+    rawMemberCounts: sub.rawMemberCounts ?? null,
+    displayChain: sub.displayChain ?? null,
+  })),
+  null,
+  2
+)}
+              </pre>
+            </div>
+          </section>
+        )}
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -482,10 +658,10 @@ export default function OrgOwnerDashboard({ orgId }) {
         {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: "Anggota Aktif",    value: active.length,      color: "text-black" },
-            { label: "Menunggu",         value: pending.length,     color: "text-black" },
+            { label: "Anggota Aktif",    value: displayRootActiveCount,      color: "text-black" },
+            { label: "Menunggu",         value: displayRootPendingCount,     color: "text-black" },
             { label: "Peran",            value: roles.length,       color: "text-black" },
-            { label: "Total Anggota",    value: members.length,     color: "text-black" },
+            { label: "Total Anggota",    value: displayRootTotalCount,     color: "text-black" },
           ].map((s) => (
             <div key={s.label} className="bg-white rounded-2xl border border-[#E8D1C5] p-4 text-center">
               <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
@@ -526,11 +702,11 @@ export default function OrgOwnerDashboard({ orgId }) {
             <div>
               <h3 className="text-[#17191B] font-semibold">Sub-Organisasi</h3>
               <p className="text-sm text-white0 mt-0.5">
-                Daftar organisasi turunan langsung dari organisasi ini.
+                Daftar organisasi turunan beserta cabang parent-child-nya.
               </p>
             </div>
             <span className="px-2.5 py-1 rounded-full bg-[#452829] text-white text-xs font-semibold">
-              {subOrganizations.length} item
+              {subOrganizations.length} item • {displayRootTotalCount} anggota total
             </span>
           </div>
 
@@ -545,13 +721,25 @@ export default function OrgOwnerDashboard({ orgId }) {
                 const subName = sub?.name || "Sub-organisasi";
                 const subDescription = sub?.description || "Tanpa deskripsi";
                 const subDepth = resolveOrgDepth(sub);
+                const subTotalMembers = Number(sub?.memberCounts?.totalCount);
+                const displaySubTotalMembers = Number.isFinite(subTotalMembers)
+                  ? subTotalMembers
+                  : Number(sub?.computedMemberCounts?.totalCount) || 0;
+                const titleChain = [rootOrgName, ...(sub?.displayChain || [subName])].filter(Boolean);
                 return (
                   <div
                     key={subId || `${subName}-${subDepth}`}
                     className="rounded-xl border border-[#E8D1C5] px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#17191B] truncate">{subName}</p>
+                      <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                        <p className="text-sm font-semibold text-[#17191B] truncate">
+                          {titleChain.join(" / ")}
+                        </p>
+                        <span className="px-2 py-0.5 rounded-full bg-[#E8D1C5] text-[#17191B] text-xs font-semibold flex-shrink-0 whitespace-nowrap">
+                          {displaySubTotalMembers} anggota total
+                        </span>
+                      </div>
                       <p className="text-xs text-white0 truncate mt-0.5">{subDescription}</p>
                       <p className="text-xs text-[#C9A89A] mt-1">Depth: {subDepth}</p>
                     </div>
@@ -675,14 +863,32 @@ export default function OrgOwnerDashboard({ orgId }) {
                     </div>
                     <div className="flex items-center gap-2">
                       <select
-                        value={roleId ?? ""}
-                        onChange={(e) => handleAssignRole(m.id, e.target.value)}
-                        className="text-xs border border-[#D9C7B8] rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#D9C7B8] bg-white text-[#37393B]"
+                        value={isOwner ? "owner" : (roleId ?? "")}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value && value !== "owner") {
+                            handleAssignRole(m.id, value);
+                          }
+                        }}
+                        disabled={isOwner || roles.length === 0}
+                        className="text-xs border border-[#D9C7B8] rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#D9C7B8] bg-white text-[#37393B] disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <option value="">Tanpa peran</option>
-                        {roles.map((r) => (
-                          <option key={r.id} value={r.id}>{r.name}</option>
-                        ))}
+                        {isOwner ? (
+                          <option value="owner">Admin (owner)</option>
+                        ) : (
+                          <>
+                            <option value="">Pilih peran</option>
+                            {roles.length === 0 ? (
+                              <option disabled>Tidak ada peran tersedia</option>
+                            ) : (
+                              roles.map((r) => (
+                                <option key={r.id} value={r.id}>
+                                  {r.name || "Peran tanpa nama"}
+                                </option>
+                              ))
+                            )}
+                          </>
+                        )}
                       </select>
                       <button
                         onClick={() => handleRemove(m.id, userName)}
@@ -737,7 +943,7 @@ export default function OrgOwnerDashboard({ orgId }) {
                           <div className="flex flex-wrap gap-1.5 mt-2">
                             {grantedPerms.length === 0 ? (
                               <span className="text-xs text-[#C9A89A]">
-                                Tidak ada hak akses
+                                {/* Tidak ada hak akses */}
                               </span>
                             ) : (
                               grantedPerms.map((p) => (

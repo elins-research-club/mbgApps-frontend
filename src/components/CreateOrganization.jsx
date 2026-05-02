@@ -359,7 +359,7 @@ export default function CreateOrganization() {
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-semibold text-[#37393B] mb-1.5">
                   Tambah Anggota Awal
                   <span className="text-[#C9A89A] font-normal ml-1">(opsional)</span>
@@ -402,17 +402,21 @@ export default function CreateOrganization() {
                     ))}
                   </div>
                 )}
-              </div>
+              </div> */}
 
               {/* Info box */}
-              <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700">
-                <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span>
-                  Setelah membuat {isSubOrgMode ? "sub-organisasi" : "organisasi"}, 
-                  <strong> organisasi akan menunggu persetujuan dari administrator</strong>. 
-                  Setelah disetujui, Anda dapat mengundang anggota menggunakan kode undangan yang tersedia.
-                </span>
-              </div>
+              {!isSubOrgMode ? (
+                <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700">
+                  <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  
+                    <span>
+                      Setelah membuat {isSubOrgMode ? "sub-organisasi" : "organisasi"}, 
+                      <strong> organisasi akan menunggu persetujuan dari administrator</strong>. 
+                      Setelah disetujui, Anda dapat mengundang anggota menggunakan kode undangan yang tersedia.
+                    </span>
+                  
+                </div>
+              ):<></>}
 
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">

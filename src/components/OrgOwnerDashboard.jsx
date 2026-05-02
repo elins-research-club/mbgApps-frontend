@@ -864,9 +864,9 @@ export default function OrgOwnerDashboard({ orgId }) {
           {canManageUsers && (
             <TabButton active={tab === "pending"} onClick={() => setTab("pending")} icon={Clock} label="Permintaan" badge={pending.length} />
           )}
-          {canManageUsers && (
+          {/* {canManageUsers && (
             <TabButton active={tab === "invite"} onClick={() => setTab("invite")} icon={Plus} label="Undang Anggota" badge={0} />
-          )}
+          )} */}
             <TabButton active={tab === "members"} onClick={() => setTab("members")} icon={Users} label="Anggota" badge={0} />
           {canManageRoles && (
             <TabButton active={tab === "roles"} onClick={() => setTab("roles")} icon={Shield} label="Peran & Akses" badge={0} />

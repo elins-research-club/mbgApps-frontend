@@ -161,7 +161,6 @@ export default function MealDetails() {
     try {
       // Use planName or generate a default name
       const mealPlanName = planName.trim() || `Meal Plan ${new Date().toLocaleDateString('id-ID')}`
-
       const mealPlanData = {
         name: mealPlanName,
         recipes: plateRecipes.map(r => ({

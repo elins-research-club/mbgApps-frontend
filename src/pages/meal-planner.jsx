@@ -346,21 +346,19 @@ function RecommendationSummaryPanel({
       <div className="flex border-b border-white">
         <button
           onClick={() => setActiveTab("current")}
-          className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
-            activeTab === "current"
+          className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${activeTab === "current"
               ? "text-white0 border-b-2 border-white0 bg-white"
               : "text-white0 hover:text-[#37393B]"
-          }`}
+            }`}
         >
           Kelas Aktif
         </button>
         <button
           onClick={() => setActiveTab("all")}
-          className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${
-            activeTab === "all"
+          className={`flex-1 px-4 py-3 text-sm font-semibold transition-colors ${activeTab === "all"
               ? "text-white0 border-b-2 border-white0 bg-white"
               : "text-white0 hover:text-[#37393B]"
-          }`}
+            }`}
         >
           Semua Kelas
         </button>
@@ -709,7 +707,9 @@ export default function MealPlanner() {
 
   useEffect(() => {
     if (plateRecipes.length > 0) {
+      console.log("Plate recipes before stringify:", plateRecipes);
       localStorage.setItem("plateRecipes", JSON.stringify(plateRecipes));
+      console.log("Saved plateRecipes to localStorage:", plateRecipes);
     }
   }, [plateRecipes]);
 
@@ -720,6 +720,7 @@ export default function MealPlanner() {
   useEffect(() => {
     if (planName) {
       localStorage.setItem("planName", planName);
+      console.log("Saved planName to localStorage:", planName);
     }
   }, [planName]);
 
@@ -754,6 +755,7 @@ export default function MealPlanner() {
               : recipe.nutrisi,
         }));
         setRecipes(recipesArray);
+        console.log("Fetched recipes:", recipesArray);
       } catch (error) {
         console.error("Error loading recipes:", error);
         setRecipes([]);
@@ -978,7 +980,7 @@ export default function MealPlanner() {
 
       // Get recipes from the meal plan
       const planRecipes = plan.recipes || [];
-
+      console.log("Plan recipes before mapped:", planRecipes);
       if (planRecipes.length === 0) {
         alert("Set menu ini tidak memiliki menu");
         return;
@@ -996,6 +998,7 @@ export default function MealPlanner() {
           };
         }
 
+        console.log("plan recipe after mapping attempt:", planRecipe);
         // If not found, use the data from the meal plan
         return {
           id: planRecipe.id,
@@ -1003,10 +1006,11 @@ export default function MealPlanner() {
           kategori: planRecipe.kategori || "",
           total_gramasi: planRecipe.total_gramasi || 100,
           nutrisi: planRecipe.nutrisi || {},
+          rincian_bahan: planRecipe.rincian_bahan || [],
           quantity: planRecipe.quantity || 1,
         };
       });
-
+      console.log("final mapped recipes for plate:", mappedRecipes);
       setPlateRecipes(mappedRecipes);
       setTargetClass(plan.targetClass || 6); // Set the target class from the plan
       setPlanName(plan.name || ""); // Set the plan name
@@ -1459,12 +1463,11 @@ export default function MealPlanner() {
                     onClick={handleGetRecommendations}
                     disabled={isLoadingRecs}
                     className={`px-6 py-3 rounded-lg font-medium shadow-md flex items-center gap-2 transition-all duration-200
-                      ${
-                        isLoadingRecs
-                          ? "bg-[#D9C7B8] text-[#C9A89A] cursor-not-allowed"
-                          : recommendations
-                            ? "bg-emerald-500 hover:bg-emerald-600 text-white"
-                            : "bg-[#452829] hover:bg-[#17191B] text-white"
+                      ${isLoadingRecs
+                        ? "bg-[#D9C7B8] text-[#C9A89A] cursor-not-allowed"
+                        : recommendations
+                          ? "bg-emerald-500 hover:bg-emerald-600 text-white"
+                          : "bg-[#452829] hover:bg-[#17191B] text-white"
                       }`}
                   >
                     {isLoadingRecs ? (

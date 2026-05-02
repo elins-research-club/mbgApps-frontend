@@ -1429,7 +1429,13 @@ export default function MealPlanner() {
                 <div className="flex flex-wrap justify-center gap-3 mb-6">
                   {/* View Details Button */}
                   <button
-                    onClick={() => router.push("/meal-details")}
+                    onClick={() =>
+                      router.push(
+                        activeOrgId
+                          ? `/meal-details?orgId=${activeOrgId}`
+                          : "/meal-details"
+                      )
+                    }
                     className="px-6 py-3 bg-[#452829] hover:bg-[#17191B] text-white rounded-lg transition-colors font-medium shadow-md flex items-center gap-2"
                   >
                     <svg

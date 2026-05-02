@@ -21,6 +21,7 @@ export default function MealDetails() {
   const orgId = Array.isArray(router.query?.orgId)
     ? router.query.orgId[0]
     : router.query?.orgId || orgMembership?.organization?.id || organizations?.[0]?.id || null
+  const setMenuHref = orgId ? `/meal-planner?orgId=${orgId}` : '/meal-planner'
   const [showPortionModal, setShowPortionModal] = useState(false)
   const [portion, setPortion] = useState(1)
 
@@ -289,7 +290,7 @@ export default function MealDetails() {
               Silakan tambahkan menu di Meal Planner terlebih dahulu
             </p>
             <button
-              onClick={() => router.push('/meal-planner')}
+              onClick={() => router.push(setMenuHref)}
               className='px-6 py-3 bg-[#452829] hover:bg-[#17191B] text-white rounded-lg transition-colors'
             >
               ← Kembali ke Set Menu
@@ -374,7 +375,7 @@ export default function MealDetails() {
                 </button>                {/* ─────────────────────────── */}
 
                 <button
-                  onClick={() => router.push('/meal-planner')}
+                  onClick={() => router.push(setMenuHref)}
                   className='px-4 py-2 bg-[#452829] hover:bg-[#17191B] text-white rounded-lg transition-colors'
                 >
                   ← Kembali ke Set Menu

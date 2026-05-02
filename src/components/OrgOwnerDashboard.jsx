@@ -803,102 +803,106 @@ export default function OrgOwnerDashboard({ orgId }) {
           ))}
         </div>
 
-        {/* Organization hierarchy */}
-        <section className="bg-white rounded-2xl border border-[#E8D1C5] p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2 text-[#17191B] font-semibold">
-                <GitBranch className="w-4 h-4 text-white0" />
-                Struktur Organisasi
-              </div>
-              <p className="text-sm text-white0 mt-1">
-                Kedalaman saat ini: {currentOrgDepth}/{MAX_ORG_DEPTH}. Sub-organisasi hanya bisa dibuat hingga kedalaman {MAX_ORG_DEPTH}.
-              </p>
-            </div>
-            <button
-              onClick={handleCreateSubOrganization}
-              disabled={!canCreateSubOrg}
-              className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#452829] hover:bg-[#6C2D19] text-white rounded-xl text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-              title={
-                canCreateSubOrg
-                  ? "Buat sub-organisasi"
-                  : `Batas kedalaman ${MAX_ORG_DEPTH} sudah tercapai`
-              }
-            >
-              <Plus className="w-4 h-4" /> Buat Sub-Organisasi
-            </button>
-          </div>
-        </section>
-
-        <section className="bg-white rounded-2xl border border-[#E8D1C5] p-5">
-          <div className="flex items-center justify-between gap-3 mb-4">
-            <div>
-              <h3 className="text-[#17191B] font-semibold">Sub-Organisasi</h3>
-              <p className="text-sm text-white0 mt-0.5">
-                Daftar organisasi turunan beserta cabang parent-child-nya.
-              </p>
-            </div>
-            <span className="px-2.5 py-1 rounded-full bg-[#452829] text-white text-xs font-semibold">
-              {subOrganizations.length} item • {displayRootTotalCount} anggota total
-            </span>
-          </div>
-
-          {subOrganizations.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[#D9C7B8] bg-white px-4 py-6 text-sm text-white0 text-center">
-              Belum ada sub-organisasi.
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              {subOrganizations.map((sub) => {
-                const subId = sub?.id;
-                const subName = sub?.name || "Sub-organisasi";
-                const subDescription = sub?.description || "Tanpa deskripsi";
-                const subDepth = resolveOrgDepth(sub);
-                const subTotalMembers = Number(sub?.memberCounts?.totalCount);
-                const displaySubTotalMembers = Number.isFinite(subTotalMembers)
-                  ? subTotalMembers
-                  : Number(sub?.computedMemberCounts?.totalCount) || 0;
-                const titleChain = [rootOrgName, ...(sub?.displayChain || [subName])].filter(Boolean);
-                return (
-                  <div
-                    key={subId || `${subName}-${subDepth}`}
-                    className="rounded-xl border border-[#E8D1C5] px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                        <p className="text-sm font-semibold text-[#17191B] truncate">
-                          {titleChain.join(" / ")}
-                        </p>
-                        <span className="px-2 py-0.5 rounded-full bg-[#E8D1C5] text-[#17191B] text-xs font-semibold flex-shrink-0 whitespace-nowrap">
-                          {displaySubTotalMembers} anggota total
-                        </span>
-                      </div>
-                      <p className="text-xs text-white0 truncate mt-0.5">{subDescription}</p>
-                      <p className="text-xs text-[#C9A89A] mt-1">Depth: {subDepth}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => subId && router.push(`/organization/${subId}/dashboard`)}
-                      disabled={!subId}
-                      className="px-3 py-2 rounded-lg text-xs font-semibold bg-[#17191B] text-white hover:bg-[#37393B] transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Buka Dashboard
-                    </button>
+        {currentUserIsOrgOwner && (
+          <>
+            {/* Organization hierarchy */}
+            <section className="bg-white rounded-2xl border border-[#E8D1C5] p-5">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2 text-[#17191B] font-semibold">
+                    <GitBranch className="w-4 h-4 text-white0" />
+                    Struktur Organisasi
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
+                  <p className="text-sm text-white0 mt-1">
+                    Kedalaman saat ini: {currentOrgDepth}/{MAX_ORG_DEPTH}. Sub-organisasi hanya bisa dibuat hingga kedalaman {MAX_ORG_DEPTH}.
+                  </p>
+                </div>
+                <button
+                  onClick={handleCreateSubOrganization}
+                  disabled={!canCreateSubOrg}
+                  className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#452829] hover:bg-[#6C2D19] text-white rounded-xl text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={
+                    canCreateSubOrg
+                      ? "Buat sub-organisasi"
+                      : `Batas kedalaman ${MAX_ORG_DEPTH} sudah tercapai`
+                  }
+                >
+                  <Plus className="w-4 h-4" /> Buat Sub-Organisasi
+                </button>
+              </div>
+            </section>
+
+            <section className="bg-white rounded-2xl border border-[#E8D1C5] p-5">
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <h3 className="text-[#17191B] font-semibold">Sub-Organisasi</h3>
+                  <p className="text-sm text-white0 mt-0.5">
+                    Daftar organisasi turunan beserta cabang parent-child-nya.
+                  </p>
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-[#452829] text-white text-xs font-semibold">
+                  {subOrganizations.length} item • {displayRootTotalCount} anggota total
+                </span>
+              </div>
+
+              {subOrganizations.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-[#D9C7B8] bg-white px-4 py-6 text-sm text-white0 text-center">
+                  Belum ada sub-organisasi.
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {subOrganizations.map((sub) => {
+                    const subId = sub?.id;
+                    const subName = sub?.name || "Sub-organisasi";
+                    const subDescription = sub?.description || "Tanpa deskripsi";
+                    const subDepth = resolveOrgDepth(sub);
+                    const subTotalMembers = Number(sub?.memberCounts?.totalCount);
+                    const displaySubTotalMembers = Number.isFinite(subTotalMembers)
+                      ? subTotalMembers
+                      : Number(sub?.computedMemberCounts?.totalCount) || 0;
+                    const titleChain = [rootOrgName, ...(sub?.displayChain || [subName])].filter(Boolean);
+                    return (
+                      <div
+                        key={subId || `${subName}-${subDepth}`}
+                        className="rounded-xl border border-[#E8D1C5] px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                      >
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                            <p className="text-sm font-semibold text-[#17191B] truncate">
+                              {titleChain.join(" / ")}
+                            </p>
+                            <span className="px-2 py-0.5 rounded-full bg-[#E8D1C5] text-[#17191B] text-xs font-semibold flex-shrink-0 whitespace-nowrap">
+                              {displaySubTotalMembers} anggota total
+                            </span>
+                          </div>
+                          <p className="text-xs text-white0 truncate mt-0.5">{subDescription}</p>
+                          <p className="text-xs text-[#C9A89A] mt-1">Depth: {subDepth}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => subId && router.push(`/organization/${subId}/dashboard`)}
+                          disabled={!subId}
+                          className="px-3 py-2 rounded-lg text-xs font-semibold bg-[#17191B] text-white hover:bg-[#37393B] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Buka Dashboard
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          </>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-2 flex-wrap">
           {canManageUsers && (
             <TabButton active={tab === "pending"} onClick={() => setTab("pending")} icon={Clock} label="Permintaan" badge={pending.length} />
           )}
-          {/* {canManageUsers && (
+          {canManageUsers && (
             <TabButton active={tab === "invite"} onClick={() => setTab("invite")} icon={Plus} label="Undang Anggota" badge={0} />
-          )} */}
+          )}
             <TabButton active={tab === "members"} onClick={() => setTab("members")} icon={Users} label="Anggota" badge={0} />
           {canManageRoles && (
             <TabButton active={tab === "roles"} onClick={() => setTab("roles")} icon={Shield} label="Peran & Akses" badge={0} />

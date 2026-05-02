@@ -53,38 +53,74 @@ export default async function Home() {
     const accessibleOrgIds = new Set(unique.map((o) => o.id));
     console.log("🔍 [HOME] Accessible orgs:", Array.from(accessibleOrgIds));
 
-    // Fetch all org hierarchy info for accessible orgs
-    const { data: orgDetails } = await supabase
+    // Fetch initial hierarchy info for accessible orgs.
+    // Use only known columns to avoid empty data caused by invalid select fields.
+    const { data: orgDetails, error: orgDetailsError } = await supabase
       .from("Organizations")
-      .select("id, parent_id, parentId, name")
+      .select("id, parent_id, name")
       .in("id", Array.from(accessibleOrgIds));
+
+    if (orgDetailsError) {
+      console.log("❌ [HOME] Failed to fetch org details:", orgDetailsError.message);
+    }
 
     console.log("📊 [HOME] Org details:", orgDetails);
 
     const orgMap = new Map(orgDetails?.map((o) => [o.id, o]) || []);
 
+    // Cache helper to fetch org rows not present in the initial map.
+    const loadOrgNode = async (orgId) => {
+      if (!orgId) return null;
+      if (orgMap.has(orgId)) return orgMap.get(orgId);
+
+      const { data, error } = await supabase
+        .from("Organizations")
+        .select("id, parent_id, name")
+        .eq("id", orgId)
+        .maybeSingle();
+
+      if (error) {
+        console.log(`❌ [HOME] Failed to load org ${orgId}:`, error.message);
+        return null;
+      }
+
+      if (data) {
+        orgMap.set(data.id, data);
+      }
+
+      return data || null;
+    };
+
     // Helper: find the highest accessible parent
-    const findRootAccessibleOrg = (orgId) => {
+    const findRootAccessibleOrg = async (orgId) => {
       let current = orgId;
       let highest = orgId;
+      const visited = new Set();
       console.log(`  🔗 Finding root for org ${orgId}`);
 
       while (current) {
-        const org = orgMap.get(current);
+        if (visited.has(current)) {
+          console.log(`    ⚠️ Cycle detected at ${current}, stopping traversal`);
+          break;
+        }
+        visited.add(current);
+
+        const org = await loadOrgNode(current);
         if (!org) {
           console.log(`    ❌ Org ${current} not in map`);
           break;
         }
 
-        const parentId = org.parent_id || org.parentId;
+        const parentId = org.parent_id;
         console.log(`    📍 Current: ${current} (${org.name}), Parent: ${parentId}`);
 
-        if (!parentId || !accessibleOrgIds.has(parentId)) {
-          console.log(`    ✅ Parent not accessible, root is: ${highest}`);
+        if (!parentId) {
+          console.log(`    ✅ Reached top root: ${highest}`);
           return highest;
         }
 
-        // Parent is accessible, keep going up
+        // Always climb to the true top-level parent,
+        // even if that parent is not in the user's immediate accessible set.
         highest = parentId;
         current = parentId;
       }
@@ -96,7 +132,7 @@ export default async function Home() {
     // Find roots for all accessible orgs
     const roots = new Map();
     for (const orgId of accessibleOrgIds) {
-      const root = findRootAccessibleOrg(orgId);
+      const root = await findRootAccessibleOrg(orgId);
       if (!roots.has(root)) {
         roots.set(root, root);
       }

@@ -116,7 +116,10 @@ export default function MainNavbar() {
             )}
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 shrink-0">
+            <Link
+              href={activeOrgId ? `/organization/${activeOrgId}/dashboard` : "/"}
+              className="flex items-center gap-2 shrink-0"
+            >
               <div className="w-8 h-8 bg-[#452829] rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">M</span>
               </div>

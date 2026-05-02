@@ -58,6 +58,32 @@ function getOrgDisplayName(org) {
   return org?.name || org?.organizationName || org?.title || "Sub-organisasi";
 }
 
+function getOrgParentId(org) {
+  return org?.parent_id || org?.parentId || org?.parent?.id || null;
+}
+
+async function loadOrgAncestorChain(orgNode) {
+  const chain = [];
+  const visited = new Set();
+  let current = orgNode;
+
+  while (current?.id && !visited.has(current.id)) {
+    visited.add(current.id);
+    chain.unshift(current);
+
+    const parentId = getOrgParentId(current);
+    if (!parentId) break;
+
+    try {
+      current = await getOrganization(parentId);
+    } catch {
+      break;
+    }
+  }
+
+  return chain;
+}
+
 function getOrgMemberCount(org) {
   const direct = Number(org?.memberCounts?.totalCount);
   return Number.isFinite(direct) ? direct : 0;
@@ -316,6 +342,7 @@ export default function OrgOwnerDashboard({ orgId }) {
   const [roles, setRoles]           = useState([]);
   const [subOrganizationTree, setSubOrganizationTree] = useState([]);
   const [subOrganizations, setSubOrganizations] = useState([]);
+  const [orgTitleChain, setOrgTitleChain] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [tab, setTab]               = useState("pending");
   const [toast, setToast]           = useState(null);
@@ -359,6 +386,9 @@ export default function OrgOwnerDashboard({ orgId }) {
       ]);
       const enrichedRoot = await loadOrgTree(orgData, new Set(), membersData);
       setOrg(enrichedRoot);
+      setOrgTitleChain(
+        (await loadOrgAncestorChain(enrichedRoot)).map((item) => getOrgDisplayName(item))
+      );
       setMembers(membersData);
       setRoles(rolesData);
 
@@ -742,7 +772,9 @@ export default function OrgOwnerDashboard({ orgId }) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-[#17191B]">
-              {org?.name ?? "Dashboard Organisasi"}
+              {orgTitleChain.length > 0
+                ? orgTitleChain.join(" / ")
+                : org?.name ?? "Dashboard Organisasi"}
             </h1>
             {org?.description && (
               <p className="text-white0 text-sm mt-0.5">{org.description}</p>

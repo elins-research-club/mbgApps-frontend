@@ -248,3 +248,11 @@ export async function rejectOrganization(orgId, reason = "") {
   });
   return unwrap(payload);
 }
+
+export async function acceptInvitation(token) {
+  const payload = await request("/organizations/invitations/accept", {
+    method: "POST",
+    body: JSON.stringify({ token }),
+  });
+  return unwrap(payload);
+}

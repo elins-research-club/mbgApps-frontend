@@ -20,5 +20,9 @@ export default function AhliGiziPage() {
     );
   }
 
-  return <AhliGiziDashboard />;
+  return (
+    <>
+      <AhliGiziDashboard />
+    </>
+  );
 }

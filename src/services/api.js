@@ -243,9 +243,13 @@ export const saveRecipe = async (recipeData, context = {}) => {
   }
 };
 
-export const getNotValidatedIngredients = async () => {
+export const getNotValidatedIngredients = async (context = {}) => {
   try {
-    const response = await fetch(`${API_URL}/ingredients/get-not-validated`);
+    const response = await fetch(`${API_URL}/ingredients/get-not-validated`, {
+      headers: {
+        ...buildContextHeaders(context),
+      },
+    });
     if (!response.ok) {
       throw new Error("Gagal mengambil data untuk validasi");
     }
@@ -257,19 +261,87 @@ export const getNotValidatedIngredients = async () => {
   }
 };
 
-export const validateIngredient = async (id, nutritionData, validatorName) => {
+export const getAllIngredients = async (context = {}) => {
+  try {
+    const response = await fetch(`${API_URL}/ingredients`, {
+      headers: {
+        ...buildContextHeaders(context),
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Gagal mengambil daftar bahan");
+    }
+    const data = await response.json();
+    return data.ingredients || data;
+  } catch (error) {
+    console.error("Error di getAllIngredients:", error);
+    return [];
+  }
+};
+
+export const createIngredient = async (ingredientData, context = {}) => {
+  try {
+    const token = await getAccessToken();
+    const response = await fetch(`${API_URL}/ingredients`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...buildContextHeaders(context),
+      },
+      body: JSON.stringify(ingredientData),
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || "Gagal membuat bahan");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error di createIngredient:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+export const updateIngredient = async (id, ingredientData, context = {}) => {
+  try {
+    const token = await getAccessToken();
+    const response = await fetch(`${API_URL}/ingredients/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...buildContextHeaders(context),
+      },
+      body: JSON.stringify(ingredientData),
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || "Gagal mengupdate bahan");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error di updateIngredient:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+export const validateIngredient = async (id, nutritionData, validatorName, context = {}) => {
   try {
     const payload = {
       ingredientData: nutritionData,
       validatedBy: validatorName, // KIRIM NAMA AHLI GIZI
     };
 
-    console.log("Validating ingredient:", payload);
+    console.log("Validating ingredient:", payload, "context:", context);
 
     const token = await getAccessToken();
     const response = await fetch(`${API_URL}/ingredients/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...buildContextHeaders(context),
+      },
       body: JSON.stringify(payload),
     });
 

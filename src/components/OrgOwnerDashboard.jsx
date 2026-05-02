@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/contexts/AuthContext";
+import { createClient } from "@/lib/client";
 import {
   getOrganization,
   getOrgMembers,
@@ -32,6 +33,7 @@ import {
   AlertCircle,
   CheckCircle,
   GitBranch,
+  Info,
 } from "lucide-react";
 
 const MAX_ORG_DEPTH = 2;
@@ -325,10 +327,27 @@ export default function OrgOwnerDashboard({ orgId }) {
   // Copy invite code
   const [codeCopied, setCodeCopied] = useState(false);
 
+  // Invitation form
+  const [invitationEmailInput, setInvitationEmailInput] = useState("");
+  const [invitationEmails, setInvitationEmails] = useState([]);
+  const [invitationResults, setInvitationResults] = useState([]);
+  const [invitationLoading, setInvitationLoading] = useState(false);
+
   const showToast = (type, text) => {
     setToast({ type, text });
     setTimeout(() => setToast(null), 3500);
   };
+
+  // Check if current user is the organization owner
+  const currentUserIsOrgOwner = user?.id === (org?.ownerId || org?.owner_id);
+
+  // If the current user is not the owner, default to the members tab
+  // but only when the tab is still the initial "pending" value.
+  useEffect(() => {
+    if (!currentUserIsOrgOwner && tab === "pending") {
+      setTab("members");
+    }
+  }, [currentUserIsOrgOwner, tab]);
 
   const loadAll = useCallback(async () => {
     setLoadingData(true);
@@ -444,6 +463,7 @@ export default function OrgOwnerDashboard({ orgId }) {
   };
 
   const handleRemove = async (memberId, name) => {
+    if (!currentUserIsOrgOwner) return showToast("error", "Hanya owner organisasi yang dapat menghapus anggota");
     if (!canManageUsers) return showToast("error", "Anda tidak memiliki izin untuk menghapus anggota");
     if (!confirm(`Hapus ${name} dari organisasi?`)) return;
     try {
@@ -454,6 +474,7 @@ export default function OrgOwnerDashboard({ orgId }) {
   };
 
   const handleAssignRole = async (memberId, roleId) => {
+    if (!currentUserIsOrgOwner) return showToast("error", "Hanya owner organisasi yang dapat mengubah peran anggota");
     if (!canManageUsers) return showToast("error", "Anda tidak memiliki izin untuk mengubah peran anggota");
     try {
       await assignRole(orgId, memberId, roleId || null);
@@ -494,6 +515,86 @@ export default function OrgOwnerDashboard({ orgId }) {
     navigator.clipboard.writeText(code);
     setCodeCopied(true);
     setTimeout(() => setCodeCopied(false), 2000);
+  };
+
+  const addInvitationEmail = () => {
+    const email = invitationEmailInput.trim().toLowerCase();
+    if (!email) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast("error", "Format email tidak valid");
+      return;
+    }
+    if (invitationEmails.includes(email)) {
+      showToast("error", "Email sudah ditambahkan");
+      return;
+    }
+    setInvitationEmails((prev) => [...prev, email]);
+    setInvitationEmailInput("");
+  };
+
+  const removeInvitationEmail = (email) => {
+    setInvitationEmails((prev) => prev.filter((item) => item !== email));
+  };
+
+  const handleInviteMembers = async (e) => {
+    e.preventDefault();
+    if (!canManageUsers) {
+      showToast("error", "Anda tidak memiliki izin untuk mengundang anggota");
+      return;
+    }
+    if (invitationEmails.length === 0) {
+      showToast("error", "Tambahkan minimal satu email");
+      return;
+    }
+
+    setInvitationLoading(true);
+    try {
+      const supabase = createClient();
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError || !session?.access_token) {
+        throw new Error("Session tidak valid. Silakan login kembali.");
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"}/organizations/${orgId}/invite-members`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ emails: invitationEmails }),
+        }
+      );
+
+      const contentType = response.headers.get("content-type") || "";
+      const payload = contentType.includes("application/json")
+        ? await response.json()
+        : await response.text();
+
+      if (!response.ok) {
+        const message =
+          (typeof payload === "object" && (payload.message || payload.error)) ||
+          (typeof payload === "string" && payload) ||
+          "Gagal mengirim undangan";
+        throw new Error(message);
+      }
+
+      // Extract invitation results from response
+      const results = payload?.results || payload?.invitationResults || payload?.data?.results || [];
+      setInvitationResults(Array.isArray(results) ? results : []);
+      setInvitationEmails([]);
+      showToast("success", `${invitationEmails.length} undangan berhasil diproses`);
+    } catch (err) {
+      showToast("error", err.message || "Gagal mengirim undangan");
+    } finally {
+      setInvitationLoading(false);
+    }
   };
 
   const handleCreateSubOrganization = () => {
@@ -764,8 +865,9 @@ export default function OrgOwnerDashboard({ orgId }) {
             <TabButton active={tab === "pending"} onClick={() => setTab("pending")} icon={Clock} label="Permintaan" badge={pending.length} />
           )}
           {canManageUsers && (
-            <TabButton active={tab === "members"} onClick={() => setTab("members")} icon={Users} label="Anggota" badge={0} />
+            <TabButton active={tab === "invite"} onClick={() => setTab("invite")} icon={Plus} label="Undang Anggota" badge={0} />
           )}
+            <TabButton active={tab === "members"} onClick={() => setTab("members")} icon={Users} label="Anggota" badge={0} />
           {canManageRoles && (
             <TabButton active={tab === "roles"} onClick={() => setTab("roles")} icon={Shield} label="Peran & Akses" badge={0} />
           )}
@@ -821,8 +923,189 @@ export default function OrgOwnerDashboard({ orgId }) {
           </section>
         )}
 
+        {/* TAB: Invite members */}
+        {tab === "invite" && canManageUsers && (
+          <section className="bg-white rounded-2xl border border-[#E8D1C5] shadow-sm">
+            <div className="px-6 py-4 border-b border-white">
+              <h2 className="font-semibold text-[#17191B]">Undang Anggota</h2>
+              <p className="text-xs text-white0 mt-0.5">
+                Kirim undangan kepada anggota baru untuk bergabung dengan organisasi
+              </p>
+            </div>
+
+            <form onSubmit={handleInviteMembers} className="p-6 space-y-5">
+              {/* Email input section */}
+              <div>
+                <label className="block text-sm font-semibold text-[#37393B] mb-1.5">
+                  Email Anggota
+                  <span className="text-[#C9A89A] font-normal ml-1">(opsional)</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={invitationEmailInput}
+                    onChange={(e) => setInvitationEmailInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addInvitationEmail();
+                      }
+                    }}
+                    placeholder="email@contoh.com"
+                    className="flex-1 px-4 py-3 border border-[#D9C7B8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D9C7B8] focus:border-white0 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={addInvitationEmail}
+                    disabled={invitationLoading}
+                    className="px-4 py-3 bg-[#452829] hover:bg-[#6C2D19] text-white rounded-xl font-semibold text-sm transition disabled:opacity-60 flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Tambah
+                  </button>
+                </div>
+              </div>
+
+              {/* Added emails display */}
+              {invitationEmails.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {invitationEmails.map((email) => (
+                    <span
+                      key={email}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E8D1C5] text-[#17191B] text-xs font-medium"
+                    >
+                      {email}
+                      <button
+                        type="button"
+                        onClick={() => removeInvitationEmail(email)}
+                        className="text-[#452829] hover:text-red-600"
+                        aria-label={`Hapus ${email}`}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Info box */}
+              <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700">
+                <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>
+                  Undangan akan dikirim ke email yang ditambahkan. Penerima dapat mengklik link di email untuk bergabung.
+                </span>
+              </div>
+
+              {/* Submit button */}
+              <div className="flex justify-end gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setInvitationEmails([]);
+                    setInvitationEmailInput("");
+                    setInvitationResults([]);
+                  }}
+                  disabled={invitationLoading}
+                  className="px-5 py-2.5 bg-white hover:bg-gray-50 text-[#37393B] font-semibold rounded-xl text-sm transition disabled:opacity-60 border border-[#D9C7B8]"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={invitationLoading || invitationEmails.length === 0}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-[#452829] hover:bg-[#6C2D19] text-white font-semibold rounded-xl text-sm transition disabled:opacity-60"
+                >
+                  {invitationLoading ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Mengirim...
+                    </span>
+                  ) : (
+                    <>
+                      Kirim Undangan ({invitationEmails.length})
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Invitation results table */}
+              {invitationResults.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-[#E8D1C5]">
+                  <h3 className="font-semibold text-[#17191B] mb-3">Hasil Undangan</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-semibold text-[#37393B]">Email</th>
+                          <th className="px-4 py-3 text-left font-semibold text-[#37393B]">Status</th>
+                          <th className="px-4 py-3 text-left font-semibold text-[#37393B]">Keterangan</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {invitationResults.map((result, idx) => (
+                          <tr key={idx} className="hover:bg-gray-50 transition">
+                            <td className="px-4 py-3 font-medium text-[#17191B] break-all">
+                              {result.email}
+                            </td>
+                            <td className="px-4 py-3">
+                              {result.errors ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium">
+                                  <AlertCircle className="w-3 h-3" />
+                                  Gagal
+                                </span>
+                              ) : result.delivery === "email" ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+                                  <CheckCircle className="w-3 h-3" />
+                                  Email Terkirim
+                                </span>
+                              ) : result.inviteUrl ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                                  <CheckCircle className="w-3 h-3" />
+                                  Link Tersedia
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
+                                  Diproses
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-[#37393B]">
+                              {result.errors ? (
+                                <span className="text-red-600 text-xs break-all">
+                                  {Array.isArray(result.errors) 
+                                    ? result.errors.join(", ") 
+                                    : result.errors}
+                                </span>
+                              ) : result.delivery === "email" ? (
+                                <span className="text-blue-600 text-xs">
+                                  Undangan dikirim melalui email
+                                </span>
+                              ) : result.inviteUrl ? (
+                                <a
+                                  href={result.inviteUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[#452829] hover:text-[#6C2D19] text-xs font-medium underline break-all"
+                                >
+                                  Buka Undangan
+                                </a>
+                              ) : (
+                                <span className="text-gray-500 text-xs">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </form>
+          </section>
+        )}
+
         {/* TAB: Active members */}
-        {tab === "members" && canManageUsers && (
+        {tab === "members" && (
           <section className="bg-white rounded-2xl border border-[#E8D1C5] shadow-sm">
             <div className="px-6 py-4 border-b border-white">
               <h2 className="font-semibold text-[#17191B]">Daftar Anggota Aktif</h2>
@@ -870,8 +1153,15 @@ export default function OrgOwnerDashboard({ orgId }) {
                             handleAssignRole(m.id, value);
                           }
                         }}
-                        disabled={isOwner || roles.length === 0}
+                        disabled={isOwner || roles.length === 0 || !currentUserIsOrgOwner}
                         className="text-xs border border-[#D9C7B8] rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#D9C7B8] bg-white text-[#37393B] disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={
+                          !currentUserIsOrgOwner
+                            ? "Hanya owner organisasi yang dapat mengubah peran anggota"
+                            : isOwner
+                            ? "Owner tidak dapat diubah perannya"
+                            : "Pilih peran untuk anggota"
+                        }
                       >
                         {isOwner ? (
                           <option value="owner">Admin (owner)</option>
@@ -892,9 +1182,15 @@ export default function OrgOwnerDashboard({ orgId }) {
                       </select>
                       <button
                         onClick={() => handleRemove(m.id, userName)}
-                        disabled={isOwner}
+                        disabled={isOwner || !currentUserIsOrgOwner}
                         className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-30 disabled:cursor-not-allowed"
-                        title={isOwner ? "Owner tidak dapat dihapus" : "Hapus anggota"}
+                        title={
+                          !currentUserIsOrgOwner
+                            ? "Hanya owner organisasi yang dapat menghapus anggota"
+                            : isOwner
+                            ? "Owner tidak dapat dihapus"
+                            : "Hapus anggota"
+                        }
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

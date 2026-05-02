@@ -28,6 +28,7 @@ export default function CreateOrganization() {
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState(null);
   const [successOrg, setSuccessOrg]   = useState(null);
+  const [invitationResults, setInvitationResults] = useState([]);
   const [memberEmailInput, setMemberEmailInput] = useState("");
   const [memberEmails, setMemberEmails] = useState([]);
   const [joinCode, setJoinCode] = useState("");
@@ -103,8 +104,15 @@ export default function CreateOrganization() {
       const orgId = org?.id || org?.organization?.id || org?.data?.id;
       if (!orgId) throw new Error("Organisasi berhasil dibuat, tapi ID organisasi tidak ditemukan");
       
-      // Store success org info for display, ensuring id is set
+      // Store success org info and invitation results for display
       setSuccessOrg({ ...org, id: orgId });
+      
+      // Extract invitation results if they exist in the response
+      const invites = org?.invitationResults || org?.data?.invitationResults || [];
+      if (Array.isArray(invites)) {
+        setInvitationResults(invites);
+      }
+      
       await refresh();
       
       // Don't redirect immediately - let user see the success message
@@ -139,54 +147,143 @@ export default function CreateOrganization() {
 
           {/* Success Message */}
           {successOrg && (
-            <div className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-5">
-              <div className="flex items-start gap-3">
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-green-800 mb-2">
-                    {successOrg.status === 'pending' 
-                      ? "Organisasi Berhasil Dibuat!" 
-                      : "Organisasi Berhasil Dibuat!"}
-                  </h3>
-                  {successOrg.status === 'pending' ? (
-                    <div className="space-y-2 text-sm text-green-700">
-                      <p>
-                        <strong>{successOrg.name}</strong> telah berhasil dibuat.
-                      </p>
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-2">
-                        <p className="font-medium text-amber-800 mb-1">Menunggu Persetujuan Admin</p>
-                        <p className="text-xs text-amber-700">
-                          Organisasi Anda sedang menunggu persetujuan dari administrator. 
-                          Anda akan menerima notifikasi setelah organisasi disetujui.
+            <div className="mb-6 space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-2xl p-5">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-green-800 mb-2">
+                      {successOrg.status === 'pending' 
+                        ? "Organisasi Berhasil Dibuat!" 
+                        : "Organisasi Berhasil Dibuat!"}
+                    </h3>
+                    {successOrg.status === 'pending' ? (
+                      <div className="space-y-2 text-sm text-green-700">
+                        <p>
+                          <strong>{successOrg.name}</strong> telah berhasil dibuat.
                         </p>
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-2">
+                          <p className="font-medium text-amber-800 mb-1">Menunggu Persetujuan Admin</p>
+                          <p className="text-xs text-amber-700">
+                            Organisasi Anda sedang menunggu persetujuan dari administrator. 
+                            Anda akan menerima notifikasi setelah organisasi disetujui.
+                          </p>
+                        </div>
                       </div>
+                    ) : (
+                      <p className="text-sm text-green-700">
+                        <strong>{successOrg.name}</strong> telah berhasil dibuat dan siap digunakan.
+                      </p>
+                    )}
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        onClick={() => router.push(`/organization/${successOrg.id}/dashboard`)}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                      >
+                        <Building2 className="w-4 h-4" />
+                        Lihat Dashboard
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSuccessOrg(null);
+                          setName("");
+                          setDescription("");
+                          setMemberEmails([]);
+                          setInvitationResults([]);
+                        }}
+                        className="px-4 py-2 bg-white hover:bg-green-50 text-green-700 border border-green-300 text-sm font-medium rounded-lg transition-colors"
+                      >
+                        Buat Organisasi Lain
+                      </button>
                     </div>
-                  ) : (
-                    <p className="text-sm text-green-700">
-                      <strong>{successOrg.name}</strong> telah berhasil dibuat dan siap digunakan.
-                    </p>
-                  )}
-                  <div className="mt-4 flex gap-2">
-                    <button
-                      onClick={() => router.push(`/organization/${successOrg.id}/dashboard`)}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
-                    >
-                      <Building2 className="w-4 h-4" />
-                      Lihat Dashboard
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSuccessOrg(null);
-                        setName("");
-                        setDescription("");
-                      }}
-                      className="px-4 py-2 bg-white hover:bg-green-50 text-green-700 border border-green-300 text-sm font-medium rounded-lg transition-colors"
-                    >
-                      Buat Organisasi Lain
-                    </button>
                   </div>
                 </div>
               </div>
+
+              {/* Invitation Results Table */}
+              {invitationResults.length > 0 && (
+                <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+                  <div className="p-4 bg-gray-50 border-b border-gray-200">
+                    <h4 className="font-semibold text-[#17191B] text-sm">Hasil Undangan Anggota</h4>
+                    <p className="text-xs text-[#37393B] mt-1">
+                      {invitationResults.length} undangan telah diproses
+                    </p>
+                  </div>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-semibold text-[#37393B]">Email</th>
+                          <th className="px-4 py-3 text-left font-semibold text-[#37393B]">Status</th>
+                          <th className="px-4 py-3 text-left font-semibold text-[#37393B]">Keterangan</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {invitationResults.map((result, idx) => (
+                          <tr key={idx} className="hover:bg-gray-50 transition">
+                            <td className="px-4 py-3 font-medium text-[#17191B] break-all">
+                              {result.email}
+                            </td>
+                            <td className="px-4 py-3">
+                              {result.errors ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium">
+                                  <AlertCircle className="w-3 h-3" />
+                                  Gagal
+                                </span>
+                              ) : result.delivery === "email" ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+                                  <CheckCircle className="w-3 h-3" />
+                                  Email Terkirim
+                                </span>
+                              ) : result.inviteUrl ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                                  <CheckCircle className="w-3 h-3" />
+                                  Link Tersedia
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
+                                  Diproses
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-[#37393B]">
+                              {result.errors ? (
+                                <span className="text-red-600 text-xs break-all">
+                                  {Array.isArray(result.errors) 
+                                    ? result.errors.join(", ") 
+                                    : result.errors}
+                                </span>
+                              ) : result.delivery === "email" ? (
+                                <span className="text-blue-600 text-xs">
+                                  Undangan dikirim melalui email
+                                </span>
+                              ) : result.inviteUrl ? (
+                                <a
+                                  href={result.inviteUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[#452829] hover:text-[#6C2D19] text-xs font-medium underline break-all"
+                                >
+                                  Buka Undangan
+                                </a>
+                              ) : (
+                                <span className="text-gray-500 text-xs">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="p-4 bg-blue-50 border-t border-gray-200">
+                    <p className="text-xs text-blue-700">
+                      <strong>Tips:</strong> Pengguna yang menerima email undangan akan secara otomatis bergabung dengan organisasi saat mereka mengklik link di email tersebut.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

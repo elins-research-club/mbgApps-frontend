@@ -166,7 +166,7 @@ export default function MainNavbar() {
 
               {showValidationAction && isActiveOrg && (
                 <Link
-                  href="/ahli-gizi"
+                  href={activeOrgId ? `/ahli-gizi?orgId=${activeOrgId}` : "/ahli-gizi"}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -209,10 +209,23 @@ export default function MainNavbar() {
                 }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
-                Create Menu
+                Buat Menu
               </Link>
               </>
             )}
+              {showValidationAction && (
+                <Link
+                href={activeOrgId ? `/ahli-gizi?orgId=${activeOrgId}` : "/ahli-gizi"}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
+                  isSetMenuRoute
+                    ? "bg-[#452829] text-white border-[#452829]"
+                    : "bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                Validasi Bahan
+              </Link>
+              )}
             </div>
 
             {/* User dropdown */}
@@ -275,18 +288,18 @@ export default function MainNavbar() {
                         onClick={() => setDropdownOpen(false)}
                       >
                         <Utensils className="w-4 h-4" />
-                        Create Menu
+                        Buat Menu
                       </Link>
                     )}
 
                     {showValidationAction && (
                       <Link
-                        href="/ahli-gizi"
+                        href={activeOrgId ? `/ahli-gizi?orgId=${activeOrgId}` : "/ahli-gizi"}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-black hover:bg-[#E8D1C5] hover:text-white transition font-medium rounded-xl"
                         onClick={() => setDropdownOpen(false)}
                       >
                         <CheckCircle2 className="w-4 h-4" />
-                        Verify Bahan
+                        Validasi Bahan
                       </Link>
                     )}
 

@@ -6,6 +6,7 @@ import { ChevronDown } from "lucide-react";
 
 const ValidationModal = ({ ingredient, onClose, onValidate }) => {
   const [editableData, setEditableData] = useState(ingredient.nutritionData);
+  const [name, setName] = useState(ingredient.nama || ingredient.name || "");
   const [validatorName, setValidatorName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
@@ -15,17 +16,20 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
   };
 
   const handleValidate = async () => {
-    if (!validatorName.trim()) {
-      setError("Nama ahli gizi harus diisi");
+    // If editing an existing ingredient (has id), require validator name.
+    if (ingredient?.id && !validatorName.trim()) {
+      setError("Nama ahli gizi harus diisi saat memvalidasi bahan");
       return;
     }
 
     setIsSaving(true);
     setError("");
 
-    console.log("Validating data:", editableData, "by:", validatorName);
+    console.log("Saving data:", { name, editableData }, "by:", validatorName);
 
-    await onValidate(ingredient.id, editableData, validatorName);
+    // Include the ingredient name in the payload passed to the parent handler
+    const payload = { ...editableData, nama: name };
+    await onValidate(ingredient.id, payload, validatorName);
 
     setIsSaving(false);
     onClose();
@@ -62,16 +66,28 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
               </svg>
               Nama Ahli Gizi <span className="text-white0">*</span>
             </label>
-            <input
-              type="text"
-              value={validatorName}
-              onChange={(e) => {
-                setValidatorName(e.target.value);
-                setError("");
-              }}
-              placeholder="Contoh: Dr. Budi Santoso, S.Gz"
-              className="w-full px-4 py-2.5 border border-[#D9C7B8] rounded-lg focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-white0 outline-none transition-all"
-            />
+              <input
+                type="text"
+                value={validatorName}
+                onChange={(e) => {
+                  setValidatorName(e.target.value);
+                  setError("");
+                }}
+                placeholder="Contoh: Dr. Budi Santoso, S.Gz"
+                className="w-full px-4 py-2.5 border border-[#D9C7B8] rounded-lg focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-white0 outline-none transition-all"
+              />
+            </div>
+
+            {/* Nama Bahan (title) */}
+            <div>
+              <label className="text-sm font-medium text-[#37393B] mb-2 block">Nama Bahan</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Nama bahan, contoh: Beras, Telur"
+                className="w-full px-4 py-2.5 border border-[#D9C7B8] rounded-lg focus:ring-2 focus:ring-[#F3E8DF]0 focus:border-white0 outline-none transition-all"
+              />
           </div>
 
           {/* Error Message */}
@@ -151,8 +167,8 @@ const ValidationModal = ({ ingredient, onClose, onValidate }) => {
           </button>
           <button
             onClick={handleValidate}
-            disabled={isSaving || !validatorName.trim()}
-            className="px-5 py-2 bg-white0 text-white font-medium rounded-lg hover:bg-[#37393B] transition disabled:opacity-50 flex items-center gap-2"
+            disabled={isSaving || (ingredient?.id ? !validatorName.trim() : false)}
+            className="px-5 py-2 bg-[#452829] hover:bg-[#6C2D19] text-white font-medium rounded-lg transition disabled:opacity-50 flex items-center gap-2"
           >
             {isSaving ? (
               <>

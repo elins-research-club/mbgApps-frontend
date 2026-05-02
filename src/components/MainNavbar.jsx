@@ -11,7 +11,6 @@ import {
   ChevronDown,
   LayoutDashboard,
   LayoutGrid,
-  Plus,
   Ticket,
   X,
   Utensils,
@@ -26,24 +25,6 @@ export default function MainNavbar() {
   const [inviteCode, setInviteCode] = useState("");
   const [inviteSubmitting, setInviteSubmitting] = useState(false);
   const [inviteError, setInviteError] = useState("");
-
-  // Helper to organize orgs hierarchically
-  const getOrganizationTree = () => {
-    if (!allOrganizations.length) return [];
-    
-    const orgsWithDepth = allOrganizations.map(org => ({
-      ...org,
-      depth: org?.depth || org?.level || org?.hierarchyDepth || org?.hierarchy_depth || 0,
-    }));
-    
-    // Sort by depth (roots first) then by name
-    const sorted = orgsWithDepth.sort((a, b) => {
-      if (a.depth !== b.depth) return a.depth - b.depth;
-      return (a.name || '').localeCompare(b.name || '');
-    });
-    
-    return sorted;
-  };
 
   const handleLogout = async () => {
     await logout();
@@ -101,6 +82,12 @@ export default function MainNavbar() {
     : org
     ? [org]
     : [];
+  const organizationList = [...allOrganizations].sort((a, b) => {
+    const depthA = a?.depth ?? 0;
+    const depthB = b?.depth ?? 0;
+    if (depthA !== depthB) return depthA - depthB;
+    return (a?.name || "").localeCompare(b?.name || "");
+  });
 
   return (
     <nav className="bg-white border-b border-[#E8D1C5] shadow-sm sticky top-0 z-50">
@@ -125,37 +112,13 @@ export default function MainNavbar() {
               </div>
               <span className="font-bold text-lg text-[#17191B]">MBG Calc</span>
             </Link>
-            {/* {showChefActions && (
-              <Link
-                href={activeOrgId ? `/meal-planner?orgId=${activeOrgId}` : "/meal-planner"}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
-                  isSetMenuRoute
-                    ? "bg-[#452829] text-white border-[#452829]"
-                    : "bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
-                }`}
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                Set Menu
-              </Link>
-            )} */}
+            
           </div>
 
           {/* Right section */}
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2">
-              {/* {showChefActions && isActiveOrg && (
-                <Link
-                  href={activeOrgId ? `/meal-planner?orgId=${activeOrgId}` : "/meal-planner"}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition border ${
-                    isSetMenuRoute
-                      ? "bg-[#452829] text-white border-[#452829]"
-                      : "bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
-                  }`}
-                >
-                  <LayoutGrid className="w-3.5 h-3.5" />
-                  Set Menu
-                </Link>
-              )} */}
+              
 
               {showChefActions && isActiveOrg && (
                 <Link
@@ -177,19 +140,7 @@ export default function MainNavbar() {
                 </Link>
               )}
 
-              {/* {canOpenDashboard && org && (
-                <Link
-                  href={`/organization/${org.id}/dashboard`}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition border ${
-                    isDashboardRoute && routeOrgId === org.id
-                      ? "bg-[#452829] text-white border-[#452829]"
-                      : "bg-[#452829] hover:bg-[#6C2D19] text-white border-[#6C2D19]"
-                  }`}
-                >
-                  <LayoutDashboard className="w-3.5 h-3.5" />
-                  <span>Dashboard</span>
-                </Link>
-              )} */}
+              
               {showChefActions && (
               <>
               <Link
@@ -314,33 +265,23 @@ export default function MainNavbar() {
                         <Ticket className="w-4 h-4" />
                         Masukkan Kode Undangan
                       </button>
-{/* 
-                      <Link
-                        href="/organization/create"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-black hover:bg-[#E8D1C5] hover:text-white transition font-medium rounded-xl"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        <Plus className="w-4 h-4" />
-                        Buat Organisasi
-                      </Link> */}
 
                       <div className="border-t border-[#E8D1C5] mt-1 pt-1" />
 
                       {allOrganizations.length > 0 ? (
                         <>
-                        
                           <div className="px-4 py-2">
                             <p className="text-xs font-semibold text-[#37393B]">Organisasi</p>
                           </div>
 
                           <div className="px-2 pb-1 space-y-0.5 max-h-64 overflow-y-auto">
-                            {getOrganizationTree().map((item) => {
+                            {organizationList.map((item) => {
                               const isActiveOrg = item?.id === routeOrgId || (!routeOrgId && item?.id === org?.id);
                               const canOpenItemDashboard =
                                 item?.owner_id === user?.id || isOrgOwner || canManageUsers || canManageRoles;
-                              const isSubOrg = item.depth > 0;
+                              const isSubOrg = (item?.depth ?? 0) > 0;
                               const isOwner = item?.owner_id === user?.id;
-                              const indentLevel = item.depth;
+                              const indentLevel = item?.depth || 0;
                               const totalMembers = item?.memberCounts?.totalCount;
 
                               return (
@@ -353,9 +294,11 @@ export default function MainNavbar() {
                                       : "bg-[#452829] text-white hover:bg-[#6C2D19]"
                                   }`}
                                   onClick={() => setDropdownOpen(false)}
-                                  style={{ marginLeft: `${indentLevel * 100}px` }}
                                 >
-                                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  <div
+                                    className="flex items-center gap-2 min-w-0 flex-1"
+                                    style={{ paddingLeft: `${indentLevel * 16}px` }}
+                                  >
                                     {isSubOrg && (
                                       <span className="text-xs text-[#C9A89A] flex-shrink-0 font-bold">└</span>
                                     )}

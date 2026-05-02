@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
       .from("Membership")
       .select(`
         id, status, invite_method, role_id, joined_at,
-        organization:Organizations ( id, name, owner_id, invite_code, description, status ),
+        organization:Organizations ( id, name, owner_id, invite_code, description, status, parent_id, depth ),
         role:Roles ( id, name, permissions )
       `)
       .eq("user_id", userId)
@@ -39,7 +39,7 @@ export function AuthProvider({ children }) {
     // Get owned organizations
     const { data: ownedOrgs } = await supabase
       .from("Organizations")
-      .select("id, name, owner_id, invite_code, description, status")
+      .select("id, name, owner_id, invite_code, description, status, parent_id, depth")
       .eq("owner_id", userId)
       .order("created_at", { ascending: false });
 
